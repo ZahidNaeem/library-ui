@@ -8,7 +8,7 @@ import Select from 'react-select'
 import Moment from 'moment'
 import PoDtl from './poDtl'
 import { request, isSuccessfullResponse } from './util/APIUtils'
-import { API_PO_INVOICE_URL, API_PARTY_URL } from './constant'
+import { API_PO_INVOICE_URL, API_PUBLISHER_URL } from './constant'
 
 class PO extends Component {
 
@@ -35,7 +35,7 @@ class PO extends Component {
 
         const parties = [];
         const options = {
-            url: API_PARTY_URL + 'all',
+            url: API_PUBLISHER_URL + 'all',
             method: 'GET'
         };
         try {

@@ -94,16 +94,16 @@ const SideBar = () => {
 
 
       <li className="nav-item">
-        <Link className="nav-link" to="/item">
+        <Link className="nav-link" to="/author">
           <i className="fas fa-fw fa-chart-area"></i>
-          <span>Item</span></Link>
+          <span>Author</span></Link>
       </li>
 
 
       <li className="nav-item">
-        <Link className="nav-link" to="/party">
+        <Link className="nav-link" to="/publisher">
           <i className="fas fa-fw fa-table"></i>
-          <span>Party</span></Link>
+          <span>Publisher</span></Link>
       </li>
 
       <li className="nav-item">

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import Footer from './common/footer';
 import Navbar from './common/navbar';
-import Item from './item';
+import Author from './author';
 import Dashboard from './common/dashboard';
-import Party from './party';
+import Party from './publisher';
 import PO from './po';
+import Publisher from './publisher';
 
 class PageContent extends Component {
 
@@ -14,10 +15,10 @@ class PageContent extends Component {
 
     if (pathname === "/" || pathname === "/dashboard") {
       return <><h1 className="text-center h3 mb-4 text-gray-800">Dashboard</h1><Dashboard /></>;
-    } else if (pathname === "/item") {
-      return <><h1 className="text-center h3 mb-4 text-gray-800">Item Management</h1><Item /></>;
+    } else if (pathname === "/author") {
+      return <><h1 className="text-center h3 mb-4 text-gray-800">Author Registration</h1><Author /></>;
     } else if (pathname === "/party") {
-      return <><h1 className="text-center h3 mb-4 text-gray-800">Party Management</h1><Party /></>;
+      return <><h1 className="text-center h3 mb-4 text-gray-800">Publisher Registration</h1><Publisher /></>;
     } else if (pathname === "/po") {
       return <><h1 className="text-center h3 mb-4 text-gray-800">Invoice Main (Purchase Order)</h1><PO /></>;
     }

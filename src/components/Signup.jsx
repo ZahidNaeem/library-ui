@@ -64,14 +64,14 @@ class Signup extends Component {
 
             if (isSuccessfullResponse(res)) {
                 notification.success({
-                    message: 'Point of Sale App',
+                    message: 'Library App',
                     description: "Thank you! You're successfully registered. Please Login to continue!",
                 });
                 this.props.history.push("/login");
             }
         } catch (error) {
             notification.error({
-                message: 'Point of Sale App',
+                message: 'Library App',
                 description: error.message || 'Sorry! Something went wrong. Please try again!'
             });
         }

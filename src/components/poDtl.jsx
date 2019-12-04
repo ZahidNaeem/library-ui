@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import Select from 'react-select'
 import { request, isSuccessfullResponse } from './util/APIUtils'
-import { API_ITEM_URL, API_INVOICE_DTL_URL } from './constant'
+import { API_AUTHOR_URL, API_INVOICE_DTL_URL } from './constant'
 
 class PoDtl extends Component {
     state = {
@@ -70,7 +70,7 @@ class PoDtl extends Component {
     async populateItems() {
         let items = [];
         const options = {
-            url: API_ITEM_URL + 'all',
+            url: API_AUTHOR_URL + 'all',
             method: 'GET'
         };
         try {

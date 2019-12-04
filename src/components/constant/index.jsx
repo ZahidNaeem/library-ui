@@ -1,7 +1,7 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8089/api/';
-export const API_ITEM_URL = API_BASE_URL + 'item/';
+export const API_AUTHOR_URL = API_BASE_URL + 'author/';
 export const API_ITEM_STOCK_URL = API_BASE_URL + 'stock/';
-export const API_PARTY_URL = API_BASE_URL + 'party/';
+export const API_PUBLISHER_URL = API_BASE_URL + 'publisher/';
 export const API_PARTY_BALANCE_URL = API_BASE_URL + 'balance/';
 export const API_INVOICE_URL = API_BASE_URL + 'invoice/';
 export const API_PO_INVOICE_URL = API_INVOICE_URL + 'po/';
