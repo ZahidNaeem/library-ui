@@ -99,6 +99,11 @@ const SideBar = () => {
           <span>Author</span></Link>
       </li>
 
+      <li className="nav-item">
+        <Link className="nav-link" to="/subject">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Subject</span></Link>
+      </li>
 
       <li className="nav-item">
         <Link className="nav-link" to="/publisher">
@@ -107,10 +112,23 @@ const SideBar = () => {
       </li>
 
       <li className="nav-item">
-        <Link className="nav-link" to="/po">
+        <Link className="nav-link" to="/researcher">
           <i className="fas fa-fw fa-table"></i>
-          <span>Purchase Order</span></Link>
+          <span>Researcher</span></Link>
       </li>
+
+      <li className="nav-item">
+        <Link className="nav-link" to="/shelf">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Shelf</span></Link>
+      </li>
+
+      <li className="nav-item">
+        <Link className="nav-link" to="/book">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Book</span></Link>
+      </li>
+
 
 
       <hr className="sidebar-divider d-none d-md-block" />

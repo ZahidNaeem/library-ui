@@ -5,15 +5,15 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
-import { API_AUTHOR_URL } from './constant'
+import { API_BOOK_URL } from './constant'
 import { async } from 'q';
 
-class Author extends Component {
+class Book extends Component {
 
     state = {
-        author: {},
+        book: {},
         navigationDtl: {},
-        authorAlert: false,
+        bookAlert: false,
         fieldsDisabled: true,
         addButtonDisabled: true,
         deleteButtonDisabled: true,
@@ -22,7 +22,7 @@ class Author extends Component {
     }
 
     async componentDidMount() {
-        this.firstAuthor();
+        this.firstBook();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -41,56 +41,56 @@ class Author extends Component {
         }
     }
 
-    handleAuthorChange = (event) => {
+    handleBookChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
         console.log(value);
-        const author = { ...this.state.author };
-        author[name] = name === 'authorName' ? value.toUpperCase() : value;
+        const book = { ...this.state.book };
+        book[name] = name === 'bookName' ? value.toUpperCase() : value;
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
+        if (book.bookName === undefined || book.bookName === null || book.bookName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ book, saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
-        let author = { ...this.state.author };
-        author[name] = value.toUpperCase();
+        let book = { ...this.state.book };
+        book[name] = value.toUpperCase();
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
+        if (book.bookName === undefined || book.bookName === null || book.bookName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled });
+        this.setState({ book, saveButtonDisabled });
     } */
 
-    newAuthor = () => {
-        const author = {};
-        author.authorStocks = [];
-        this.setState({ author, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+    newBook = () => {
+        const book = {};
+        book.bookStocks = [];
+        this.setState({ book, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
     }
 
-    saveAuthor = async () => {
-        const { authorName } = this.state.author;
-        if (authorName === undefined || authorName === null || authorName === '') {
-            toast.error("Author name is required field");
+    saveBook = async () => {
+        const { bookName } = this.state.book;
+        if (bookName === undefined || bookName === null || bookName === '') {
+            toast.error("Book name is required field");
         } else {
-            console.log("Post: Object sent: ", this.state.author);
+            console.log("Post: Object sent: ", this.state.book);
             const options = {
-                url: API_AUTHOR_URL + 'save',
+                url: API_BOOK_URL + 'save',
                 method: 'POST',
-                data: this.state.author
+                data: this.state.book
             };
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Post: Object received: ", res.data);
-                    const { author, navigationDtl } = res.data;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    const { book, navigationDtl } = res.data;
+                    this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -99,28 +99,28 @@ class Author extends Component {
         }
     }
 
-    saveAuthorShowMessage = async (message) => {
+    saveBookShowMessage = async (message) => {
         try {
-            await this.saveAuthor();
+            await this.saveBook();
         } catch (error) {
             console.log(error);
         }
         toast.success(message);
     }
 
-    deleteAuthor = async () => {
-        if (this.state.author.authorId != null) {
-            console.log("Delete: Author ID sent: ", this.state.author.authorId);
+    deleteBook = async () => {
+        if (this.state.book.bookId != null) {
+            console.log("Delete: Book ID sent: ", this.state.book.bookId);
             const options = {
-                url: API_AUTHOR_URL + 'delete/' + this.state.author.authorId,
+                url: API_BOOK_URL + 'delete/' + this.state.book.bookId,
                 method: 'DELETE'
             };
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { author, navigationDtl } = res.data;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true });
+                    const { book, navigationDtl } = res.data;
+                    this.setState({ book, navigationDtl, saveButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -128,66 +128,66 @@ class Author extends Component {
             }
         }
         this.setState({
-            authorAlert: false
+            bookAlert: false
         });
     }
 
-    navigateAuthor = async (operation) => {
+    navigateBook = async (operation) => {
         const options = {
-            url: API_AUTHOR_URL + operation,
+            url: API_BOOK_URL + operation,
             method: 'GET'
         };
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { author, navigationDtl } = res.data;
-                this.setState({ author, navigationDtl })
-                console.log(this.state.author);
+                const { book, navigationDtl } = res.data;
+                this.setState({ book, navigationDtl })
+                console.log(this.state.book);
             }
         } catch (error) {
             console.log(error);
         }
     }
 
-    saveAndNavigateAuthor = async (operation) => {
+    saveAndNavigateBook = async (operation) => {
         const { saveButtonDisabled: saveButtonDisabled } = this.state;
         if (!saveButtonDisabled) {
             try {
-                await this.saveAuthor();
+                await this.saveBook();
             } catch (error) {
                 console.log(error);
             }
-            this.navigateAuthor(operation);
+            this.navigateBook(operation);
         } else {
-            this.navigateAuthor(operation);
+            this.navigateBook(operation);
         }
     }
 
-    firstAuthor = () => {
-        this.saveAndNavigateAuthor('first');
+    firstBook = () => {
+        this.saveAndNavigateBook('first');
     }
 
-    previousAuthor = () => {
-        this.saveAndNavigateAuthor('previous');
+    previousBook = () => {
+        this.saveAndNavigateBook('previous');
     }
 
-    nextAuthor = () => {
-        this.saveAndNavigateAuthor('next');
+    nextBook = () => {
+        this.saveAndNavigateBook('next');
     }
 
-    lastAuthor = () => {
-        this.saveAndNavigateAuthor('last');
+    lastBook = () => {
+        this.saveAndNavigateBook('last');
     }
 
     undoChanges = () => {
-        const author = { ...this.state.author };
-        console.log("Author ID: ", author.authorId);
+        const book = { ...this.state.book };
+        console.log("Book ID: ", book.bookId);
         this.setState({ saveButtonDisabled: true });
-        if (author.authorId != null) {
-            const operation = author.authorId;
-            this.saveAndNavigateAuthor(operation);
+        if (book.bookId != null) {
+            const operation = book.bookId;
+            this.saveAndNavigateBook(operation);
         } else {
-            this.firstAuthor();
+            this.firstBook();
         }
         this.setState({ undoButtonDisabled: true });
     }
@@ -229,7 +229,7 @@ class Author extends Component {
 
 
     render() {
-        const { author, navigationDtl } = this.state;
+        const { book, navigationDtl } = this.state;
 
         const inputGroupTextStyle = {
             width: "180px"
@@ -248,30 +248,30 @@ class Author extends Component {
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Author ID</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Book ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="authorId"
-                            placeholder="Author ID"
-                            aria-label="Author ID"
+                            name="bookId"
+                            placeholder="Book ID"
+                            aria-label="Book ID"
                             readOnly
-                            value={author.authorId || ''}
-                            onChange={this.handleAuthorChange}
+                            value={book.bookId || ''}
+                            onChange={this.handleBookChange}
                         />
                     </InputGroup>
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Author Name</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Book Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="authorName"
-                            placeholder="Author Name"
-                            aria-label="Author Name"
-                            value={author.authorName || ''}
+                            name="bookName"
+                            placeholder="Book Name"
+                            aria-label="Book Name"
+                            value={book.bookName || ''}
                             required
                             disabled={this.state.fieldsDisabled}
-                            onChange={this.handleAuthorChange}
+                            onChange={this.handleBookChange}
                         />
                     </InputGroup>
 
@@ -285,9 +285,9 @@ class Author extends Component {
                             name="remarks"
                             placeholder="Remarks"
                             aria-label="Remarks"
-                            value={author.remarks || ''}
+                            value={book.remarks || ''}
                             disabled={this.state.fieldsDisabled}
-                            onChange={this.handleAuthorChange}
+                            onChange={this.handleBookChange}
                         />
                     </InputGroup>
 
@@ -295,7 +295,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
-                            onClick={this.firstAuthor}
+                            onClick={this.firstBook}
                             className="mr-1" style={smallButtonStyle}
                             active>First
                             </Button>
@@ -303,7 +303,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
-                            onClick={this.previousAuthor}
+                            onClick={this.previousBook}
                             className="mr-1" style={smallButtonStyle}
                             active>Previous
                             </Button>
@@ -311,7 +311,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
-                            onClick={this.nextAuthor}
+                            onClick={this.nextBook}
                             className="mr-1" style={smallButtonStyle}
                             active>Next
                             </Button>
@@ -319,7 +319,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
-                            onClick={this.lastAuthor}
+                            onClick={this.lastBook}
                             className="mr-1" style={smallButtonStyle}
                             active>Last
                             </Button>
@@ -330,7 +330,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={this.state.addButtonDisabled}
-                            onClick={this.newAuthor}
+                            onClick={this.newBook}
                             className="mr-1" style={smallButtonStyle}
                             active>Add
                             </Button>
@@ -338,29 +338,29 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
-                            onClick={() => this.setState({ authorAlert: true })}
+                            onClick={() => this.setState({ bookAlert: true })}
                             className="mr-1" style={smallButtonStyle}
                             active>Delete
                             </Button>
 
                         <SweetAlert
-                            show={this.state.authorAlert}
+                            show={this.state.bookAlert}
                             warning
                             showCancel
                             confirmBtnText="Delete"
                             confirmBtnBsStyle="danger"
                             cancelBtnBsStyle="default"
                             title="Delete Confirmation"
-                            Text="Are you sure you want to delete this author?"
-                            onConfirm={() => this.deleteAuthor()}
-                            onCancel={() => this.setState({ authorAlert: false })}
+                            Text="Are you sure you want to delete this book?"
+                            onConfirm={() => this.deleteBook()}
+                            onCancel={() => this.setState({ bookAlert: false })}
                         >
-                            Delete Author
+                            Delete Book
                                 </SweetAlert>
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveAuthorShowMessage("Author saved successfully.")}
+                            onClick={() => this.saveBookShowMessage("Book saved successfully.")}
                             className="mr-1" style={smallButtonStyle}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
@@ -381,4 +381,4 @@ class Author extends Component {
     }
 }
 
-export default Author;
+export default Book;

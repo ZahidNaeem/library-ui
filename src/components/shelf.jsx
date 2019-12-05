@@ -5,15 +5,15 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
-import { API_AUTHOR_URL } from './constant'
+import { API_SHELF_URL } from './constant'
 import { async } from 'q';
 
-class Author extends Component {
+class Shelf extends Component {
 
     state = {
-        author: {},
+        shelf: {},
         navigationDtl: {},
-        authorAlert: false,
+        shelfAlert: false,
         fieldsDisabled: true,
         addButtonDisabled: true,
         deleteButtonDisabled: true,
@@ -22,7 +22,7 @@ class Author extends Component {
     }
 
     async componentDidMount() {
-        this.firstAuthor();
+        this.firstShelf();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -41,56 +41,56 @@ class Author extends Component {
         }
     }
 
-    handleAuthorChange = (event) => {
+    handleShelfChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
         console.log(value);
-        const author = { ...this.state.author };
-        author[name] = name === 'authorName' ? value.toUpperCase() : value;
+        const shelf = { ...this.state.shelf };
+        shelf[name] = name === 'shelfName' ? value.toUpperCase() : value;
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
+        if (shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ shelf, saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
-        let author = { ...this.state.author };
-        author[name] = value.toUpperCase();
+        let shelf = { ...this.state.shelf };
+        shelf[name] = value.toUpperCase();
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
+        if (shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled });
+        this.setState({ shelf, saveButtonDisabled });
     } */
 
-    newAuthor = () => {
-        const author = {};
-        author.authorStocks = [];
-        this.setState({ author, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+    newShelf = () => {
+        const shelf = {};
+        shelf.shelfStocks = [];
+        this.setState({ shelf, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
     }
 
-    saveAuthor = async () => {
-        const { authorName } = this.state.author;
-        if (authorName === undefined || authorName === null || authorName === '') {
-            toast.error("Author name is required field");
+    saveShelf = async () => {
+        const { shelfName } = this.state.shelf;
+        if (shelfName === undefined || shelfName === null || shelfName === '') {
+            toast.error("Shelf name is required field");
         } else {
-            console.log("Post: Object sent: ", this.state.author);
+            console.log("Post: Object sent: ", this.state.shelf);
             const options = {
-                url: API_AUTHOR_URL + 'save',
+                url: API_SHELF_URL + 'save',
                 method: 'POST',
-                data: this.state.author
+                data: this.state.shelf
             };
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Post: Object received: ", res.data);
-                    const { author, navigationDtl } = res.data;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    const { shelf, navigationDtl } = res.data;
+                    this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -99,28 +99,28 @@ class Author extends Component {
         }
     }
 
-    saveAuthorShowMessage = async (message) => {
+    saveShelfShowMessage = async (message) => {
         try {
-            await this.saveAuthor();
+            await this.saveShelf();
         } catch (error) {
             console.log(error);
         }
         toast.success(message);
     }
 
-    deleteAuthor = async () => {
-        if (this.state.author.authorId != null) {
-            console.log("Delete: Author ID sent: ", this.state.author.authorId);
+    deleteShelf = async () => {
+        if (this.state.shelf.shelfId != null) {
+            console.log("Delete: Shelf ID sent: ", this.state.shelf.shelfId);
             const options = {
-                url: API_AUTHOR_URL + 'delete/' + this.state.author.authorId,
+                url: API_SHELF_URL + 'delete/' + this.state.shelf.shelfId,
                 method: 'DELETE'
             };
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { author, navigationDtl } = res.data;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true });
+                    const { shelf, navigationDtl } = res.data;
+                    this.setState({ shelf, navigationDtl, saveButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -128,66 +128,66 @@ class Author extends Component {
             }
         }
         this.setState({
-            authorAlert: false
+            shelfAlert: false
         });
     }
 
-    navigateAuthor = async (operation) => {
+    navigateShelf = async (operation) => {
         const options = {
-            url: API_AUTHOR_URL + operation,
+            url: API_SHELF_URL + operation,
             method: 'GET'
         };
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { author, navigationDtl } = res.data;
-                this.setState({ author, navigationDtl })
-                console.log(this.state.author);
+                const { shelf, navigationDtl } = res.data;
+                this.setState({ shelf, navigationDtl })
+                console.log(this.state.shelf);
             }
         } catch (error) {
             console.log(error);
         }
     }
 
-    saveAndNavigateAuthor = async (operation) => {
+    saveAndNavigateShelf = async (operation) => {
         const { saveButtonDisabled: saveButtonDisabled } = this.state;
         if (!saveButtonDisabled) {
             try {
-                await this.saveAuthor();
+                await this.saveShelf();
             } catch (error) {
                 console.log(error);
             }
-            this.navigateAuthor(operation);
+            this.navigateShelf(operation);
         } else {
-            this.navigateAuthor(operation);
+            this.navigateShelf(operation);
         }
     }
 
-    firstAuthor = () => {
-        this.saveAndNavigateAuthor('first');
+    firstShelf = () => {
+        this.saveAndNavigateShelf('first');
     }
 
-    previousAuthor = () => {
-        this.saveAndNavigateAuthor('previous');
+    previousShelf = () => {
+        this.saveAndNavigateShelf('previous');
     }
 
-    nextAuthor = () => {
-        this.saveAndNavigateAuthor('next');
+    nextShelf = () => {
+        this.saveAndNavigateShelf('next');
     }
 
-    lastAuthor = () => {
-        this.saveAndNavigateAuthor('last');
+    lastShelf = () => {
+        this.saveAndNavigateShelf('last');
     }
 
     undoChanges = () => {
-        const author = { ...this.state.author };
-        console.log("Author ID: ", author.authorId);
+        const shelf = { ...this.state.shelf };
+        console.log("Shelf ID: ", shelf.shelfId);
         this.setState({ saveButtonDisabled: true });
-        if (author.authorId != null) {
-            const operation = author.authorId;
-            this.saveAndNavigateAuthor(operation);
+        if (shelf.shelfId != null) {
+            const operation = shelf.shelfId;
+            this.saveAndNavigateShelf(operation);
         } else {
-            this.firstAuthor();
+            this.firstShelf();
         }
         this.setState({ undoButtonDisabled: true });
     }
@@ -229,7 +229,7 @@ class Author extends Component {
 
 
     render() {
-        const { author, navigationDtl } = this.state;
+        const { shelf, navigationDtl } = this.state;
 
         const inputGroupTextStyle = {
             width: "180px"
@@ -248,30 +248,30 @@ class Author extends Component {
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Author ID</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Shelf ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="authorId"
-                            placeholder="Author ID"
-                            aria-label="Author ID"
+                            name="shelfId"
+                            placeholder="Shelf ID"
+                            aria-label="Shelf ID"
                             readOnly
-                            value={author.authorId || ''}
-                            onChange={this.handleAuthorChange}
+                            value={shelf.shelfId || ''}
+                            onChange={this.handleShelfChange}
                         />
                     </InputGroup>
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Author Name</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Shelf Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="authorName"
-                            placeholder="Author Name"
-                            aria-label="Author Name"
-                            value={author.authorName || ''}
+                            name="shelfName"
+                            placeholder="Shelf Name"
+                            aria-label="Shelf Name"
+                            value={shelf.shelfName || ''}
                             required
                             disabled={this.state.fieldsDisabled}
-                            onChange={this.handleAuthorChange}
+                            onChange={this.handleShelfChange}
                         />
                     </InputGroup>
 
@@ -285,9 +285,9 @@ class Author extends Component {
                             name="remarks"
                             placeholder="Remarks"
                             aria-label="Remarks"
-                            value={author.remarks || ''}
+                            value={shelf.remarks || ''}
                             disabled={this.state.fieldsDisabled}
-                            onChange={this.handleAuthorChange}
+                            onChange={this.handleShelfChange}
                         />
                     </InputGroup>
 
@@ -295,7 +295,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
-                            onClick={this.firstAuthor}
+                            onClick={this.firstShelf}
                             className="mr-1" style={smallButtonStyle}
                             active>First
                             </Button>
@@ -303,7 +303,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
-                            onClick={this.previousAuthor}
+                            onClick={this.previousShelf}
                             className="mr-1" style={smallButtonStyle}
                             active>Previous
                             </Button>
@@ -311,7 +311,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
-                            onClick={this.nextAuthor}
+                            onClick={this.nextShelf}
                             className="mr-1" style={smallButtonStyle}
                             active>Next
                             </Button>
@@ -319,7 +319,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
-                            onClick={this.lastAuthor}
+                            onClick={this.lastShelf}
                             className="mr-1" style={smallButtonStyle}
                             active>Last
                             </Button>
@@ -330,7 +330,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={this.state.addButtonDisabled}
-                            onClick={this.newAuthor}
+                            onClick={this.newShelf}
                             className="mr-1" style={smallButtonStyle}
                             active>Add
                             </Button>
@@ -338,29 +338,29 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
-                            onClick={() => this.setState({ authorAlert: true })}
+                            onClick={() => this.setState({ shelfAlert: true })}
                             className="mr-1" style={smallButtonStyle}
                             active>Delete
                             </Button>
 
                         <SweetAlert
-                            show={this.state.authorAlert}
+                            show={this.state.shelfAlert}
                             warning
                             showCancel
                             confirmBtnText="Delete"
                             confirmBtnBsStyle="danger"
                             cancelBtnBsStyle="default"
                             title="Delete Confirmation"
-                            Text="Are you sure you want to delete this author?"
-                            onConfirm={() => this.deleteAuthor()}
-                            onCancel={() => this.setState({ authorAlert: false })}
+                            Text="Are you sure you want to delete this shelf?"
+                            onConfirm={() => this.deleteShelf()}
+                            onCancel={() => this.setState({ shelfAlert: false })}
                         >
-                            Delete Author
+                            Delete Shelf
                                 </SweetAlert>
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveAuthorShowMessage("Author saved successfully.")}
+                            onClick={() => this.saveShelfShowMessage("Shelf saved successfully.")}
                             className="mr-1" style={smallButtonStyle}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
@@ -381,4 +381,4 @@ class Author extends Component {
     }
 }
 
-export default Author;
+export default Shelf;

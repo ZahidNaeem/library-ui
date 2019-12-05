@@ -5,15 +5,15 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
-import { API_AUTHOR_URL } from './constant'
+import { API_RESEARCHER_URL } from './constant'
 import { async } from 'q';
 
-class Author extends Component {
+class Researcher extends Component {
 
     state = {
-        author: {},
+        researcher: {},
         navigationDtl: {},
-        authorAlert: false,
+        researcherAlert: false,
         fieldsDisabled: true,
         addButtonDisabled: true,
         deleteButtonDisabled: true,
@@ -22,7 +22,7 @@ class Author extends Component {
     }
 
     async componentDidMount() {
-        this.firstAuthor();
+        this.firstResearcher();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -41,56 +41,56 @@ class Author extends Component {
         }
     }
 
-    handleAuthorChange = (event) => {
+    handleResearcherChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
         console.log(value);
-        const author = { ...this.state.author };
-        author[name] = name === 'authorName' ? value.toUpperCase() : value;
+        const researcher = { ...this.state.researcher };
+        researcher[name] = name === 'researcherName' ? value.toUpperCase() : value;
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
+        if (researcher.researcherName === undefined || researcher.researcherName === null || researcher.researcherName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ researcher, saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
-        let author = { ...this.state.author };
-        author[name] = value.toUpperCase();
+        let researcher = { ...this.state.researcher };
+        researcher[name] = value.toUpperCase();
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
+        if (researcher.researcherName === undefined || researcher.researcherName === null || researcher.researcherName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled });
+        this.setState({ researcher, saveButtonDisabled });
     } */
 
-    newAuthor = () => {
-        const author = {};
-        author.authorStocks = [];
-        this.setState({ author, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+    newResearcher = () => {
+        const researcher = {};
+        researcher.researcherStocks = [];
+        this.setState({ researcher, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
     }
 
-    saveAuthor = async () => {
-        const { authorName } = this.state.author;
-        if (authorName === undefined || authorName === null || authorName === '') {
-            toast.error("Author name is required field");
+    saveResearcher = async () => {
+        const { researcherName } = this.state.researcher;
+        if (researcherName === undefined || researcherName === null || researcherName === '') {
+            toast.error("Researcher name is required field");
         } else {
-            console.log("Post: Object sent: ", this.state.author);
+            console.log("Post: Object sent: ", this.state.researcher);
             const options = {
-                url: API_AUTHOR_URL + 'save',
+                url: API_RESEARCHER_URL + 'save',
                 method: 'POST',
-                data: this.state.author
+                data: this.state.researcher
             };
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Post: Object received: ", res.data);
-                    const { author, navigationDtl } = res.data;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    const { researcher, navigationDtl } = res.data;
+                    this.setState({ researcher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -99,28 +99,28 @@ class Author extends Component {
         }
     }
 
-    saveAuthorShowMessage = async (message) => {
+    saveResearcherShowMessage = async (message) => {
         try {
-            await this.saveAuthor();
+            await this.saveResearcher();
         } catch (error) {
             console.log(error);
         }
         toast.success(message);
     }
 
-    deleteAuthor = async () => {
-        if (this.state.author.authorId != null) {
-            console.log("Delete: Author ID sent: ", this.state.author.authorId);
+    deleteResearcher = async () => {
+        if (this.state.researcher.researcherId != null) {
+            console.log("Delete: Researcher ID sent: ", this.state.researcher.researcherId);
             const options = {
-                url: API_AUTHOR_URL + 'delete/' + this.state.author.authorId,
+                url: API_RESEARCHER_URL + 'delete/' + this.state.researcher.researcherId,
                 method: 'DELETE'
             };
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { author, navigationDtl } = res.data;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true });
+                    const { researcher, navigationDtl } = res.data;
+                    this.setState({ researcher, navigationDtl, saveButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -128,66 +128,66 @@ class Author extends Component {
             }
         }
         this.setState({
-            authorAlert: false
+            researcherAlert: false
         });
     }
 
-    navigateAuthor = async (operation) => {
+    navigateResearcher = async (operation) => {
         const options = {
-            url: API_AUTHOR_URL + operation,
+            url: API_RESEARCHER_URL + operation,
             method: 'GET'
         };
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { author, navigationDtl } = res.data;
-                this.setState({ author, navigationDtl })
-                console.log(this.state.author);
+                const { researcher, navigationDtl } = res.data;
+                this.setState({ researcher, navigationDtl })
+                console.log(this.state.researcher);
             }
         } catch (error) {
             console.log(error);
         }
     }
 
-    saveAndNavigateAuthor = async (operation) => {
+    saveAndNavigateResearcher = async (operation) => {
         const { saveButtonDisabled: saveButtonDisabled } = this.state;
         if (!saveButtonDisabled) {
             try {
-                await this.saveAuthor();
+                await this.saveResearcher();
             } catch (error) {
                 console.log(error);
             }
-            this.navigateAuthor(operation);
+            this.navigateResearcher(operation);
         } else {
-            this.navigateAuthor(operation);
+            this.navigateResearcher(operation);
         }
     }
 
-    firstAuthor = () => {
-        this.saveAndNavigateAuthor('first');
+    firstResearcher = () => {
+        this.saveAndNavigateResearcher('first');
     }
 
-    previousAuthor = () => {
-        this.saveAndNavigateAuthor('previous');
+    previousResearcher = () => {
+        this.saveAndNavigateResearcher('previous');
     }
 
-    nextAuthor = () => {
-        this.saveAndNavigateAuthor('next');
+    nextResearcher = () => {
+        this.saveAndNavigateResearcher('next');
     }
 
-    lastAuthor = () => {
-        this.saveAndNavigateAuthor('last');
+    lastResearcher = () => {
+        this.saveAndNavigateResearcher('last');
     }
 
     undoChanges = () => {
-        const author = { ...this.state.author };
-        console.log("Author ID: ", author.authorId);
+        const researcher = { ...this.state.researcher };
+        console.log("Researcher ID: ", researcher.researcherId);
         this.setState({ saveButtonDisabled: true });
-        if (author.authorId != null) {
-            const operation = author.authorId;
-            this.saveAndNavigateAuthor(operation);
+        if (researcher.researcherId != null) {
+            const operation = researcher.researcherId;
+            this.saveAndNavigateResearcher(operation);
         } else {
-            this.firstAuthor();
+            this.firstResearcher();
         }
         this.setState({ undoButtonDisabled: true });
     }
@@ -229,7 +229,7 @@ class Author extends Component {
 
 
     render() {
-        const { author, navigationDtl } = this.state;
+        const { researcher, navigationDtl } = this.state;
 
         const inputGroupTextStyle = {
             width: "180px"
@@ -248,30 +248,30 @@ class Author extends Component {
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Author ID</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Researcher ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="authorId"
-                            placeholder="Author ID"
-                            aria-label="Author ID"
+                            name="researcherId"
+                            placeholder="Researcher ID"
+                            aria-label="Researcher ID"
                             readOnly
-                            value={author.authorId || ''}
-                            onChange={this.handleAuthorChange}
+                            value={researcher.researcherId || ''}
+                            onChange={this.handleResearcherChange}
                         />
                     </InputGroup>
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Author Name</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Researcher Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="authorName"
-                            placeholder="Author Name"
-                            aria-label="Author Name"
-                            value={author.authorName || ''}
+                            name="researcherName"
+                            placeholder="Researcher Name"
+                            aria-label="Researcher Name"
+                            value={researcher.researcherName || ''}
                             required
                             disabled={this.state.fieldsDisabled}
-                            onChange={this.handleAuthorChange}
+                            onChange={this.handleResearcherChange}
                         />
                     </InputGroup>
 
@@ -285,9 +285,9 @@ class Author extends Component {
                             name="remarks"
                             placeholder="Remarks"
                             aria-label="Remarks"
-                            value={author.remarks || ''}
+                            value={researcher.remarks || ''}
                             disabled={this.state.fieldsDisabled}
-                            onChange={this.handleAuthorChange}
+                            onChange={this.handleResearcherChange}
                         />
                     </InputGroup>
 
@@ -295,7 +295,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
-                            onClick={this.firstAuthor}
+                            onClick={this.firstResearcher}
                             className="mr-1" style={smallButtonStyle}
                             active>First
                             </Button>
@@ -303,7 +303,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
-                            onClick={this.previousAuthor}
+                            onClick={this.previousResearcher}
                             className="mr-1" style={smallButtonStyle}
                             active>Previous
                             </Button>
@@ -311,7 +311,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
-                            onClick={this.nextAuthor}
+                            onClick={this.nextResearcher}
                             className="mr-1" style={smallButtonStyle}
                             active>Next
                             </Button>
@@ -319,7 +319,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
-                            onClick={this.lastAuthor}
+                            onClick={this.lastResearcher}
                             className="mr-1" style={smallButtonStyle}
                             active>Last
                             </Button>
@@ -330,7 +330,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={this.state.addButtonDisabled}
-                            onClick={this.newAuthor}
+                            onClick={this.newResearcher}
                             className="mr-1" style={smallButtonStyle}
                             active>Add
                             </Button>
@@ -338,29 +338,29 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
-                            onClick={() => this.setState({ authorAlert: true })}
+                            onClick={() => this.setState({ researcherAlert: true })}
                             className="mr-1" style={smallButtonStyle}
                             active>Delete
                             </Button>
 
                         <SweetAlert
-                            show={this.state.authorAlert}
+                            show={this.state.researcherAlert}
                             warning
                             showCancel
                             confirmBtnText="Delete"
                             confirmBtnBsStyle="danger"
                             cancelBtnBsStyle="default"
                             title="Delete Confirmation"
-                            Text="Are you sure you want to delete this author?"
-                            onConfirm={() => this.deleteAuthor()}
-                            onCancel={() => this.setState({ authorAlert: false })}
+                            Text="Are you sure you want to delete this researcher?"
+                            onConfirm={() => this.deleteResearcher()}
+                            onCancel={() => this.setState({ researcherAlert: false })}
                         >
-                            Delete Author
+                            Delete Researcher
                                 </SweetAlert>
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveAuthorShowMessage("Author saved successfully.")}
+                            onClick={() => this.saveResearcherShowMessage("Researcher saved successfully.")}
                             className="mr-1" style={smallButtonStyle}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
@@ -381,4 +381,4 @@ class Author extends Component {
     }
 }
 
-export default Author;
+export default Researcher;

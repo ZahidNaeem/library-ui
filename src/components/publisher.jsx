@@ -4,9 +4,9 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { Combobox } from 'react-widgets'
-import { request, isSuccessfullResponse } from './util/APIUtils'
+import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
 import { API_PUBLISHER_URL } from './constant'
+import { async } from 'q';
 
 class Publisher extends Component {
 
@@ -14,11 +14,31 @@ class Publisher extends Component {
         publisher: {},
         navigationDtl: {},
         publisherAlert: false,
-        saveDisabled: true
+        fieldsDisabled: true,
+        addButtonDisabled: true,
+        deleteButtonDisabled: true,
+        saveButtonDisabled: true,
+        undoButtonDisabled: true
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.firstPublisher();
+        const canAdd = await this.canAdd();
+        const canEdit = await this.canEdit();
+        const canDelete = await this.canDelete();
+        this.setState({ addButtonDisabled: !canAdd, fieldsDisabled: !canEdit, deleteButtonDisabled: !canDelete });
+    }
+
+    getCurrentUser = async () => {
+        try {
+            const res = await getCurrentUser();
+            if (isSuccessfullResponse(res)) {
+                console.log("Current User: ", res.data);
+                return res.data;
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     handlePublisherChange = (event) => {
@@ -27,33 +47,31 @@ class Publisher extends Component {
         console.log(value);
         const publisher = { ...this.state.publisher };
         publisher[name] = name === 'publisherName' ? value.toUpperCase() : value;
-        let saveDisabled = { ...this.state.saveDisabled };
-        if (publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === ''
-            || publisher.publisherUom === undefined || publisher.publisherUom === null || publisher.publisherUom === ''
-            || publisher.effectiveStartDate === undefined || publisher.effectiveStartDate === null || publisher.effectiveStartDate === '') {
-            saveDisabled = true;
+        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        if (publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === '') {
+            saveButtonDisabled = true;
         } else {
-            saveDisabled = false;
+            saveButtonDisabled = false;
         }
-        this.setState({ publisher, saveDisabled });
+        this.setState({ publisher, saveButtonDisabled, undoButtonDisabled: false });
     }
 
-    handleComboboxChange = (value, name) => {
+    /* handleComboboxChange = (value, name) => {
         let publisher = { ...this.state.publisher };
         publisher[name] = value.toUpperCase();
-        let saveDisabled = { ...this.state.saveDisabled };
+        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
         if (publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === '') {
-            saveDisabled = true;
+            saveButtonDisabled = true;
         } else {
-            saveDisabled = false;
+            saveButtonDisabled = false;
         }
-        this.setState({ publisher, saveDisabled });
-    }
+        this.setState({ publisher, saveButtonDisabled });
+    } */
 
     newPublisher = () => {
         const publisher = {};
         publisher.publisherStocks = [];
-        this.setState({ publisher, navigationDtl: { first: true, last: true } });
+        this.setState({ publisher, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
     }
 
     savePublisher = async () => {
@@ -69,10 +87,10 @@ class Publisher extends Component {
             };
             try {
                 const res = await request(options);
-                if(isSuccessfullResponse(res)){
+                if (isSuccessfullResponse(res)) {
                     console.log("Post: Object received: ", res.data);
                     const { publisher, navigationDtl } = res.data;
-                    this.setState({ publisher, navigationDtl, saveDisabled: true });
+                    this.setState({ publisher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -99,10 +117,10 @@ class Publisher extends Component {
             };
             try {
                 const res = await request(options);
-                if(isSuccessfullResponse(res)){
+                if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
                     const { publisher, navigationDtl } = res.data;
-                    this.setState({ publisher, navigationDtl, saveDisabled: true });
+                    this.setState({ publisher, navigationDtl, saveButtonDisabled: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -121,7 +139,7 @@ class Publisher extends Component {
         };
         try {
             const res = await request(options);
-            if(isSuccessfullResponse(res)){
+            if (isSuccessfullResponse(res)) {
                 const { publisher, navigationDtl } = res.data;
                 this.setState({ publisher, navigationDtl })
                 console.log(this.state.publisher);
@@ -132,8 +150,8 @@ class Publisher extends Component {
     }
 
     saveAndNavigatePublisher = async (operation) => {
-        const { saveDisabled } = this.state;
-        if (!saveDisabled) {
+        const { saveButtonDisabled: saveButtonDisabled } = this.state;
+        if (!saveButtonDisabled) {
             try {
                 await this.savePublisher();
             } catch (error) {
@@ -164,58 +182,54 @@ class Publisher extends Component {
     undoChanges = () => {
         const publisher = { ...this.state.publisher };
         console.log("Publisher ID: ", publisher.publisherId);
-        this.setState({ saveDisabled: true });
+        this.setState({ saveButtonDisabled: true });
         if (publisher.publisherId != null) {
             const operation = publisher.publisherId;
             this.saveAndNavigatePublisher(operation);
         } else {
             this.firstPublisher();
         }
+        this.setState({ undoButtonDisabled: true });
     }
 
-    publisherCategories = () => {
-        const data = [];
-        const options = {
-            url: API_PUBLISHER_URL + 'cats',
-            method: 'GET'
-        };
-        request(options)
-            .then(res => {
-                res.data.forEach(element => {
-                    data.push(element);
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            });
-
-        return data;
+    userRoles = async () => {
+        const currentUser = await this.getCurrentUser();
+        return currentUser.roles;
     }
 
-    publisherUOMs = () => {
-        const data = [];
-        const options = {
-            url: API_PUBLISHER_URL + 'uoms',
-            method: 'GET'
-        };
-        request(options)
-            .then(res => {
-                res.data.forEach(element => {
-                    data.push(element);
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            });
-
-        return data;
+    canAdd = async () => {
+        const roles = await this.userRoles();
+        const filteredRoles = roles.filter(role => role === 'ROLE_PM');
+        if (filteredRoles.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
+    canEdit = async () => {
+        const roles = await this.userRoles();
+        const filteredRoles = roles.filter(role => role === 'ROLE_ADMIN');
+        if (filteredRoles.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    canDelete = async () => {
+        const roles = await this.userRoles();
+        const filteredRoles = roles.filter(role => role === 'ROLE_ADMIN');
+        if (filteredRoles.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     render() {
         const { publisher, navigationDtl } = this.state;
-
-        const cats = this.publisherCategories();
-        const uoms = this.publisherUOMs();
 
         const inputGroupTextStyle = {
             width: "180px"
@@ -226,12 +240,12 @@ class Publisher extends Component {
         }
 
         const smallButtonStyle = {
-            width: "7%"
+            width: "10%"
         }
 
         return (
             <>
-                <Form>
+                <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={inputGroupTextStyle}>Publisher ID</InputGroup.Text>
@@ -256,11 +270,28 @@ class Publisher extends Component {
                             aria-label="Publisher Name"
                             value={publisher.publisherName || ''}
                             required
+                            disabled={this.state.fieldsDisabled}
                             onChange={this.handlePublisherChange}
                         />
                     </InputGroup>
 
-                    <ButtonToolbar className="m-2">
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={inputGroupTextStyle}>Remarks</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                            as="textarea"
+                            rows="3"
+                            name="remarks"
+                            placeholder="Remarks"
+                            aria-label="Remarks"
+                            value={publisher.remarks || ''}
+                            disabled={this.state.fieldsDisabled}
+                            onChange={this.handlePublisherChange}
+                        />
+                    </InputGroup>
+
+                    <ButtonToolbar className="mb-2">
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
@@ -295,10 +326,10 @@ class Publisher extends Component {
 
                     </ButtonToolbar>
 
-                    <ButtonToolbar className="ml-2">
+                    <ButtonToolbar className="mb-2">
                         <Button
                             variant="primary"
-                            // disabled={navigationDtl.first}
+                            disabled={this.state.addButtonDisabled}
                             onClick={this.newPublisher}
                             className="mr-1" style={smallButtonStyle}
                             active>Add
@@ -306,26 +337,10 @@ class Publisher extends Component {
 
                         <Button
                             variant="primary"
-                            // disabled={navigationDtl.first}
+                            disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ publisherAlert: true })}
                             className="mr-1" style={smallButtonStyle}
                             active>Delete
-                            </Button>
-
-                        <Button
-                            variant="primary"
-                            onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
-                            className="mr-1" style={smallButtonStyle}
-                            disabled={this.state.saveDisabled}
-                            active>Save
-                            </Button>
-
-                        <Button
-                            variant="primary"
-                            /* disabled={navigationDtl.last} */
-                            onClick={this.undoChanges}
-                            className="mr-1" style={smallButtonStyle}
-                            active>Undo
                             </Button>
 
                         <SweetAlert
@@ -342,7 +357,24 @@ class Publisher extends Component {
                         >
                             Delete Publisher
                                 </SweetAlert>
+
+                        <Button
+                            variant="primary"
+                            onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
+                            className="mr-1" style={smallButtonStyle}
+                            disabled={this.state.saveButtonDisabled}
+                            active>Save
+                            </Button>
+
+                        <Button
+                            variant="primary"
+                            onClick={this.undoChanges}
+                            className="mr-1" style={smallButtonStyle}
+                            disabled={this.state.undoButtonDisabled}
+                            active>Undo
+                            </Button>
                     </ButtonToolbar>
+
                 </Form>
             </>
         );
