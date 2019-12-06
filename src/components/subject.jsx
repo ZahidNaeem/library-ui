@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { InputGroup, FormControl, Button, ButtonToolbar, Form } from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
+import Select from 'react-select'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
@@ -13,6 +14,7 @@ class Subject extends Component {
     state = {
         subject: {},
         navigationDtl: {},
+        subjects: [],
         subjectAlert: false,
         fieldsDisabled: true,
         addButtonDisabled: true,
@@ -23,6 +25,7 @@ class Subject extends Component {
 
     async componentDidMount() {
         this.firstSubject();
+        await this.populateSubjects();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -227,9 +230,32 @@ class Subject extends Component {
         }
     }
 
+    async populateSubjects() {
+        console.log("Start populate subjects");
+        const subjects = [];
+        const options = {
+            url: API_SUBJECT_URL + 'all',
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate subjects");
+                res.data.forEach(element => {
+                    subjects.push({
+                        value: element.subjectId,
+                        label: element.subjectName
+                    });
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ subjects });
+    }
 
     render() {
-        const { subject, navigationDtl } = this.state;
+        const { subject, navigationDtl, subjects } = this.state;
 
         const inputGroupTextStyle = {
             width: "180px"
@@ -262,6 +288,21 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
+                            <InputGroup.Text style={inputGroupTextStyle}>Subject Code</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                            name="subjectCode"
+                            placeholder="Subject Code"
+                            aria-label="Subject Code"
+                            value={subject.subjectCode || ''}
+                            required
+                            disabled={this.state.fieldsDisabled}
+                            onChange={this.handleSubjectChange}
+                        />
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
                             <InputGroup.Text style={inputGroupTextStyle}>Subject Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
@@ -273,6 +314,25 @@ class Subject extends Component {
                             disabled={this.state.fieldsDisabled}
                             onChange={this.handleSubjectChange}
                         />
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={inputGroupTextStyle}>Parent Subject</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={stretchStyle}>
+                            <Select
+                                name="parentSubjectId"
+                                placeholder="Select Parent Subject"
+                                aria-label="Select Parent Subject"
+                                // value={{ value: subject.parentSubjectId || '', label: subjectName || '' }}
+                                /* getOptionLabel={option => option.label}
+                                getOptionValue={option => option.value} */
+                                onChange={(name, value) => this.handleInvoiceSelectChange(name, value)}
+                                clearable={true}
+                                options={subjects}
+                            />
+                        </div>
                     </InputGroup>
 
                     <InputGroup className="mb-3">
