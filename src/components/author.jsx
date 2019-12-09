@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
 import { API_AUTHOR_URL } from './constant'
-import { async } from 'q';
 
 class Author extends Component {
 
@@ -93,8 +92,7 @@ class Author extends Component {
                     this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                 }
             } catch (error) {
-                console.log(error);
-
+                throw error.response.data;
             }
         }
     }
@@ -102,10 +100,10 @@ class Author extends Component {
     saveAuthorShowMessage = async (message) => {
         try {
             await this.saveAuthor();
+            toast.success(message);
         } catch (error) {
-            console.log(error);
+            toast.error(JSON.stringify(error));
         }
-        toast.success(message);
     }
 
     deleteAuthor = async () => {
@@ -150,7 +148,7 @@ class Author extends Component {
     }
 
     saveAndNavigateAuthor = async (operation) => {
-        const { saveButtonDisabled: saveButtonDisabled } = this.state;
+        const { saveButtonDisabled } = this.state;
         if (!saveButtonDisabled) {
             try {
                 await this.saveAuthor();

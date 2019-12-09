@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
 import { API_PUBLISHER_URL } from './constant'
-import { async } from 'q';
 
 class Publisher extends Component {
 
@@ -93,8 +92,7 @@ class Publisher extends Component {
                     this.setState({ publisher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                 }
             } catch (error) {
-                console.log(error);
-
+                throw error.response.data;
             }
         }
     }
@@ -102,10 +100,10 @@ class Publisher extends Component {
     savePublisherShowMessage = async (message) => {
         try {
             await this.savePublisher();
+            toast.success(message);
         } catch (error) {
-            console.log(error);
+            toast.error(JSON.stringify(error));
         }
-        toast.success(message);
     }
 
     deletePublisher = async () => {
@@ -150,7 +148,7 @@ class Publisher extends Component {
     }
 
     saveAndNavigatePublisher = async (operation) => {
-        const { saveButtonDisabled: saveButtonDisabled } = this.state;
+        const { saveButtonDisabled } = this.state;
         if (!saveButtonDisabled) {
             try {
                 await this.savePublisher();

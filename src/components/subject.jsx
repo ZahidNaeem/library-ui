@@ -1,20 +1,27 @@
 import React, { Component } from 'react';
-import { InputGroup, FormControl, Button, ButtonToolbar, Form } from 'react-bootstrap'
+import {
+    Button,
+    ButtonToolbar,
+    Form,
+    FormControl,
+    InputGroup
+} from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import Select from 'react-select'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils'
 import { API_SUBJECT_URL } from './constant'
-import { async } from 'q';
 
 class Subject extends Component {
 
     state = {
         subject: {},
-        navigationDtl: {},
         subjects: [],
+        subjectName: '',
+        subjectsExcludeCurrent: [],
+        navigationDtl: {},
         subjectAlert: false,
         fieldsDisabled: true,
         addButtonDisabled: true,
@@ -29,7 +36,11 @@ class Subject extends Component {
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
-        this.setState({ addButtonDisabled: !canAdd, fieldsDisabled: !canEdit, deleteButtonDisabled: !canDelete });
+        this.setState({
+            addButtonDisabled: !canAdd,
+            fieldsDisabled: !canEdit,
+            deleteButtonDisabled: !canDelete
+        });
     }
 
     getCurrentUser = async () => {
@@ -47,11 +58,12 @@ class Subject extends Component {
     handleSubjectChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
-        console.log(value);
+        console.log("Target value", value);
         const subject = { ...this.state.subject };
         subject[name] = name === 'subjectName' ? value.toUpperCase() : value;
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (subject.subjectName === undefined || subject.subjectName === null || subject.subjectName === '') {
+        if (subject.subjectName === undefined || subject.subjectName === null
+            || subject.subjectName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
@@ -59,27 +71,35 @@ class Subject extends Component {
         this.setState({ subject, saveButtonDisabled, undoButtonDisabled: false });
     }
 
-    /* handleComboboxChange = (value, name) => {
-        let subject = { ...this.state.subject };
-        subject[name] = value.toUpperCase();
+    handleSubjectSelectChange = (selectedSubject, name) => {
+        const subject = { ...this.state.subject };
+        console.log("Target name", name.name);
+        console.log("Target value", selectedSubject.value);
+        subject[name.name] = selectedSubject.value;
         let saveButtonDisabled = { ...this.state.saveButtonDisabled };
-        if (subject.subjectName === undefined || subject.subjectName === null || subject.subjectName === '') {
+        if (subject.subjectName === undefined || subject.subjectName === null
+            || subject.subjectName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ subject, saveButtonDisabled });
-    } */
+        this.setState({ subject, saveButtonDisabled, undoButtonDisabled: false });
+    };
 
     newSubject = () => {
         const subject = {};
-        subject.subjectStocks = [];
-        this.setState({ subject, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.setState({
+            subject,
+            navigationDtl: { first: true, last: true },
+            undoButtonDisabled: false
+        });
+        this.populateSubjectName(subject.parentSubjectId);
     }
 
     saveSubject = async () => {
         const { subjectName } = this.state.subject;
-        if (subjectName === undefined || subjectName === null || subjectName === '') {
+        if (subjectName === undefined || subjectName === null || subjectName
+            === '') {
             toast.error("Subject name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.subject);
@@ -93,11 +113,16 @@ class Subject extends Component {
                 if (isSuccessfullResponse(res)) {
                     console.log("Post: Object received: ", res.data);
                     const { subject, navigationDtl } = res.data;
-                    this.setState({ subject, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.setState({
+                        subject,
+                        navigationDtl,
+                        saveButtonDisabled: true,
+                        undoButtonDisabled: true
+                    });
+                    await this.populateSubjects();
                 }
             } catch (error) {
-                console.log(error);
-
+                throw error.response.data;
             }
         }
     }
@@ -105,10 +130,10 @@ class Subject extends Component {
     saveSubjectShowMessage = async (message) => {
         try {
             await this.saveSubject();
+            toast.success(message);
         } catch (error) {
-            console.log(error);
+            toast.error(JSON.stringify(error));
         }
-        toast.success(message);
     }
 
     deleteSubject = async () => {
@@ -124,6 +149,7 @@ class Subject extends Component {
                     console.log("Delete: Response: ", res);
                     const { subject, navigationDtl } = res.data;
                     this.setState({ subject, navigationDtl, saveButtonDisabled: true });
+                    await this.populateSubjects();
                 }
             } catch (error) {
                 console.log(error);
@@ -144,6 +170,7 @@ class Subject extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 const { subject, navigationDtl } = res.data;
+                this.populateSubjectName(subject.parentSubjectId);
                 this.setState({ subject, navigationDtl })
                 console.log(this.state.subject);
             }
@@ -153,7 +180,7 @@ class Subject extends Component {
     }
 
     saveAndNavigateSubject = async (operation) => {
-        const { saveButtonDisabled: saveButtonDisabled } = this.state;
+        const { saveButtonDisabled } = this.state;
         if (!saveButtonDisabled) {
             try {
                 await this.saveSubject();
@@ -248,14 +275,42 @@ class Subject extends Component {
                     });
                 });
             }
+            console.log("Subjects:", subjects);
         } catch (error) {
             console.log(error);
         }
         this.setState({ subjects });
     }
 
+    populateSubjectName = (parentSubjectId) => {
+        console.log("populateSubjectName called");
+        console.log("Subject ID: ", parentSubjectId);
+
+        let subjects = [...this.state.subjects];
+        let subjectName = null;
+
+        const result = subjects.filter(subject => subject.value === parentSubjectId);
+        if (result[0] !== undefined && result[0] !== null) {
+            subjectName = result[0].label;
+        }
+        this.setState({ subjectName });
+    }
+
+    getSubjectsExcludeCurrent = () => {
+        let subjectsExcludeCurrent = [...this.state.subjects];
+
+        console.log("subjects", subjectsExcludeCurrent);
+        const currentSubject = { ...this.state.subject };
+
+        if (currentSubject.subjectId !== null && currentSubject.subjectId !== undefined) {
+            subjectsExcludeCurrent = subjectsExcludeCurrent.filter(s => s.value !== currentSubject.subjectId);
+            console.log("newArray", subjectsExcludeCurrent);
+        }
+        this.setState({ subjectsExcludeCurrent });
+    }
+
     render() {
-        const { subject, navigationDtl, subjects } = this.state;
+        const { subject, navigationDtl, subjectsExcludeCurrent, subjectName } = this.state;
 
         const inputGroupTextStyle = {
             width: "180px"
@@ -274,7 +329,8 @@ class Subject extends Component {
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Subject ID</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Subject
+                  ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="subjectId"
@@ -288,7 +344,8 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Subject Code</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Subject
+                  Code</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="subjectCode"
@@ -303,7 +360,8 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Subject Name</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Subject
+                  Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="subjectName"
@@ -318,26 +376,27 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Parent Subject</InputGroup.Text>
+                            <InputGroup.Text style={inputGroupTextStyle}>Parent
+                  Subject</InputGroup.Text>
                         </InputGroup.Prepend>
                         <div style={stretchStyle}>
                             <Select
                                 name="parentSubjectId"
                                 placeholder="Select Parent Subject"
                                 aria-label="Select Parent Subject"
-                                // value={{ value: subject.parentSubjectId || '', label: subjectName || '' }}
-                                /* getOptionLabel={option => option.label}
-                                getOptionValue={option => option.value} */
-                                onChange={(name, value) => this.handleInvoiceSelectChange(name, value)}
+                                value={{value: subject.parentSubjectId || '', label: subjectName || ''}}
+                                onChange={this.handleSubjectSelectChange}
+                                onMenuOpen={this.getSubjectsExcludeCurrent}
                                 clearable={true}
-                                options={subjects}
+                                options={subjectsExcludeCurrent}
                             />
                         </div>
                     </InputGroup>
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Remarks</InputGroup.Text>
+                            <InputGroup.Text
+                                style={inputGroupTextStyle}>Remarks</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             as="textarea"
@@ -358,7 +417,7 @@ class Subject extends Component {
                             onClick={this.firstSubject}
                             className="mr-1" style={smallButtonStyle}
                             active>First
-                            </Button>
+              </Button>
 
                         <Button
                             variant="primary"
@@ -366,7 +425,7 @@ class Subject extends Component {
                             onClick={this.previousSubject}
                             className="mr-1" style={smallButtonStyle}
                             active>Previous
-                            </Button>
+              </Button>
 
                         <Button
                             variant="primary"
@@ -374,7 +433,7 @@ class Subject extends Component {
                             onClick={this.nextSubject}
                             className="mr-1" style={smallButtonStyle}
                             active>Next
-                            </Button>
+              </Button>
 
                         <Button
                             variant="primary"
@@ -382,7 +441,7 @@ class Subject extends Component {
                             onClick={this.lastSubject}
                             className="mr-1" style={smallButtonStyle}
                             active>Last
-                            </Button>
+              </Button>
 
                     </ButtonToolbar>
 
@@ -393,7 +452,7 @@ class Subject extends Component {
                             onClick={this.newSubject}
                             className="mr-1" style={smallButtonStyle}
                             active>Add
-                            </Button>
+              </Button>
 
                         <Button
                             variant="primary"
@@ -401,7 +460,7 @@ class Subject extends Component {
                             onClick={() => this.setState({ subjectAlert: true })}
                             className="mr-1" style={smallButtonStyle}
                             active>Delete
-                            </Button>
+              </Button>
 
                         <SweetAlert
                             show={this.state.subjectAlert}
@@ -416,15 +475,16 @@ class Subject extends Component {
                             onCancel={() => this.setState({ subjectAlert: false })}
                         >
                             Delete Subject
-                                </SweetAlert>
+              </SweetAlert>
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveSubjectShowMessage("Subject saved successfully.")}
+                            onClick={() => this.saveSubjectShowMessage(
+                                "Subject saved successfully.")}
                             className="mr-1" style={smallButtonStyle}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
-                            </Button>
+              </Button>
 
                         <Button
                             variant="primary"
@@ -432,7 +492,7 @@ class Subject extends Component {
                             className="mr-1" style={smallButtonStyle}
                             disabled={this.state.undoButtonDisabled}
                             active>Undo
-                            </Button>
+              </Button>
                     </ButtonToolbar>
 
                 </Form>
