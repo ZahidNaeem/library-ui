@@ -80,7 +80,7 @@ class Researcher extends Component {
         } else {
             console.log("Post: Object sent: ", this.state.researcher);
             const options = {
-                url: API_RESEARCHER_URL + 'save',
+                url: API_RESEARCHER_URL,
                 method: 'POST',
                 data: this.state.researcher
             };
@@ -110,7 +110,7 @@ class Researcher extends Component {
         if (this.state.researcher.researcherId != null) {
             console.log("Delete: Researcher ID sent: ", this.state.researcher.researcherId);
             const options = {
-                url: API_RESEARCHER_URL + 'delete/' + this.state.researcher.researcherId,
+                url: API_RESEARCHER_URL + this.state.researcher.researcherId,
                 method: 'DELETE'
             };
             try {

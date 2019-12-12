@@ -80,7 +80,7 @@ class Author extends Component {
         } else {
             console.log("Post: Object sent: ", this.state.author);
             const options = {
-                url: API_AUTHOR_URL + 'save',
+                url: API_AUTHOR_URL,
                 method: 'POST',
                 data: this.state.author
             };
@@ -110,7 +110,7 @@ class Author extends Component {
         if (this.state.author.authorId != null) {
             console.log("Delete: Author ID sent: ", this.state.author.authorId);
             const options = {
-                url: API_AUTHOR_URL + 'delete/' + this.state.author.authorId,
+                url: API_AUTHOR_URL + this.state.author.authorId,
                 method: 'DELETE'
             };
             try {

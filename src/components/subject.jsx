@@ -84,6 +84,7 @@ class Subject extends Component {
             saveButtonDisabled = false;
         }
         this.setState({ subject, saveButtonDisabled, undoButtonDisabled: false });
+        this.populateSubjectName(subject.parentSubjectId);
     };
 
     newSubject = () => {
@@ -104,7 +105,7 @@ class Subject extends Component {
         } else {
             console.log("Post: Object sent: ", this.state.subject);
             const options = {
-                url: API_SUBJECT_URL + 'save',
+                url: API_SUBJECT_URL,
                 method: 'POST',
                 data: this.state.subject
             };
@@ -140,7 +141,7 @@ class Subject extends Component {
         if (this.state.subject.subjectId != null) {
             console.log("Delete: Subject ID sent: ", this.state.subject.subjectId);
             const options = {
-                url: API_SUBJECT_URL + 'delete/' + this.state.subject.subjectId,
+                url: API_SUBJECT_URL + this.state.subject.subjectId,
                 method: 'DELETE'
             };
             try {
@@ -261,7 +262,7 @@ class Subject extends Component {
         console.log("Start populate subjects");
         const subjects = [];
         const options = {
-            url: API_SUBJECT_URL + 'all',
+            url: API_SUBJECT_URL,
             method: 'GET'
         };
         try {
@@ -296,7 +297,7 @@ class Subject extends Component {
         this.setState({ subjectName });
     }
 
-    getSubjectsExcludeCurrent = () => {
+    getSubjectsExcludeCurrentHierarchy = () => {
         let subjectsExcludeCurrent = [...this.state.subjects];
 
         console.log("subjects", subjectsExcludeCurrent);
@@ -386,7 +387,7 @@ class Subject extends Component {
                                 aria-label="Select Parent Subject"
                                 value={{value: subject.parentSubjectId || '', label: subjectName || ''}}
                                 onChange={this.handleSubjectSelectChange}
-                                onMenuOpen={this.getSubjectsExcludeCurrent}
+                                onMenuOpen={this.getSubjectsExcludeCurrentHierarchy}
                                 clearable={true}
                                 options={subjectsExcludeCurrent}
                             />

@@ -80,7 +80,7 @@ class Book extends Component {
         } else {
             console.log("Post: Object sent: ", this.state.book);
             const options = {
-                url: API_BOOK_URL + 'save',
+                url: API_BOOK_URL,
                 method: 'POST',
                 data: this.state.book
             };
@@ -110,7 +110,7 @@ class Book extends Component {
         if (this.state.book.bookId != null) {
             console.log("Delete: Book ID sent: ", this.state.book.bookId);
             const options = {
-                url: API_BOOK_URL + 'delete/' + this.state.book.bookId,
+                url: API_BOOK_URL + this.state.book.bookId,
                 method: 'DELETE'
             };
             try {

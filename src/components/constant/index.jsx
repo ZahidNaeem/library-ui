@@ -1,10 +1,10 @@
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8089/api/';
-export const API_AUTHOR_URL = API_BASE_URL + 'author/';
-export const API_SUBJECT_URL = API_BASE_URL + 'subject/';
-export const API_PUBLISHER_URL = API_BASE_URL + 'publisher/';
-export const API_RESEARCHER_URL = API_BASE_URL + 'researcher/';
-export const API_SHELF_URL = API_BASE_URL + 'shelf/';
-export const API_BOOK_URL = API_BASE_URL + 'book/';
+export const API_AUTHOR_URL = API_BASE_URL + 'authors/';
+export const API_SUBJECT_URL = API_BASE_URL + 'subjects/';
+export const API_PUBLISHER_URL = API_BASE_URL + 'publishers/';
+export const API_RESEARCHER_URL = API_BASE_URL + 'researchers/';
+export const API_SHELF_URL = API_BASE_URL + 'shelfs/';
+export const API_BOOK_URL = API_BASE_URL + 'books/';
 
 export const ACCESS_TOKEN = 'accessToken';
 export const LOGIN_REQUEST = 'loginRequest';

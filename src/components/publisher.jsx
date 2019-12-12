@@ -80,7 +80,7 @@ class Publisher extends Component {
         } else {
             console.log("Post: Object sent: ", this.state.publisher);
             const options = {
-                url: API_PUBLISHER_URL + 'save',
+                url: API_PUBLISHER_URL,
                 method: 'POST',
                 data: this.state.publisher
             };
@@ -110,7 +110,7 @@ class Publisher extends Component {
         if (this.state.publisher.publisherId != null) {
             console.log("Delete: Publisher ID sent: ", this.state.publisher.publisherId);
             const options = {
-                url: API_PUBLISHER_URL + 'delete/' + this.state.publisher.publisherId,
+                url: API_PUBLISHER_URL + this.state.publisher.publisherId,
                 method: 'DELETE'
             };
             try {

@@ -80,7 +80,7 @@ class Shelf extends Component {
         } else {
             console.log("Post: Object sent: ", this.state.shelf);
             const options = {
-                url: API_SHELF_URL + 'save',
+                url: API_SHELF_URL,
                 method: 'POST',
                 data: this.state.shelf
             };
@@ -110,7 +110,7 @@ class Shelf extends Component {
         if (this.state.shelf.shelfId != null) {
             console.log("Delete: Shelf ID sent: ", this.state.shelf.shelfId);
             const options = {
-                url: API_SHELF_URL + 'delete/' + this.state.shelf.shelfId,
+                url: API_SHELF_URL + this.state.shelf.shelfId,
                 method: 'DELETE'
             };
             try {
