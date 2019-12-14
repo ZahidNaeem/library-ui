@@ -14,6 +14,7 @@ import 'react-widgets/dist/css/react-widgets.css'
 import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils'
 import { API_SUBJECT_URL } from './constant'
 
+let toBeExcluded = [];
 class Subject extends Component {
 
     state = {
@@ -272,7 +273,8 @@ class Subject extends Component {
                 res.data.forEach(element => {
                     subjects.push({
                         value: element.subjectId,
-                        label: element.subjectName
+                        label: element.subjectName,
+                        parent: element.parentSubjectId
                     });
                 });
             }
@@ -297,16 +299,36 @@ class Subject extends Component {
         this.setState({ subjectName });
     }
 
-    getSubjectsExcludeCurrentHierarchy = () => {
-        let subjectsExcludeCurrent = [...this.state.subjects];
+    excludeCurrentHierarchy = (subjectId) => {
+        console.log("Subject ID", subjectId);
 
-        console.log("subjects", subjectsExcludeCurrent);
+        let subjects = this.state.subjects;
+
+        const rootArray = subjects.filter(s => s.value === subjectId);
+        toBeExcluded.push(...rootArray);
+        console.log("toBeExcluded length", toBeExcluded.length);
+
+        const childrenArray = subjects.filter(s => s.parent === subjectId);
+        console.log("childrenArray", childrenArray);
+
+        if (childrenArray.length > 0) {
+            childrenArray.map(s => {
+                return this.excludeCurrentHierarchy(s.value);
+            });
+        } else {
+            return;
+        }
+    }
+
+    getSubjectsExcludeCurrentHierarchy = () => {
+        toBeExcluded.length = 0;
         const currentSubject = { ...this.state.subject };
 
         if (currentSubject.subjectId !== null && currentSubject.subjectId !== undefined) {
-            subjectsExcludeCurrent = subjectsExcludeCurrent.filter(s => s.value !== currentSubject.subjectId);
-            console.log("newArray", subjectsExcludeCurrent);
+            this.excludeCurrentHierarchy(currentSubject.subjectId);
         }
+        console.log("Exc", toBeExcluded);
+        const subjectsExcludeCurrent = this.state.subjects.filter(s => toBeExcluded.indexOf(s) === -1);
         this.setState({ subjectsExcludeCurrent });
     }
 
@@ -385,7 +407,7 @@ class Subject extends Component {
                                 name="parentSubjectId"
                                 placeholder="Select Parent Subject"
                                 aria-label="Select Parent Subject"
-                                value={{value: subject.parentSubjectId || '', label: subjectName || ''}}
+                                value={{ value: subject.parentSubjectId || '', label: subjectName || '' }}
                                 onChange={this.handleSubjectSelectChange}
                                 onMenuOpen={this.getSubjectsExcludeCurrentHierarchy}
                                 clearable={true}
