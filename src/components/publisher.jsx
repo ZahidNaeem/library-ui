@@ -5,7 +5,12 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
-import { API_PUBLISHER_URL } from './constant'
+import {
+    API_PUBLISHER_URL,
+    INPUT_GROUP_TEXT_STYLE,
+    STRETCH_STYLE,
+    SMALL_BUTTON_STYLE
+} from './constant'
 
 class Publisher extends Component {
 
@@ -229,24 +234,12 @@ class Publisher extends Component {
     render() {
         const { publisher, navigationDtl } = this.state;
 
-        const inputGroupTextStyle = {
-            width: "180px"
-        }
-
-        const stretchStyle = {
-            flex: "1"
-        }
-
-        const smallButtonStyle = {
-            width: "10%"
-        }
-
         return (
             <>
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Publisher ID</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Publisher ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="publisherId"
@@ -260,7 +253,7 @@ class Publisher extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Publisher Name</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Publisher Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="publisherName"
@@ -275,7 +268,7 @@ class Publisher extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Remarks</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Remarks</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             as="textarea"
@@ -294,7 +287,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstPublisher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>First
                             </Button>
 
@@ -302,7 +295,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousPublisher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Previous
                             </Button>
 
@@ -310,7 +303,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextPublisher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Next
                             </Button>
 
@@ -318,7 +311,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastPublisher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Last
                             </Button>
 
@@ -329,7 +322,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newPublisher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Add
                             </Button>
 
@@ -337,7 +330,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ publisherAlert: true })}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Delete
                             </Button>
 
@@ -359,7 +352,7 @@ class Publisher extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
                             </Button>
@@ -367,7 +360,7 @@ class Publisher extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
                             active>Undo
                             </Button>

@@ -5,7 +5,12 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
-import { API_RESEARCHER_URL } from './constant'
+import {
+    API_RESEARCHER_URL,
+    INPUT_GROUP_TEXT_STYLE,
+    STRETCH_STYLE,
+    SMALL_BUTTON_STYLE
+} from './constant'
 
 class Researcher extends Component {
 
@@ -229,24 +234,12 @@ class Researcher extends Component {
     render() {
         const { researcher, navigationDtl } = this.state;
 
-        const inputGroupTextStyle = {
-            width: "180px"
-        }
-
-        const stretchStyle = {
-            flex: "1"
-        }
-
-        const smallButtonStyle = {
-            width: "10%"
-        }
-
         return (
             <>
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Researcher ID</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Researcher ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="researcherId"
@@ -260,7 +253,7 @@ class Researcher extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Researcher Name</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Researcher Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             name="researcherName"
@@ -275,7 +268,7 @@ class Researcher extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Remarks</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Remarks</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             as="textarea"
@@ -294,7 +287,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstResearcher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>First
                             </Button>
 
@@ -302,7 +295,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousResearcher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Previous
                             </Button>
 
@@ -310,7 +303,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextResearcher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Next
                             </Button>
 
@@ -318,7 +311,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastResearcher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Last
                             </Button>
 
@@ -329,7 +322,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newResearcher}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Add
                             </Button>
 
@@ -337,7 +330,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ researcherAlert: true })}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Delete
                             </Button>
 
@@ -359,7 +352,7 @@ class Researcher extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.saveResearcherShowMessage("Researcher saved successfully.")}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
                             </Button>
@@ -367,7 +360,7 @@ class Researcher extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
                             active>Undo
                             </Button>

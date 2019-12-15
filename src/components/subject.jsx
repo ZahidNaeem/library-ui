@@ -12,7 +12,12 @@ import Select from 'react-select'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils'
-import { API_SUBJECT_URL } from './constant'
+import {
+    API_SUBJECT_URL,
+    INPUT_GROUP_TEXT_STYLE,
+    STRETCH_STYLE,
+    SMALL_BUTTON_STYLE
+} from './constant'
 
 let toBeExcluded = [];
 class Subject extends Component {
@@ -335,24 +340,12 @@ class Subject extends Component {
     render() {
         const { subject, navigationDtl, subjectsExcludeCurrent, subjectName } = this.state;
 
-        const inputGroupTextStyle = {
-            width: "180px"
-        }
-
-        const stretchStyle = {
-            flex: "1"
-        }
-
-        const smallButtonStyle = {
-            width: "10%"
-        }
-
         return (
             <>
                 <Form dir="rtl">
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Subject
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Subject
                   ID</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
@@ -367,7 +360,7 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Subject
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Subject
                   Code</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
@@ -383,7 +376,7 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Subject
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Subject
                   Name</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
@@ -399,10 +392,10 @@ class Subject extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={inputGroupTextStyle}>Parent
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Parent
                   Subject</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <div style={stretchStyle}>
+                        <div style={STRETCH_STYLE}>
                             <Select
                                 name="parentSubjectId"
                                 placeholder="Select Parent Subject"
@@ -419,7 +412,7 @@ class Subject extends Component {
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text
-                                style={inputGroupTextStyle}>Remarks</InputGroup.Text>
+                                style={INPUT_GROUP_TEXT_STYLE}>Remarks</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
                             as="textarea"
@@ -438,7 +431,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstSubject}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>First
               </Button>
 
@@ -446,7 +439,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousSubject}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Previous
               </Button>
 
@@ -454,7 +447,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextSubject}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Next
               </Button>
 
@@ -462,7 +455,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastSubject}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Last
               </Button>
 
@@ -473,7 +466,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newSubject}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Add
               </Button>
 
@@ -481,7 +474,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ subjectAlert: true })}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>Delete
               </Button>
 
@@ -504,7 +497,7 @@ class Subject extends Component {
                             variant="primary"
                             onClick={() => this.saveSubjectShowMessage(
                                 "Subject saved successfully.")}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
                             active>Save
               </Button>
@@ -512,7 +505,7 @@ class Subject extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={smallButtonStyle}
+                            className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
                             active>Undo
               </Button>

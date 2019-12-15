@@ -3,7 +3,7 @@ export const API_AUTHOR_URL = API_BASE_URL + 'authors/';
 export const API_SUBJECT_URL = API_BASE_URL + 'subjects/';
 export const API_PUBLISHER_URL = API_BASE_URL + 'publishers/';
 export const API_RESEARCHER_URL = API_BASE_URL + 'researchers/';
-export const API_SHELF_URL = API_BASE_URL + 'shelfs/';
+export const API_SHELF_URL = API_BASE_URL + 'shelves/';
 export const API_BOOK_URL = API_BASE_URL + 'books/';
 
 export const ACCESS_TOKEN = 'accessToken';
@@ -23,3 +23,15 @@ export const EMAIL_MAX_LENGTH = 40;
 
 export const PASSWORD_MIN_LENGTH = 6;
 export const PASSWORD_MAX_LENGTH = 20;
+
+export const INPUT_GROUP_TEXT_STYLE = {
+    width: "180px"
+}
+
+export const STRETCH_STYLE = {
+    flex: "1"
+}
+
+export const SMALL_BUTTON_STYLE = {
+    width: "10%"
+}
