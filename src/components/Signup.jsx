@@ -1,17 +1,27 @@
 import React, { Component } from 'react';
 import { signup, checkUsernameAvailability, checkEmailAvailability, isSuccessfullResponse } from './util/APIUtils';
-import './Signup.css';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Footer from './common/footer';
 import {
-    NAME_MIN_LENGTH, NAME_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH,
+    NAME_MIN_LENGTH,
+    NAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
     EMAIL_MAX_LENGTH,
-    PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH
+    PASSWORD_MIN_LENGTH,
+    PASSWORD_MAX_LENGTH,
+    INPUT_GROUP_TEXT_STYLE
 } from './constant';
-
-import { Form, Input, Button, notification } from 'antd';
-
-const FormItem = Form.Item;
+import {
+    Button,
+    ButtonToolbar,
+    Form,
+    FormControl,
+    InputGroup,
+    FormGroup
+} from 'react-bootstrap';
 
 class Signup extends Component {
     state = {
@@ -50,30 +60,26 @@ class Signup extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
 
+        const { name, username, email, password, role } = this.state;
+
         const signupRequest = {
-            name: this.state.name.value,
-            username: this.state.username.value,
-            email: this.state.email.value,
-            password: this.state.password.value,
+            name: name.value,
+            username: username.value,
+            email: email.value,
+            password: password.value,
             organization: 1,
-            role: [...this.state.role]
+            role: [...role]
         };
         try {
             const res = await signup(signupRequest);
             console.log("Response:", res);
 
             if (isSuccessfullResponse(res)) {
-                notification.success({
-                    message: 'Library App',
-                    description: "Thank you! You're successfully registered. Please Login to continue!",
-                });
+                toast.success("Thank you! You're successfully registered. Please Login to continue!");
                 this.props.history.push("/login");
             }
         } catch (error) {
-            notification.error({
-                message: 'Library App',
-                description: error.message || 'Sorry! Something went wrong. Please try again!'
-            });
+            toast.error(error.message || 'Sorry! Something went wrong. Please try again!');
         }
     }
 
@@ -87,73 +93,90 @@ class Signup extends Component {
 
     render() {
         return (
-            <div className="signup-container">
-                <h1 className="page-title">Sign Up</h1>
-                <div className="signup-content">
-                    <Form onSubmit={this.handleSubmit} className="signup-form">
-                        <FormItem
-                            label="Full Name"
-                            validateStatus={this.state.name.validateStatus}
-                            help={this.state.name.errorMsg}>
-                            <Input
-                                size="large"
-                                name="name"
-                                autoComplete="off"
-                                placeholder="Your full name"
-                                value={this.state.name.value}
-                                onChange={(event) => this.handleInputChange(event, this.validateName)} />
-                        </FormItem>
-                        <FormItem label="Username"
-                            hasFeedback
-                            validateStatus={this.state.username.validateStatus}
-                            help={this.state.username.errorMsg}>
-                            <Input
-                                size="large"
-                                name="username"
-                                autoComplete="off"
-                                placeholder="A unique username"
-                                value={this.state.username.value}
-                                onBlur={this.validateUsernameAvailability}
-                                onChange={(event) => this.handleInputChange(event, this.validateUsername)} />
-                        </FormItem>
-                        <FormItem
-                            label="Email"
-                            hasFeedback
-                            validateStatus={this.state.email.validateStatus}
-                            help={this.state.email.errorMsg}>
-                            <Input
-                                size="large"
-                                name="email"
-                                type="email"
-                                autoComplete="off"
-                                placeholder="Your email"
-                                value={this.state.email.value}
-                                onBlur={this.validateEmailAvailability}
-                                onChange={(event) => this.handleInputChange(event, this.validateEmail)} />
-                        </FormItem>
-                        <FormItem
-                            label="Password"
-                            validateStatus={this.state.password.validateStatus}
-                            help={this.state.password.errorMsg}>
-                            <Input
-                                size="large"
-                                name="password"
-                                type="password"
-                                autoComplete="off"
-                                placeholder="A password between 6 to 20 characters"
-                                value={this.state.password.value}
-                                onChange={(event) => this.handleInputChange(event, this.validatePassword)} />
-                        </FormItem>
-                        <FormItem>
-                            <Button type="primary"
-                                htmlType="submit"
-                                size="large"
-                                className="signup-form-button"
-                                disabled={this.isFormInvalid()}>Sign up</Button>
+            <div id="content-wrapper" className="d-flex flex-column">
+                <h1 className="text-center mb-4 text-gray-800">Sign Up</h1>
+                <div id="content">
+                    <div className="container-fluid">
+                        <Form onSubmit={this.handleSubmit} className="signup-form">
+                            <FormGroup>
+                                <InputGroup className="mb-3">
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Full Name</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                        name="name"
+                                        placeholder="Your full name"
+                                        value={this.state.name.value}
+                                        onChange={(event) => this.handleInputChange(event, this.validateName)}
+                                    />
+                                </InputGroup>
+                                {this.state.name.errorMsg}
+                            </FormGroup>
+
+                            <FormGroup>
+                                <InputGroup className="mb-3">
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Username</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                        name="username"
+                                        autoComplete="off"
+                                        placeholder="A unique username"
+                                        value={this.state.username.value}
+                                        onBlur={this.validateUsernameAvailability}
+                                        onChange={(event) => this.handleInputChange(event, this.validateUsername)}
+                                    />
+                                </InputGroup>
+                                {this.state.username.errorMsg}
+                            </FormGroup>
+
+                            <FormGroup>
+                                <InputGroup className="mb-3">
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Username</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                        name="email"
+                                        type="email"
+                                        autoComplete="off"
+                                        placeholder="Your email"
+                                        value={this.state.email.value}
+                                        onBlur={this.validateEmailAvailability}
+                                        onChange={(event) => this.handleInputChange(event, this.validateEmail)}
+                                    />
+                                </InputGroup>
+                                {this.state.email.errorMsg}
+                            </FormGroup>
+
+                            <FormGroup>
+                                <InputGroup className="mb-3">
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Username</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                        name="password"
+                                        type="password"
+                                        autoComplete="off"
+                                        placeholder="A password between 6 to 20 characters"
+                                        value={this.state.password.value}
+                                        onChange={(event) => this.handleInputChange(event, this.validatePassword)}
+                                    />
+                                </InputGroup>
+                                {this.state.password.errorMsg}
+                            </FormGroup>
+
+                            <ButtonToolbar>
+                                <Button
+                                    type="submit"
+                                    size="large"
+                                    className="signup-form-button"
+                                    disabled={this.isFormInvalid()}>Sign up</Button>
+                            </ButtonToolbar>
                             Already registed? <Link to="/login">Login now!</Link>
-                        </FormItem>
-                    </Form>
+                        </Form>
+                    </div>
                 </div>
+                <Footer />
             </div>
         );
     }

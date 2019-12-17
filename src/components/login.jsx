@@ -178,8 +178,9 @@ class Login extends Component {
                                                     <FormItem className="small">
                                                         Not a member?&nbsp;
                                                         <Link
-                                                            // to="/signup"
-                                                            onClick={showRegisterPopup}>
+                                                            to="/signup"
+                                                            // onClick={showRegisterPopup}
+                                                            >
                                                             Register
                                                             </Link>
                                                         {registerPopup}
