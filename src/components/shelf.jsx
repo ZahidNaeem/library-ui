@@ -188,7 +188,7 @@ class Shelf extends Component {
         this.setState({ saveButtonDisabled: true });
         if (shelf.shelfId != null) {
             const operation = shelf.shelfId;
-            this.saveAndNavigateShelf(operation);
+            this.navigateShelf(operation);
         } else {
             this.firstShelf();
         }

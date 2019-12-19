@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
-import Select from 'react-select'
+import MySelect from './common/select'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils'
@@ -25,7 +25,6 @@ class Subject extends Component {
     state = {
         subject: {},
         subjects: [],
-        subjectName: '',
         subjectsExcludeCurrent: [],
         navigationDtl: {},
         subjectAlert: false,
@@ -37,6 +36,8 @@ class Subject extends Component {
     }
 
     async componentDidMount() {
+        console.log("componentDidMount called");
+
         this.firstSubject();
         await this.populateSubjects();
         const canAdd = await this.canAdd();
@@ -76,6 +77,21 @@ class Subject extends Component {
         }
         this.setState({ subject, saveButtonDisabled, undoButtonDisabled: false });
     }
+
+    handleChange = (selectedOption, name) => {
+        console.log("Target name", name);
+        const subject = { ...this.state.subject };
+        subject[name.name] = selectedOption.value;
+        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        if (subject.subjectName === undefined || subject.subjectName === null
+            || subject.subjectName === '') {
+            saveButtonDisabled = true;
+        } else {
+            saveButtonDisabled = false;
+        }
+        this.setState({ subject, selectedOption, saveButtonDisabled, undoButtonDisabled: false });
+        console.log(`Option selected:`, selectedOption);
+    };
 
     handleSubjectSelectChange = (selectedSubject, name) => {
         const subject = { ...this.state.subject };
@@ -218,11 +234,10 @@ class Subject extends Component {
 
     undoChanges = () => {
         const subject = { ...this.state.subject };
-        console.log("Subject ID: ", subject.subjectId);
         this.setState({ saveButtonDisabled: true });
         if (subject.subjectId != null) {
             const operation = subject.subjectId;
-            this.saveAndNavigateSubject(operation);
+            this.navigateSubject(operation);
         } else {
             this.firstSubject();
         }
@@ -305,8 +320,6 @@ class Subject extends Component {
     }
 
     excludeCurrentHierarchy = (subjectId) => {
-        console.log("Subject ID", subjectId);
-
         let subjects = this.state.subjects;
 
         const rootArray = subjects.filter(s => s.value === subjectId);
@@ -334,11 +347,27 @@ class Subject extends Component {
         }
         console.log("Exc", toBeExcluded);
         const subjectsExcludeCurrent = this.state.subjects.filter(s => toBeExcluded.indexOf(s) === -1);
-        this.setState({ subjectsExcludeCurrent });
+        return subjectsExcludeCurrent;
+        // this.setState({ subjectsExcludeCurrent });
+    }
+
+    selectChanged = (name, value) => {
+        console.log("selectChanged name", name);
+        console.log("selectChanged value", value);
+        const { subject } = this.state;
+        subject[name] = value;
+        let saveButtonDisabled = true;
+        if (subject.subjectName === undefined || subject.subjectName === null
+            || subject.subjectName === '') {
+            saveButtonDisabled = true;
+        } else {
+            saveButtonDisabled = false;
+        }
+        this.setState({ subject, saveButtonDisabled, undoButtonDisabled: false });
     }
 
     render() {
-        const { subject, navigationDtl, subjectsExcludeCurrent, subjectName } = this.state;
+        const { subject, navigationDtl } = this.state;
 
         return (
             <>
@@ -396,15 +425,20 @@ class Subject extends Component {
                   Subject</InputGroup.Text>
                         </InputGroup.Prepend>
                         <div style={STRETCH_STYLE}>
-                            <Select
+                            <MySelect
                                 name="parentSubjectId"
+                                // className="basic-single"
+                                // classNamePrefix="select"
                                 placeholder="Select Parent Subject"
-                                aria-label="Select Parent Subject"
-                                value={{ value: subject.parentSubjectId || '', label: subjectName || '' }}
-                                onChange={this.handleSubjectSelectChange}
-                                onMenuOpen={this.getSubjectsExcludeCurrentHierarchy}
-                                clearable={true}
-                                options={subjectsExcludeCurrent}
+                                // aria-label="Select Parent Subject"
+                                value={subject.parentSubjectId}
+                                selectChanged={this.selectChanged}
+                                // noOptionsMessage="Select Parent Subject"
+                                // onChange={(selectedOption, name) => this.handleChange(selectedOption, name)}
+                                // onMenuOpen={this.getSubjectsExcludeCurrentHierarchy}
+                                // clearable={true}
+                                // options={subjectsExcludeCurrent}
+                                options={this.getSubjectsExcludeCurrentHierarchy()}
                             />
                         </div>
                     </InputGroup>

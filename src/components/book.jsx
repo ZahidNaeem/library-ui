@@ -188,7 +188,7 @@ class Book extends Component {
         this.setState({ saveButtonDisabled: true });
         if (book.bookId != null) {
             const operation = book.bookId;
-            this.saveAndNavigateBook(operation);
+            this.navigateBook(operation);
         } else {
             this.firstBook();
         }

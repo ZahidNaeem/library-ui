@@ -188,7 +188,7 @@ class Author extends Component {
         this.setState({ saveButtonDisabled: true });
         if (author.authorId != null) {
             const operation = author.authorId;
-            this.saveAndNavigateAuthor(operation);
+            this.navigateAuthor(operation);
         } else {
             this.firstAuthor();
         }

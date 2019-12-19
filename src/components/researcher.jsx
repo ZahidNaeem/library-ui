@@ -188,7 +188,7 @@ class Researcher extends Component {
         this.setState({ saveButtonDisabled: true });
         if (researcher.researcherId != null) {
             const operation = researcher.researcherId;
-            this.saveAndNavigateResearcher(operation);
+            this.navigateResearcher(operation);
         } else {
             this.firstResearcher();
         }

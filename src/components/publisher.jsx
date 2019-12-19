@@ -188,7 +188,7 @@ class Publisher extends Component {
         this.setState({ saveButtonDisabled: true });
         if (publisher.publisherId != null) {
             const operation = publisher.publisherId;
-            this.saveAndNavigatePublisher(operation);
+            this.navigatePublisher(operation);
         } else {
             this.firstPublisher();
         }
