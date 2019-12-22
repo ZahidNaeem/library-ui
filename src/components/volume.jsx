@@ -6,6 +6,7 @@ import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse } from './util/APIUtils'
 import {
     API_VOLUME_URL,
+    API_RACK_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
     LARGE_BUTTON_STYLE,
@@ -18,6 +19,7 @@ class Volume extends Component {
 
     state = {
         book: {},
+        racks: [],
         volumeAlert: false,
         volumeIndex: null
     }
@@ -28,6 +30,10 @@ class Volume extends Component {
             const { book } = props;
             this.setState({ book });
         }
+    }
+
+    async componentDidMount() {
+        await this.populateRacks();
     }
 
     handleVolumeChange = async (event, index) => {
@@ -123,14 +129,37 @@ class Volume extends Component {
         }
     }
 
+    async populateRacks() {
+        console.log("Start populate racks");
+        const racks = [];
+        const options = {
+            url: API_RACK_URL + 'details',
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate racks");
+                res.data.forEach(element => {
+                    racks.push({
+                        value: element.rackId,
+                        label: 'Shelf:' + element.shelfName + ' - Rack:' + element.rackName
+                    });
+                });
+            }
+            console.log("Racks:", racks);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ racks });
+    }
 
     render() {
-        const { volumes } = this.state.book;
-        const racks = [
-            { value: 'A', label: 'A' },
-            { value: 'B', label: 'B' },
-            { value: 'C', label: 'C' }
-        ]
+        const { book, racks } = this.state;
+        const { volumes } = book;
+        const { fieldsDisabled, addButtondisabled, deleteButtondisabled } = this.props;
+        
+
         return (
             <>
                 <br />
@@ -138,7 +167,7 @@ class Volume extends Component {
                 <ButtonToolbar className="m-2">
                     <Button
                         variant="primary"
-                        // disabled={navigationDtl.first}
+                        disabled={addButtondisabled}
                         onClick={this.addVolume}
                         className="mr-1" style={LARGE_BUTTON_STYLE}
                         active>Add Volume
@@ -146,7 +175,7 @@ class Volume extends Component {
 
                     <Button
                         variant="primary"
-                        // disabled={navigationDtl.first}
+                        disabled={deleteButtondisabled}
                         onClick={() => this.setState({ volumeAlert: true })}
                         className="mr-1" style={LARGE_BUTTON_STYLE}
                         active>Delete Volume
@@ -171,12 +200,13 @@ class Volume extends Component {
                     striped
                     bordered
                     hover
-                    responsive>
+                // responsive
+                >
                     <thead>
 
                         <tr>
                             <th style={INPUT_DATE_STYLE}>Volume Number</th>
-                            <th style={INPUT_DATE_STYLE}>Rack</th>
+                            <th style={STRETCH_STYLE}>Rack</th>
                             <th style={STRETCH_STYLE}>Remarks</th>
                         </tr>
                     </thead>
@@ -192,6 +222,7 @@ class Volume extends Component {
                                             placeholder="Volume Number"
                                             aria-label="Volume Number"
                                             value={volume.volumeName || ''}
+                                            disabled={fieldsDisabled}
                                             required
                                             onChange={e => this.handleVolumeChange(e, index)}
                                         />
@@ -202,6 +233,7 @@ class Volume extends Component {
                                             placeholder="Select Rack"
                                             value={volume.rack || ''}
                                             onChange={(name, value) => this.handleSelectChange(name, value, index)}
+                                            disabled={fieldsDisabled}
                                             options={racks}
                                         />
                                     </td>
@@ -212,6 +244,7 @@ class Volume extends Component {
                                             placeholder="Remarks"
                                             aria-label="Remarks"
                                             value={volume.remarks || ''}
+                                            disabled={fieldsDisabled}
                                             onChange={e => this.handleVolumeChange(e, index)}
                                         />
                                     </td>

@@ -47,13 +47,13 @@ class MySelect extends Component {
     }
 
     clearValue = () => {
-        this.setState({selectedOption: null});
+        this.setState({ selectedOption: null });
         return true;
     }
 
     showSelect = () => {
         const { selectedOption, options } = this.state;
-        
+
         return (<Select
             name={this.props.name}
             value={selectedOption}
@@ -66,7 +66,7 @@ class MySelect extends Component {
 
     render() {
         return (
-            <div>
+            <div style={this.props.style}>
                 {this.showSelect()}
             </div>
         );

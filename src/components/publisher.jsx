@@ -245,7 +245,7 @@ class Publisher extends Component {
 
 
     render() {
-        const { publisher, navigationDtl } = this.state;
+        const { publisher, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
 
         return (
             <>
@@ -274,7 +274,7 @@ class Publisher extends Component {
                             aria-label="Publisher Name"
                             value={publisher.publisherName || ''}
                             required
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handlePublisherChange}
                         />
                     </InputGroup>
@@ -290,7 +290,7 @@ class Publisher extends Component {
                             placeholder="Remarks"
                             aria-label="Remarks"
                             value={publisher.remarks || ''}
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handlePublisherChange}
                         />
                     </InputGroup>
@@ -333,7 +333,7 @@ class Publisher extends Component {
                     <ButtonToolbar className="mb-2">
                         <Button
                             variant="primary"
-                            disabled={this.state.addButtonDisabled}
+                            disabled={addButtonDisabled}
                             onClick={this.newPublisher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
@@ -341,7 +341,7 @@ class Publisher extends Component {
 
                         <Button
                             variant="primary"
-                            disabled={this.state.deleteButtonDisabled}
+                            disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ publisherAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
@@ -366,7 +366,7 @@ class Publisher extends Component {
                             variant="primary"
                             onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.saveButtonDisabled}
+                            disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                             </Button>
 
@@ -374,7 +374,7 @@ class Publisher extends Component {
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.undoButtonDisabled}
+                            disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                             </Button>
                     </ButtonToolbar>

@@ -12,7 +12,6 @@ import {
     SMALL_BUTTON_STYLE,
     INPUT_DATE_STYLE
 } from './constant'
-import MySelect from './common/select';
 
 class Rack extends Component {
 
@@ -69,10 +68,10 @@ class Rack extends Component {
 
     addRack = async () => {
         let shelf = { ...this.state.shelf };
-        
+
         let newRack = {};
-        
-        if(this.state.shelf.racks === null){
+
+        if (this.state.shelf.racks === null) {
             alert("Please add shelf, then add rack");
             return;
         }
@@ -125,7 +124,8 @@ class Rack extends Component {
 
     render() {
         const { racks } = this.state.shelf;
-        
+        const { fieldsDisabled, addButtondisabled, deleteButtondisabled } = this.props;
+
         return (
             <>
                 <br />
@@ -133,7 +133,7 @@ class Rack extends Component {
                 <ButtonToolbar className="m-2">
                     <Button
                         variant="primary"
-                        // disabled={navigationDtl.first}
+                        disabled={addButtondisabled}
                         onClick={this.addRack}
                         className="mr-1" style={LARGE_BUTTON_STYLE}
                         active>Add Rack
@@ -141,7 +141,7 @@ class Rack extends Component {
 
                     <Button
                         variant="primary"
-                        // disabled={navigationDtl.first}
+                        disabled={deleteButtondisabled}
                         onClick={() => this.setState({ rackAlert: true })}
                         className="mr-1" style={LARGE_BUTTON_STYLE}
                         active>Delete Rack
@@ -166,7 +166,8 @@ class Rack extends Component {
                     striped
                     bordered
                     hover
-                    responsive>
+                // responsive
+                >
                     <thead>
 
                         <tr>
@@ -187,6 +188,7 @@ class Rack extends Component {
                                             aria-label="Rack Number"
                                             value={rack.rackName || ''}
                                             required
+                                            disabled={fieldsDisabled}
                                             onChange={e => this.handleRackChange(e, index)}
                                         />
                                     </td>
@@ -197,6 +199,7 @@ class Rack extends Component {
                                             placeholder="Remarks"
                                             aria-label="Remarks"
                                             value={rack.remarks || ''}
+                                            disabled={fieldsDisabled}
                                             onChange={e => this.handleRackChange(e, index)}
                                         />
                                     </td>

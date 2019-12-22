@@ -356,7 +356,7 @@ class Subject extends Component {
     }
 
     render() {
-        const { subject, navigationDtl } = this.state;
+        const { subject, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
 
         return (
             <>
@@ -387,7 +387,7 @@ class Subject extends Component {
                             aria-label="Subject Code"
                             value={subject.subjectCode || ''}
                             required
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleSubjectChange}
                         />
                     </InputGroup>
@@ -402,7 +402,7 @@ class Subject extends Component {
                             aria-label="Subject Name"
                             value={subject.subjectName || ''}
                             required
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleSubjectChange}
                         />
                     </InputGroup>
@@ -434,7 +434,7 @@ class Subject extends Component {
                             placeholder="Remarks"
                             aria-label="Remarks"
                             value={subject.remarks || ''}
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleSubjectChange}
                         />
                     </InputGroup>
@@ -477,7 +477,7 @@ class Subject extends Component {
                     <ButtonToolbar className="mb-2">
                         <Button
                             variant="primary"
-                            disabled={this.state.addButtonDisabled}
+                            disabled={addButtonDisabled}
                             onClick={this.newSubject}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
@@ -485,7 +485,7 @@ class Subject extends Component {
 
                         <Button
                             variant="primary"
-                            disabled={this.state.deleteButtonDisabled}
+                            disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ subjectAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
@@ -511,7 +511,7 @@ class Subject extends Component {
                             onClick={() => this.saveSubjectShowMessage(
                                 "Subject saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.saveButtonDisabled}
+                            disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
               </Button>
 
@@ -519,7 +519,7 @@ class Subject extends Component {
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.undoButtonDisabled}
+                            disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
               </Button>
                     </ButtonToolbar>

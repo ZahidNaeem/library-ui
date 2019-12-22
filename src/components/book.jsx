@@ -382,7 +382,7 @@ class Book extends Component {
     }
 
     render() {
-        const { book, navigationDtl, authors, subjects, publishers, researchers, fieldsDisabled } = this.state;
+        const { book, navigationDtl, authors, subjects, publishers, researchers, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
 
         const items = [
             { value: parseInt("1"), label: "Purchased", disabled: fieldsDisabled },
@@ -417,7 +417,7 @@ class Book extends Component {
                             aria-label="Book Name"
                             value={book.bookName || ''}
                             required
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleBookChange}
                         />
                     </InputGroup>
@@ -431,7 +431,7 @@ class Book extends Component {
                             name="publicationDate"
                             placeholder="Publication Date"
                             aria-label="Publication Date"
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onSelect={this.handleBookChange}
                             onChange={this.handleBookChange}
                             value={book.publicationDate != null ? book.publicationDate.split("T")[0] : ''}
@@ -538,7 +538,7 @@ class Book extends Component {
                             placeholder="Remarks"
                             aria-label="Remarks"
                             value={book.remarks || ''}
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleBookChange}
                         />
                     </InputGroup>
@@ -581,7 +581,7 @@ class Book extends Component {
                     <ButtonToolbar className="mb-2">
                         <Button
                             variant="primary"
-                            disabled={this.state.addButtonDisabled}
+                            disabled={addButtonDisabled}
                             onClick={this.newBook}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
@@ -589,7 +589,7 @@ class Book extends Component {
 
                         <Button
                             variant="primary"
-                            disabled={this.state.deleteButtonDisabled}
+                            disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ bookAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
@@ -614,7 +614,7 @@ class Book extends Component {
                             variant="primary"
                             onClick={() => this.saveBookShowMessage("Book saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.saveButtonDisabled}
+                            disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                         </Button>
 
@@ -622,11 +622,18 @@ class Book extends Component {
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.undoButtonDisabled}
+                            disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                         </Button>
                     </ButtonToolbar>
-                    <Volume book={book} addVolumeIntoBook={this.addVolumeIntoBook} enableSaveUndoButton={this.enableSaveUndoButton} />
+                    <Volume
+                        book={book}
+                        addVolumeIntoBook={this.addVolumeIntoBook}
+                        enableSaveUndoButton={this.enableSaveUndoButton}
+                        fieldsDisabled={fieldsDisabled}
+                        addButtondisabled={addButtonDisabled}
+                        deleteButtondisabled={deleteButtonDisabled}
+                    />
                 </Form>
             </>
         );

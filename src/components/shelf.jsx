@@ -255,7 +255,7 @@ class Shelf extends Component {
 
 
     render() {
-        const { shelf, navigationDtl } = this.state;
+        const { shelf, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
 
         return (
             <>
@@ -284,7 +284,7 @@ class Shelf extends Component {
                             aria-label="Shelf Name"
                             value={shelf.shelfName || ''}
                             required
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleShelfChange}
                         />
                     </InputGroup>
@@ -300,7 +300,7 @@ class Shelf extends Component {
                             placeholder="Remarks"
                             aria-label="Remarks"
                             value={shelf.remarks || ''}
-                            disabled={this.state.fieldsDisabled}
+                            disabled={fieldsDisabled}
                             onChange={this.handleShelfChange}
                         />
                     </InputGroup>
@@ -343,7 +343,7 @@ class Shelf extends Component {
                     <ButtonToolbar className="mb-2">
                         <Button
                             variant="primary"
-                            disabled={this.state.addButtonDisabled}
+                            disabled={addButtonDisabled}
                             onClick={this.newShelf}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
@@ -351,7 +351,7 @@ class Shelf extends Component {
 
                         <Button
                             variant="primary"
-                            disabled={this.state.deleteButtonDisabled}
+                            disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ shelfAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
@@ -376,7 +376,7 @@ class Shelf extends Component {
                             variant="primary"
                             onClick={() => this.saveShelfShowMessage("Shelf saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.saveButtonDisabled}
+                            disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                         </Button>
 
@@ -384,11 +384,18 @@ class Shelf extends Component {
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            disabled={this.state.undoButtonDisabled}
+                            disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                         </Button>
                     </ButtonToolbar>
-                    <Rack shelf={shelf} addRackIntoShelf={this.addRackIntoShelf} enableSaveUndoButton={this.enableSaveUndoButton} />
+                    <Rack
+                        shelf={shelf}
+                        addRackIntoShelf={this.addRackIntoShelf}
+                        enableSaveUndoButton={this.enableSaveUndoButton}
+                        fieldsDisabled={fieldsDisabled}
+                        addButtondisabled={addButtonDisabled}
+                        deleteButtondisabled={deleteButtonDisabled}
+                    />
                 </Form>
             </>
         );
