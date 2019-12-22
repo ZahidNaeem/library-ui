@@ -4,19 +4,43 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
+import MySelect from './common/select'
+import ToggleGroup from './common/toggleGroup'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
 import {
     API_BOOK_URL,
+    API_AUTHOR_URL,
+    API_SUBJECT_URL,
+    API_PUBLISHER_URL,
+    API_RESEARCHER_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
-    SMALL_BUTTON_STYLE
+    SMALL_BUTTON_STYLE,
+    BUTTON_FIRST,
+    BUTTON_PREVIOUS,
+    BUTTON_NEXT,
+    BUTTON_LAST,
+    BUTTON_ADD,
+    BUTTON_DELETE,
+    BUTTON_SAVE,
+    BUTTON_UNDO
 } from './constant'
+import Volume from './volume';
+
+const bookConditions = [
+    { value: 'New', label: 'New' },
+    { value: 'Old', label: 'Old' }
+]
 
 class Book extends Component {
 
     state = {
         book: {},
         navigationDtl: {},
+        authors: [],
+        subjects: [],
+        publishers: [],
+        researchers: [],
         bookAlert: false,
         fieldsDisabled: true,
         addButtonDisabled: true,
@@ -26,6 +50,10 @@ class Book extends Component {
     }
 
     async componentDidMount() {
+        await this.populateAuthors();
+        await this.populateSubjects();
+        await this.populatePublishers();
+        await this.populateResearchers();
         this.firstBook();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
@@ -48,16 +76,30 @@ class Book extends Component {
     handleBookChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
-        console.log(value);
+        console.log("Target value", value);
         const book = { ...this.state.book };
-        book[name] = name === 'bookName' ? value.toUpperCase() : value;
-        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        book[name] = name === 'bookName' ? value.toUpperCase() : name === 'purchased' ? parseInt(value) : value;
+        this.enableSaveUndoButton(book);
+        this.setState({ book });
+    }
+
+    handleSelectChange = (name, value) => {
+        console.log("handleSelectChange name", name);
+        console.log("handleSelectChange value", value);
+        const { book } = this.state;
+        book[name] = value;
+        this.enableSaveUndoButton(book);
+        this.setState({ book });
+    }
+
+    enableSaveUndoButton = (book) => {
+        let saveButtonDisabled = true;
         if (book.bookName === undefined || book.bookName === null || book.bookName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ book, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
@@ -76,6 +118,15 @@ class Book extends Component {
         const book = {};
         book.bookStocks = [];
         this.setState({ book, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+    }
+
+    addVolumeIntoBook = (volumes) => {
+        let book = { ...this.state.book };
+        // volumes.map(volume => {
+        //     volume['book'] = book.bookId;
+        // });
+        book.volumes = volumes;
+        this.setState({ book });
     }
 
     saveBook = async () => {
@@ -230,14 +281,119 @@ class Book extends Component {
         }
     }
 
+    async populateAuthors() {
+        console.log("Start populate authors");
+        const authors = [];
+        const options = {
+            url: API_AUTHOR_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate authors");
+                res.data.forEach(element => {
+                    authors.push({
+                        value: element.authorId,
+                        label: element.authorName
+                    });
+                });
+            }
+            console.log("Authors:", authors);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ authors });
+    }
+
+    async populateSubjects() {
+        console.log("Start populate subjects");
+        const subjects = [];
+        const options = {
+            url: API_SUBJECT_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate subjects");
+                res.data.forEach(element => {
+                    subjects.push({
+                        value: element.subjectId,
+                        label: element.subjectName
+                    });
+                });
+            }
+            console.log("Subjects:", subjects);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ subjects });
+    }
+
+    async populatePublishers() {
+        console.log("Start populate publishers");
+        const publishers = [];
+        const options = {
+            url: API_PUBLISHER_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate publishers");
+                res.data.forEach(element => {
+                    publishers.push({
+                        value: element.publisherId,
+                        label: element.publisherName
+                    });
+                });
+            }
+            console.log("Publishers:", publishers);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ publishers });
+    }
+
+    async populateResearchers() {
+        console.log("Start populate researchers");
+        const researchers = [];
+        const options = {
+            url: API_RESEARCHER_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate researchers");
+                res.data.forEach(element => {
+                    researchers.push({
+                        value: element.researcherId,
+                        label: element.researcherName
+                    });
+                });
+            }
+            console.log("Researchers:", researchers);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ researchers });
+    }
 
     render() {
-        const { book, navigationDtl } = this.state;
+        const { book, navigationDtl, authors, subjects, publishers, researchers, fieldsDisabled } = this.state;
+
+        const items = [
+            { value: parseInt("1"), label: "Purchased", disabled: fieldsDisabled },
+            { value: parseInt("0"), label: "Gifted", disabled: fieldsDisabled },
+            { value: parseInt("2"), label: "Other", disabled: fieldsDisabled }
+        ]
 
         return (
             <>
                 <Form dir="rtl">
-                    <InputGroup className="mb-3">
+                    {/* <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Book ID</InputGroup.Text>
                         </InputGroup.Prepend>
@@ -249,7 +405,7 @@ class Book extends Component {
                             value={book.bookId || ''}
                             onChange={this.handleBookChange}
                         />
-                    </InputGroup>
+                    </InputGroup> */}
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
@@ -262,6 +418,111 @@ class Book extends Component {
                             value={book.bookName || ''}
                             required
                             disabled={this.state.fieldsDisabled}
+                            onChange={this.handleBookChange}
+                        />
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Publication Date</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                            type="date"
+                            name="publicationDate"
+                            placeholder="Publication Date"
+                            aria-label="Publication Date"
+                            disabled={this.state.fieldsDisabled}
+                            onSelect={this.handleBookChange}
+                            onChange={this.handleBookChange}
+                            value={book.publicationDate != null ? book.publicationDate.split("T")[0] : ''}
+                        />
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Author</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="author"
+                                placeholder="Select Author"
+                                value={book.author}
+                                onChange={this.handleSelectChange}
+                                options={authors}
+                            />
+                        </div>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Subject</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="subject"
+                                placeholder="Select Subject"
+                                value={book.subject}
+                                onChange={this.handleSelectChange}
+                                options={subjects}
+                            />
+                        </div>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Publisher</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="publisher"
+                                placeholder="Select Publisher"
+                                value={book.publisher}
+                                onChange={this.handleSelectChange}
+                                options={publishers}
+                            />
+                        </div>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Researcher</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="researcher"
+                                placeholder="Select Researcher"
+                                value={book.researcher}
+                                onChange={this.handleSelectChange}
+                                options={researchers}
+                            />
+                        </div>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Book Condition</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="bookCondition"
+                                placeholder="Book Condition"
+                                value={book.bookCondition}
+                                onChange={this.handleSelectChange}
+                                options={bookConditions}
+                            />
+                        </div>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Purchased?</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <ToggleGroup
+                            className="radio-group"
+                            pattern="[0-9]*"
+                            name="purchased"
+                            value={book.purchased}
+                            items={items}
                             onChange={this.handleBookChange}
                         />
                     </InputGroup>
@@ -288,32 +549,32 @@ class Book extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.firstBook}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>First
-                            </Button>
+                            active>{BUTTON_FIRST}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousBook}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Previous
-                            </Button>
+                            active>{BUTTON_PREVIOUS}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextBook}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Next
-                            </Button>
+                            active>{BUTTON_NEXT}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastBook}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Last
-                            </Button>
+                            active>{BUTTON_LAST}
+                        </Button>
 
                     </ButtonToolbar>
 
@@ -323,16 +584,16 @@ class Book extends Component {
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newBook}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Add
-                            </Button>
+                            active>{BUTTON_ADD}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ bookAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Delete
-                            </Button>
+                            active>{BUTTON_DELETE}
+                        </Button>
 
                         <SweetAlert
                             show={this.state.bookAlert}
@@ -354,18 +615,18 @@ class Book extends Component {
                             onClick={() => this.saveBookShowMessage("Book saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
-                            active>Save
-                            </Button>
+                            active>{BUTTON_SAVE}
+                        </Button>
 
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
-                            active>Undo
-                            </Button>
+                            active>{BUTTON_UNDO}
+                        </Button>
                     </ButtonToolbar>
-
+                    <Volume book={book} addVolumeIntoBook={this.addVolumeIntoBook} enableSaveUndoButton={this.enableSaveUndoButton} />
                 </Form>
             </>
         );

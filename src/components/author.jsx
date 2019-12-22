@@ -9,7 +9,15 @@ import {
     API_AUTHOR_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
-    SMALL_BUTTON_STYLE
+    SMALL_BUTTON_STYLE,
+    BUTTON_FIRST,
+    BUTTON_PREVIOUS,
+    BUTTON_NEXT,
+    BUTTON_LAST,
+    BUTTON_ADD,
+    BUTTON_DELETE,
+    BUTTON_SAVE,
+    BUTTON_UNDO
 } from './constant'
 
 class Author extends Component {
@@ -51,13 +59,18 @@ class Author extends Component {
         console.log(value);
         const author = { ...this.state.author };
         author[name] = name === 'authorName' ? value.toUpperCase() : value;
-        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        this.enableSaveUndoButton(author);
+        this.setState({ author });
+    }
+
+    enableSaveUndoButton = (author) => {
+        let saveButtonDisabled = true;
         if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ author, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
@@ -237,7 +250,7 @@ class Author extends Component {
         return (
             <>
                 <Form dir="rtl">
-                    <InputGroup className="mb-3">
+                    {/* <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Author ID</InputGroup.Text>
                         </InputGroup.Prepend>
@@ -249,7 +262,7 @@ class Author extends Component {
                             value={author.authorId || ''}
                             onChange={this.handleAuthorChange}
                         />
-                    </InputGroup>
+                    </InputGroup> */}
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
@@ -288,32 +301,32 @@ class Author extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.firstAuthor}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>First
-                            </Button>
+                            active>{BUTTON_FIRST}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousAuthor}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Previous
-                            </Button>
+                            active>{BUTTON_PREVIOUS}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextAuthor}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Next
-                            </Button>
+                            active>{BUTTON_NEXT}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastAuthor}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Last
-                            </Button>
+                            active>{BUTTON_LAST}
+                        </Button>
 
                     </ButtonToolbar>
 
@@ -323,16 +336,16 @@ class Author extends Component {
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newAuthor}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Add
-                            </Button>
+                            active>{BUTTON_ADD}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ authorAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Delete
-                            </Button>
+                            active>{BUTTON_DELETE}
+                        </Button>
 
                         <SweetAlert
                             show={this.state.authorAlert}
@@ -354,16 +367,16 @@ class Author extends Component {
                             onClick={() => this.saveAuthorShowMessage("Author saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
-                            active>Save
-                            </Button>
+                            active>{BUTTON_SAVE}
+                        </Button>
 
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
-                            active>Undo
-                            </Button>
+                            active>{BUTTON_UNDO}
+                        </Button>
                     </ButtonToolbar>
 
                 </Form>

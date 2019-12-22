@@ -4,7 +4,19 @@ export const API_SUBJECT_URL = API_BASE_URL + 'subjects/';
 export const API_PUBLISHER_URL = API_BASE_URL + 'publishers/';
 export const API_RESEARCHER_URL = API_BASE_URL + 'researchers/';
 export const API_SHELF_URL = API_BASE_URL + 'shelves/';
+export const API_RACK_URL = API_BASE_URL + 'racks/';
 export const API_BOOK_URL = API_BASE_URL + 'books/';
+export const API_VOLUME_URL = API_BASE_URL + 'volumes/';
+
+export const BUTTON_FIRST = 'الأول';
+export const BUTTON_PREVIOUS = 'السابق';
+export const BUTTON_NEXT = 'اللاحق';
+export const BUTTON_LAST = 'الآخر';
+
+export const BUTTON_ADD = 'إضافة';
+export const BUTTON_DELETE = 'حذف';
+export const BUTTON_SAVE = 'حفظ';
+export const BUTTON_UNDO = 'إلغاء';
 
 export const ACCESS_TOKEN = 'accessToken';
 export const LOGIN_REQUEST = 'loginRequest';
@@ -34,4 +46,12 @@ export const STRETCH_STYLE = {
 
 export const SMALL_BUTTON_STYLE = {
     width: "10%"
+}
+
+export const LARGE_BUTTON_STYLE = {
+    width: "15%"
+}
+
+export const INPUT_DATE_STYLE = {
+    width: "15%"
 }

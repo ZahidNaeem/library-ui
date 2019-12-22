@@ -24,8 +24,8 @@ class MySelect extends Component {
     }
 
     populateSelectedOption = (value, options) => {
-        console.log("options in select", options);
-        console.log("Value in select", value);
+        // console.log("options in select", options);
+        // console.log("Value in select", value);
 
         let selectedOption = null;
 
@@ -42,7 +42,7 @@ class MySelect extends Component {
 
     onChange = (value, options) => {
         const actValue = value !== null ? value.value : null;
-        this.props.selectChanged(this.props.name, actValue);
+        this.props.onChange(this.props.name, actValue);
         this.populateSelectedOption(actValue, options);
     }
 

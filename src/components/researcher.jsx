@@ -9,7 +9,15 @@ import {
     API_RESEARCHER_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
-    SMALL_BUTTON_STYLE
+    SMALL_BUTTON_STYLE,
+    BUTTON_FIRST,
+    BUTTON_PREVIOUS,
+    BUTTON_NEXT,
+    BUTTON_LAST,
+    BUTTON_ADD,
+    BUTTON_DELETE,
+    BUTTON_SAVE,
+    BUTTON_UNDO
 } from './constant'
 
 class Researcher extends Component {
@@ -51,13 +59,18 @@ class Researcher extends Component {
         console.log(value);
         const researcher = { ...this.state.researcher };
         researcher[name] = name === 'researcherName' ? value.toUpperCase() : value;
-        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        this.enableSaveUndoButton(researcher);
+        this.setState({ researcher });
+    }
+
+    enableSaveUndoButton = (researcher) => {
+        let saveButtonDisabled = true;
         if (researcher.researcherName === undefined || researcher.researcherName === null || researcher.researcherName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ researcher, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
@@ -237,7 +250,7 @@ class Researcher extends Component {
         return (
             <>
                 <Form dir="rtl">
-                    <InputGroup className="mb-3">
+                    {/* <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Researcher ID</InputGroup.Text>
                         </InputGroup.Prepend>
@@ -249,7 +262,7 @@ class Researcher extends Component {
                             value={researcher.researcherId || ''}
                             onChange={this.handleResearcherChange}
                         />
-                    </InputGroup>
+                    </InputGroup> */}
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
@@ -288,7 +301,7 @@ class Researcher extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.firstResearcher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>First
+                            active>{BUTTON_FIRST}
                             </Button>
 
                         <Button
@@ -296,7 +309,7 @@ class Researcher extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.previousResearcher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Previous
+                            active>{BUTTON_PREVIOUS}
                             </Button>
 
                         <Button
@@ -304,7 +317,7 @@ class Researcher extends Component {
                             disabled={navigationDtl.last}
                             onClick={this.nextResearcher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Next
+                            active>{BUTTON_NEXT}
                             </Button>
 
                         <Button
@@ -312,7 +325,7 @@ class Researcher extends Component {
                             disabled={navigationDtl.last}
                             onClick={this.lastResearcher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Last
+                            active>{BUTTON_LAST}
                             </Button>
 
                     </ButtonToolbar>
@@ -323,7 +336,7 @@ class Researcher extends Component {
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newResearcher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Add
+                            active>{BUTTON_ADD}
                             </Button>
 
                         <Button
@@ -331,7 +344,7 @@ class Researcher extends Component {
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ researcherAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Delete
+                            active>{BUTTON_DELETE}
                             </Button>
 
                         <SweetAlert
@@ -354,7 +367,7 @@ class Researcher extends Component {
                             onClick={() => this.saveResearcherShowMessage("Researcher saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
-                            active>Save
+                            active>{BUTTON_SAVE}
                             </Button>
 
                         <Button
@@ -362,7 +375,7 @@ class Researcher extends Component {
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
-                            active>Undo
+                            active>{BUTTON_UNDO}
                             </Button>
                     </ButtonToolbar>
 

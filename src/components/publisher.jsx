@@ -9,7 +9,15 @@ import {
     API_PUBLISHER_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
-    SMALL_BUTTON_STYLE
+    SMALL_BUTTON_STYLE,
+    BUTTON_FIRST,
+    BUTTON_PREVIOUS,
+    BUTTON_NEXT,
+    BUTTON_LAST,
+    BUTTON_ADD,
+    BUTTON_DELETE,
+    BUTTON_SAVE,
+    BUTTON_UNDO
 } from './constant'
 
 class Publisher extends Component {
@@ -51,13 +59,18 @@ class Publisher extends Component {
         console.log(value);
         const publisher = { ...this.state.publisher };
         publisher[name] = name === 'publisherName' ? value.toUpperCase() : value;
-        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        this.enableSaveUndoButton(publisher);
+        this.setState({ publisher });
+    }
+
+    enableSaveUndoButton = (publisher) => {
+        let saveButtonDisabled = true;
         if (publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ publisher, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
@@ -237,7 +250,7 @@ class Publisher extends Component {
         return (
             <>
                 <Form dir="rtl">
-                    <InputGroup className="mb-3">
+                    {/* <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Publisher ID</InputGroup.Text>
                         </InputGroup.Prepend>
@@ -249,7 +262,7 @@ class Publisher extends Component {
                             value={publisher.publisherId || ''}
                             onChange={this.handlePublisherChange}
                         />
-                    </InputGroup>
+                    </InputGroup> */}
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
@@ -288,7 +301,7 @@ class Publisher extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.firstPublisher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>First
+                            active>{BUTTON_FIRST}
                             </Button>
 
                         <Button
@@ -296,7 +309,7 @@ class Publisher extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.previousPublisher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Previous
+                            active>{BUTTON_PREVIOUS}
                             </Button>
 
                         <Button
@@ -304,7 +317,7 @@ class Publisher extends Component {
                             disabled={navigationDtl.last}
                             onClick={this.nextPublisher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Next
+                            active>{BUTTON_NEXT}
                             </Button>
 
                         <Button
@@ -312,7 +325,7 @@ class Publisher extends Component {
                             disabled={navigationDtl.last}
                             onClick={this.lastPublisher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Last
+                            active>{BUTTON_LAST}
                             </Button>
 
                     </ButtonToolbar>
@@ -323,7 +336,7 @@ class Publisher extends Component {
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newPublisher}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Add
+                            active>{BUTTON_ADD}
                             </Button>
 
                         <Button
@@ -331,7 +344,7 @@ class Publisher extends Component {
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ publisherAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Delete
+                            active>{BUTTON_DELETE}
                             </Button>
 
                         <SweetAlert
@@ -354,7 +367,7 @@ class Publisher extends Component {
                             onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
-                            active>Save
+                            active>{BUTTON_SAVE}
                             </Button>
 
                         <Button
@@ -362,7 +375,7 @@ class Publisher extends Component {
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
-                            active>Undo
+                            active>{BUTTON_UNDO}
                             </Button>
                     </ButtonToolbar>
 

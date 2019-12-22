@@ -9,8 +9,17 @@ import {
     API_SHELF_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
-    SMALL_BUTTON_STYLE
+    SMALL_BUTTON_STYLE,
+    BUTTON_FIRST,
+    BUTTON_PREVIOUS,
+    BUTTON_NEXT,
+    BUTTON_LAST,
+    BUTTON_ADD,
+    BUTTON_DELETE,
+    BUTTON_SAVE,
+    BUTTON_UNDO
 } from './constant'
+import Rack from './rack';
 
 class Shelf extends Component {
 
@@ -51,13 +60,18 @@ class Shelf extends Component {
         console.log(value);
         const shelf = { ...this.state.shelf };
         shelf[name] = name === 'shelfName' ? value.toUpperCase() : value;
-        let saveButtonDisabled = { ...this.state.saveButtonDisabled };
+        this.enableSaveUndoButton(shelf);
+        this.setState({ shelf });
+    }
+
+    enableSaveUndoButton = (shelf) => {
+        let saveButtonDisabled = true;
         if (shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '') {
             saveButtonDisabled = true;
         } else {
             saveButtonDisabled = false;
         }
-        this.setState({ shelf, saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     /* handleComboboxChange = (value, name) => {
@@ -74,8 +88,17 @@ class Shelf extends Component {
 
     newShelf = () => {
         const shelf = {};
-        shelf.shelfStocks = [];
+        shelf.racks = [];
         this.setState({ shelf, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+    }
+
+    addRackIntoShelf = (racks) => {
+        let shelf = { ...this.state.shelf };
+        // racks.map(rack => {
+        //     rack['shelf'] = shelf.shelfId;
+        // });
+        shelf.racks = racks;
+        this.setState({ shelf });
     }
 
     saveShelf = async () => {
@@ -237,7 +260,7 @@ class Shelf extends Component {
         return (
             <>
                 <Form dir="rtl">
-                    <InputGroup className="mb-3">
+                    {/* <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Shelf ID</InputGroup.Text>
                         </InputGroup.Prepend>
@@ -249,7 +272,7 @@ class Shelf extends Component {
                             value={shelf.shelfId || ''}
                             onChange={this.handleShelfChange}
                         />
-                    </InputGroup>
+                    </InputGroup> */}
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
@@ -288,32 +311,32 @@ class Shelf extends Component {
                             disabled={navigationDtl.first}
                             onClick={this.firstShelf}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>First
-                            </Button>
+                            active>{BUTTON_FIRST}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousShelf}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Previous
-                            </Button>
+                            active>{BUTTON_PREVIOUS}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextShelf}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Next
-                            </Button>
+                            active>{BUTTON_NEXT}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastShelf}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Last
-                            </Button>
+                            active>{BUTTON_LAST}
+                        </Button>
 
                     </ButtonToolbar>
 
@@ -323,16 +346,16 @@ class Shelf extends Component {
                             disabled={this.state.addButtonDisabled}
                             onClick={this.newShelf}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Add
-                            </Button>
+                            active>{BUTTON_ADD}
+                        </Button>
 
                         <Button
                             variant="primary"
                             disabled={this.state.deleteButtonDisabled}
                             onClick={() => this.setState({ shelfAlert: true })}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
-                            active>Delete
-                            </Button>
+                            active>{BUTTON_DELETE}
+                        </Button>
 
                         <SweetAlert
                             show={this.state.shelfAlert}
@@ -354,18 +377,18 @@ class Shelf extends Component {
                             onClick={() => this.saveShelfShowMessage("Shelf saved successfully.")}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.saveButtonDisabled}
-                            active>Save
-                            </Button>
+                            active>{BUTTON_SAVE}
+                        </Button>
 
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
                             className="mr-1" style={SMALL_BUTTON_STYLE}
                             disabled={this.state.undoButtonDisabled}
-                            active>Undo
-                            </Button>
+                            active>{BUTTON_UNDO}
+                        </Button>
                     </ButtonToolbar>
-
+                    <Rack shelf={shelf} addRackIntoShelf={this.addRackIntoShelf} enableSaveUndoButton={this.enableSaveUndoButton} />
                 </Form>
             </>
         );
