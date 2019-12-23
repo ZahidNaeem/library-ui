@@ -417,6 +417,7 @@ class Subject extends Component {
                                 placeholder="Select Parent Subject"
                                 value={subject.parentSubjectId}
                                 onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
                                 options={this.getSubjectsExcludeCurrentHierarchy()}
                             />
                         </div>

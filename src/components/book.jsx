@@ -448,6 +448,7 @@ class Book extends Component {
                                 placeholder="Select Author"
                                 value={book.author}
                                 onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
                                 options={authors}
                             />
                         </div>
@@ -463,6 +464,7 @@ class Book extends Component {
                                 placeholder="Select Subject"
                                 value={book.subject}
                                 onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
                                 options={subjects}
                             />
                         </div>
@@ -478,6 +480,7 @@ class Book extends Component {
                                 placeholder="Select Publisher"
                                 value={book.publisher}
                                 onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
                                 options={publishers}
                             />
                         </div>
@@ -493,6 +496,7 @@ class Book extends Component {
                                 placeholder="Select Researcher"
                                 value={book.researcher}
                                 onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
                                 options={researchers}
                             />
                         </div>
@@ -508,6 +512,7 @@ class Book extends Component {
                                 placeholder="Book Condition"
                                 value={book.bookCondition}
                                 onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
                                 options={bookConditions}
                             />
                         </div>
@@ -522,8 +527,9 @@ class Book extends Component {
                             pattern="[0-9]*"
                             name="purchased"
                             value={book.purchased}
-                            items={items}
                             onChange={this.handleBookChange}
+                            disabled={fieldsDisabled}
+                            items={items}
                         />
                     </InputGroup>
 

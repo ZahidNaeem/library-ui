@@ -53,14 +53,16 @@ class MySelect extends Component {
 
     showSelect = () => {
         const { selectedOption, options } = this.state;
+        const {name, placeholder, disabled} = this.props;
 
         return (<Select
-            name={this.props.name}
+            name={name}
             value={selectedOption}
-            placeholder={this.props.placeholder}
+            placeholder={placeholder}
             options={options}
+            isDisabled={disabled}
             isClearable={this.clearValue}
-            onChange={(value) => this.onChange(value, this.state.options)}
+            onChange={(value) => this.onChange(value, options)}
         />);
     }
 
