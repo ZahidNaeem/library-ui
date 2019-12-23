@@ -6,19 +6,17 @@ import 'react-widgets/dist/css/react-widgets.css'
 import { request, isSuccessfullResponse } from './util/APIUtils'
 import {
     API_RACK_URL,
-    INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
     LARGE_BUTTON_STYLE,
-    SMALL_BUTTON_STYLE,
-    INPUT_DATE_STYLE
+    INPUT_DATE_STYLE,
+    EXTRA_SMALL_BUTTON_STYLE
 } from './constant'
 
 class Rack extends Component {
 
     state = {
         shelf: {},
-        rackAlert: false,
-        rackIndex: null
+        rackAlert: false
     }
 
     componentWillReceiveProps(props) {
@@ -41,11 +39,11 @@ class Rack extends Component {
         shelf.racks = racks;
         try {
             await this.props.addRackIntoShelf(racks);
-            this.props.enableSaveUndoButton(shelf);
+            this.setState({ shelf });
+            this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
         }
-        this.setState({ shelf });
     }
 
     // handleSelectChange = async (name, value, index) => {
@@ -71,20 +69,23 @@ class Rack extends Component {
 
         let newRack = {};
 
-        if (this.state.shelf.racks === null) {
+        if (shelf.racks === null) {
             alert("Please add shelf, then add rack");
             return;
+        } else if (shelf.racks === undefined) {
+            shelf['racks'] = [];
         }
-        let racks = [...this.state.shelf.racks];
+
+        let racks = [...shelf.racks];
         racks.push(newRack);
         shelf.racks = racks;
         try {
             await this.props.addRackIntoShelf(racks);
-            this.props.enableSaveUndoButton(shelf);
+            this.setState({ shelf });
+            this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
         }
-        this.setState({ shelf });
     }
 
     /*     saveRack = () => {
@@ -93,10 +94,10 @@ class Rack extends Component {
             
         } */
 
-    deleteRack = async () => {
+    deleteRack = async (index) => {
         let shelf = { ...this.state.shelf };
-        let racks = [...this.state.shelf.racks];
-        let id = racks[this.state.rackIndex]["rackId"];
+        let racks = [...shelf.racks];
+        let id = racks[index]['rackId'];
         if (id != null) {
             const options = {
                 url: API_RACK_URL + id,
@@ -111,7 +112,7 @@ class Rack extends Component {
                 console.log(error);
             }
         }
-        racks.splice(this.state.rackIndex, 1);
+        racks.splice(index, 1);
         shelf.racks = racks;
         try {
             await this.props.addRackIntoShelf(racks);
@@ -130,37 +131,14 @@ class Rack extends Component {
             <>
                 <br />
                 <h3 className="text-center h3 mb-4 text-gray-800">Shelf Racks</h3>
-                <ButtonToolbar className="m-2">
+                <ButtonToolbar className="mb-2">
                     <Button
                         variant="primary"
                         disabled={addButtondisabled}
                         onClick={this.addRack}
-                        className="mr-1" style={LARGE_BUTTON_STYLE}
+                        className="ml-1" style={LARGE_BUTTON_STYLE}
                         active>Add Rack
                                             </Button>
-
-                    <Button
-                        variant="primary"
-                        disabled={deleteButtondisabled}
-                        onClick={() => this.setState({ rackAlert: true })}
-                        className="mr-1" style={LARGE_BUTTON_STYLE}
-                        active>Delete Rack
-                                                    </Button>
-
-                    <SweetAlert
-                        show={this.state.rackAlert}
-                        warning
-                        showCancel
-                        confirmBtnText="Delete"
-                        confirmBtnBsStyle="danger"
-                        cancelBtnBsStyle="default"
-                        title="Delete Confirmation"
-                        Text="Are you sure you want to delete this rack?"
-                        onConfirm={() => this.deleteRack()}
-                        onCancel={() => this.setState({ rackAlert: false })}
-                    >
-                        Delete Rack
-                                                    </SweetAlert>
                 </ButtonToolbar>
                 <Table
                     striped
@@ -173,13 +151,14 @@ class Rack extends Component {
                         <tr>
                             <th style={INPUT_DATE_STYLE}>Rack Number</th>
                             <th style={STRETCH_STYLE}>Remarks</th>
+                            <th style={EXTRA_SMALL_BUTTON_STYLE}>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             racks && racks.map((rack, index) => (
                                 <tr key={rack.rackId}
-                                    onFocus={() => { this.setState({ rackIndex: index }) }}>
+                                >
                                     <td>
                                         <FormControl
                                             // type="number"
@@ -202,6 +181,30 @@ class Rack extends Component {
                                             disabled={fieldsDisabled}
                                             onChange={e => this.handleRackChange(e, index)}
                                         />
+                                    </td>
+                                    <td>
+                                        <Button
+                                            variant="primary"
+                                            disabled={deleteButtondisabled}
+                                            onClick={() => this.setState({ rackAlert: true })}
+                                            className="ml-1"
+                                            active>Delete
+                                                    </Button>
+
+                                        <SweetAlert
+                                            show={this.state.rackAlert}
+                                            warning
+                                            showCancel
+                                            confirmBtnText="Delete"
+                                            confirmBtnBsStyle="danger"
+                                            cancelBtnBsStyle="default"
+                                            title="Delete Confirmation"
+                                            Text="Are you sure you want to delete this rack?"
+                                            onConfirm={() => this.deleteRack(index)}
+                                            onCancel={() => this.setState({ rackAlert: false })}
+                                        >
+                                            Delete Rack
+                                                    </SweetAlert>
                                     </td>
                                 </tr>
                             ))

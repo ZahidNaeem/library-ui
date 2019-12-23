@@ -79,8 +79,8 @@ class Book extends Component {
         console.log("Target value", value);
         const book = { ...this.state.book };
         book[name] = name === 'bookName' ? value.toUpperCase() : name === 'purchased' ? parseInt(value) : value;
-        this.enableSaveUndoButton(book);
         this.setState({ book });
+        this.enableSaveUndoButton();
     }
 
     handleSelectChange = (name, value) => {
@@ -88,19 +88,28 @@ class Book extends Component {
         console.log("handleSelectChange value", value);
         const { book } = this.state;
         book[name] = value;
-        this.enableSaveUndoButton(book);
         this.setState({ book });
+        this.enableSaveUndoButton();
     }
 
-    enableSaveUndoButton = (book) => {
-        let saveButtonDisabled = true;
-        if (book.bookName === undefined || book.bookName === null || book.bookName === '') {
-            saveButtonDisabled = true;
-        } else {
-            saveButtonDisabled = false;
+    validateForm = () => {
+        const { book } = this.state;
+        let validateBook = !(book.bookName === undefined || book.bookName === null || book.bookName === '');
+        if (validateBook === true) {
+            const invalidVolumes = book.volumes.filter(volume => volume.volumeName === undefined || volume.volumeName === null || volume.volumeName === '');
+            validateBook = invalidVolumes.length < 1;
         }
+        return validateBook;
+    }
+
+    enableSaveUndoButton = () => {
+        const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
+
+    disableAddButton = (boolean) => {
+    this.setState({ addButtonDisabled: boolean });
+}
 
     /* handleComboboxChange = (value, name) => {
         let book = { ...this.state.book };
@@ -114,10 +123,11 @@ class Book extends Component {
         this.setState({ book, saveButtonDisabled });
     } */
 
-    newBook = () => {
+    addBook = () => {
         const book = {};
-        book.bookStocks = [];
+        book.volumes = [];
         this.setState({ book, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.disableAddButton(true);
     }
 
     addVolumeIntoBook = (volumes) => {
@@ -146,6 +156,7 @@ class Book extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { book, navigationDtl } = res.data;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -163,10 +174,11 @@ class Book extends Component {
     }
 
     deleteBook = async () => {
-        if (this.state.book.bookId != null) {
-            console.log("Delete: Book ID sent: ", this.state.book.bookId);
+        const book = {...this.state.book};
+        if (book.bookId !== undefined && book.bookId !== null) {
+            console.log("Delete: Book ID sent: ", book.bookId);
             const options = {
-                url: API_BOOK_URL + this.state.book.bookId,
+                url: API_BOOK_URL + book.bookId,
                 method: 'DELETE'
             };
             try {
@@ -175,11 +187,14 @@ class Book extends Component {
                     console.log("Delete: Response: ", res);
                     const { book, navigationDtl } = res.data;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
 
             }
+        } else {
+            this.undoChanges();
         }
         this.setState({
             bookAlert: false
@@ -244,6 +259,7 @@ class Book extends Component {
             this.firstBook();
         }
         this.setState({ undoButtonDisabled: true });
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -554,7 +570,7 @@ class Book extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstBook}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
                         </Button>
 
@@ -562,7 +578,7 @@ class Book extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousBook}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
                         </Button>
 
@@ -570,7 +586,7 @@ class Book extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextBook}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
                         </Button>
 
@@ -578,7 +594,7 @@ class Book extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastBook}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
                         </Button>
 
@@ -588,8 +604,8 @@ class Book extends Component {
                         <Button
                             variant="primary"
                             disabled={addButtonDisabled}
-                            onClick={this.newBook}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            onClick={this.addBook}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
                         </Button>
 
@@ -597,7 +613,7 @@ class Book extends Component {
                             variant="primary"
                             disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ bookAlert: true })}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                         </Button>
 
@@ -619,7 +635,7 @@ class Book extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.saveBookShowMessage("Book saved successfully.")}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                         </Button>
@@ -627,7 +643,7 @@ class Book extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                         </Button>

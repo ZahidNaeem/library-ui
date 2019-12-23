@@ -44,6 +44,10 @@ export const STRETCH_STYLE = {
     flex: "1"
 }
 
+export const EXTRA_SMALL_BUTTON_STYLE = {
+    width: "5%"
+}
+
 export const SMALL_BUTTON_STYLE = {
     width: "10%"
 }

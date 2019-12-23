@@ -10,7 +10,7 @@ import {
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
     LARGE_BUTTON_STYLE,
-    SMALL_BUTTON_STYLE,
+    EXTRA_SMALL_BUTTON_STYLE,
     INPUT_DATE_STYLE
 } from './constant'
 import MySelect from './common/select';
@@ -20,8 +20,7 @@ class Volume extends Component {
     state = {
         book: {},
         racks: [],
-        volumeAlert: false,
-        volumeIndex: null
+        volumeAlert: false
     }
 
     componentWillReceiveProps(props) {
@@ -48,11 +47,11 @@ class Volume extends Component {
         book.volumes = volumes;
         try {
             await this.props.addVolumeIntoBook(volumes);
-            this.props.enableSaveUndoButton(book);
+            this.setState({ book });
+            this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
         }
-        this.setState({ book });
     }
 
     handleSelectChange = async (name, value, index) => {
@@ -66,11 +65,11 @@ class Volume extends Component {
         book.volumes = volumes;
         try {
             await this.props.addVolumeIntoBook(volumes);
-            this.props.enableSaveUndoButton(book);
+            this.setState({ book });
+            this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
         }
-        this.setState({ book });
     }
 
     addVolume = async () => {
@@ -78,21 +77,23 @@ class Volume extends Component {
 
         let newVolume = {};
 
-        if (this.state.book.volumes === null) {
+        if (book.volumes === null) {
             alert("Please add book, then add volume");
             return;
+        } else if (book.volumes === undefined) {
+            book['volumes'] = [];
         }
 
-        let volumes = [...this.state.book.volumes];
+        let volumes = [...book.volumes];
         volumes.push(newVolume);
         book.volumes = volumes;
         try {
             await this.props.addVolumeIntoBook(volumes);
-            this.props.enableSaveUndoButton(book);
+            this.setState({ book });
+            this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
         }
-        this.setState({ book });
     }
 
     /*     saveVolume = () => {
@@ -101,10 +102,11 @@ class Volume extends Component {
             
         } */
 
-    deleteVolume = async () => {
-        let book = { ...this.state.book };
-        let volumes = [...this.state.book.volumes];
-        let id = volumes[this.state.volumeIndex]["volumeId"];
+    deleteVolume = async (index) => {
+        const book = { ...this.state.book };
+        let volumes = [...book.volumes];
+
+        let id = volumes[index]['volumeId'];
         if (id != null) {
             const options = {
                 url: API_VOLUME_URL + id,
@@ -119,7 +121,7 @@ class Volume extends Component {
                 console.log(error);
             }
         }
-        volumes.splice(this.state.volumeIndex, 1);
+        volumes.splice(index, 1);
         book.volumes = volumes;
         try {
             await this.props.addVolumeIntoBook(volumes);
@@ -158,43 +160,20 @@ class Volume extends Component {
         const { book, racks } = this.state;
         const { volumes } = book;
         const { fieldsDisabled, addButtondisabled, deleteButtondisabled } = this.props;
-        
+
 
         return (
             <>
                 <br />
                 <h3 className="text-center h3 mb-4 text-gray-800">Book Volumes</h3>
-                <ButtonToolbar className="m-2">
+                <ButtonToolbar className="mb-2">
                     <Button
                         variant="primary"
                         disabled={addButtondisabled}
                         onClick={this.addVolume}
-                        className="mr-1" style={LARGE_BUTTON_STYLE}
+                        style={LARGE_BUTTON_STYLE}
                         active>Add Volume
                                             </Button>
-
-                    <Button
-                        variant="primary"
-                        disabled={deleteButtondisabled}
-                        onClick={() => this.setState({ volumeAlert: true })}
-                        className="mr-1" style={LARGE_BUTTON_STYLE}
-                        active>Delete Volume
-                                                    </Button>
-
-                    <SweetAlert
-                        show={this.state.volumeAlert}
-                        warning
-                        showCancel
-                        confirmBtnText="Delete"
-                        confirmBtnBsStyle="danger"
-                        cancelBtnBsStyle="default"
-                        title="Delete Confirmation"
-                        Text="Are you sure you want to delete this volume?"
-                        onConfirm={() => this.deleteVolume()}
-                        onCancel={() => this.setState({ volumeAlert: false })}
-                    >
-                        Delete Volume
-                                                    </SweetAlert>
                 </ButtonToolbar>
                 <Table
                     striped
@@ -208,13 +187,14 @@ class Volume extends Component {
                             <th style={INPUT_DATE_STYLE}>Volume Number</th>
                             <th style={STRETCH_STYLE}>Rack</th>
                             <th style={STRETCH_STYLE}>Remarks</th>
+                            <th style={EXTRA_SMALL_BUTTON_STYLE}>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             volumes && volumes.map((volume, index) => (
                                 <tr key={volume.volumeId}
-                                    onFocus={() => { this.setState({ volumeIndex: index }) }}>
+                                >
                                     <td>
                                         <FormControl
                                             // type="number"
@@ -247,6 +227,30 @@ class Volume extends Component {
                                             disabled={fieldsDisabled}
                                             onChange={e => this.handleVolumeChange(e, index)}
                                         />
+                                    </td>
+                                    <td>
+                                        <Button
+                                            variant="primary"
+                                            disabled={deleteButtondisabled}
+                                            onClick={() => this.setState({ volumeAlert: true })}
+                                            // className="m-1"
+                                            active>Delete
+                                                    </Button>
+
+                                        <SweetAlert
+                                            show={this.state.volumeAlert}
+                                            warning
+                                            showCancel
+                                            confirmBtnText="Delete"
+                                            confirmBtnBsStyle="danger"
+                                            cancelBtnBsStyle="default"
+                                            title="Delete Confirmation"
+                                            Text="Are you sure you want to delete this volume?"
+                                            onConfirm={() => this.deleteVolume(index)}
+                                            onCancel={() => this.setState({ volumeAlert: false })}
+                                        >
+                                            Delete Volume
+                                                    </SweetAlert>
                                     </td>
                                 </tr>
                             ))

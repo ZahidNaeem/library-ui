@@ -60,19 +60,28 @@ class Shelf extends Component {
         console.log(value);
         const shelf = { ...this.state.shelf };
         shelf[name] = name === 'shelfName' ? value.toUpperCase() : value;
-        this.enableSaveUndoButton(shelf);
         this.setState({ shelf });
+        this.enableSaveUndoButton();
     }
 
-    enableSaveUndoButton = (shelf) => {
-        let saveButtonDisabled = true;
-        if (shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '') {
-            saveButtonDisabled = true;
-        } else {
-            saveButtonDisabled = false;
+    validateForm = () => {
+        const { shelf } = this.state;
+        let validateBook = !(shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '');
+        if (validateBook === true) {
+            const invalidRacks = shelf.racks.filter(rack => rack.rackName === undefined || rack.rackName === null || rack.rackName === '');
+            validateBook = invalidRacks.length < 1;
         }
+        return validateBook;
+    }
+
+    enableSaveUndoButton = () => {
+        const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
+
+    disableAddButton = (boolean) => {
+    this.setState({ addButtonDisabled: boolean });
+}
 
     /* handleComboboxChange = (value, name) => {
         let shelf = { ...this.state.shelf };
@@ -86,10 +95,11 @@ class Shelf extends Component {
         this.setState({ shelf, saveButtonDisabled });
     } */
 
-    newShelf = () => {
+    addShelf = () => {
         const shelf = {};
         shelf.racks = [];
         this.setState({ shelf, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.disableAddButton(true);
     }
 
     addRackIntoShelf = (racks) => {
@@ -118,6 +128,7 @@ class Shelf extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { shelf, navigationDtl } = res.data;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -135,10 +146,11 @@ class Shelf extends Component {
     }
 
     deleteShelf = async () => {
-        if (this.state.shelf.shelfId != null) {
-            console.log("Delete: Shelf ID sent: ", this.state.shelf.shelfId);
+        const shelf = {...this.state.shelf};
+        if (shelf.shelfId !== undefined && shelf.shelfId !== null) {
+            console.log("Delete: Shelf ID sent: ", shelf.shelfId);
             const options = {
-                url: API_SHELF_URL + this.state.shelf.shelfId,
+                url: API_SHELF_URL + shelf.shelfId,
                 method: 'DELETE'
             };
             try {
@@ -147,11 +159,14 @@ class Shelf extends Component {
                     console.log("Delete: Response: ", res);
                     const { shelf, navigationDtl } = res.data;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
 
             }
+        } else {
+            this.undoChanges();
         }
         this.setState({
             shelfAlert: false
@@ -216,6 +231,7 @@ class Shelf extends Component {
             this.firstShelf();
         }
         this.setState({ undoButtonDisabled: true });
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -310,7 +326,7 @@ class Shelf extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstShelf}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
                         </Button>
 
@@ -318,7 +334,7 @@ class Shelf extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousShelf}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
                         </Button>
 
@@ -326,7 +342,7 @@ class Shelf extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextShelf}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
                         </Button>
 
@@ -334,7 +350,7 @@ class Shelf extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastShelf}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
                         </Button>
 
@@ -344,8 +360,8 @@ class Shelf extends Component {
                         <Button
                             variant="primary"
                             disabled={addButtonDisabled}
-                            onClick={this.newShelf}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            onClick={this.addShelf}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
                         </Button>
 
@@ -353,7 +369,7 @@ class Shelf extends Component {
                             variant="primary"
                             disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ shelfAlert: true })}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                         </Button>
 
@@ -375,7 +391,7 @@ class Shelf extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.saveShelfShowMessage("Shelf saved successfully.")}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                         </Button>
@@ -383,7 +399,7 @@ class Shelf extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                         </Button>

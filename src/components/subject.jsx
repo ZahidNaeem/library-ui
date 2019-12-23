@@ -74,8 +74,8 @@ class Subject extends Component {
         console.log("Target value", value);
         const subject = { ...this.state.subject };
         subject[name] = name === 'subjectName' ? value.toUpperCase() : name === 'purchased' ? parseInt(value) : value;
-        this.enableSaveUndoButton(subject);
         this.setState({ subject });
+        this.enableSaveUndoButton();
     }
 
     handleSelectChange = (name, value) => {
@@ -83,19 +83,23 @@ class Subject extends Component {
         console.log("handleSelectChange value", value);
         const { subject } = this.state;
         subject[name] = value;
-        this.enableSaveUndoButton(subject);
         this.setState({ subject });
+        this.enableSaveUndoButton();
     }
 
-    enableSaveUndoButton = (subject) => {
-        let saveButtonDisabled = true;
-        if (subject.subjectName === undefined || subject.subjectName === null || subject.subjectName === '') {
-            saveButtonDisabled = true;
-        } else {
-            saveButtonDisabled = false;
-        }
+    validateForm = () => {
+        const { subject } = this.state;
+        return !(subject.subjectName === undefined || subject.subjectName === null || subject.subjectName === '');
+    }
+    
+    enableSaveUndoButton = () => {
+        const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
+
+    disableAddButton = (boolean) => {
+    this.setState({ addButtonDisabled: boolean });
+}
 
     /*     handleSubjectSelectChange = (selectedSubject, name) => {
             const subject = { ...this.state.subject };
@@ -113,14 +117,10 @@ class Subject extends Component {
             this.populateSubjectName(subject.parentSubjectId);
         }; */
 
-    newSubject = () => {
+    addSubject = () => {
         const subject = {};
-        this.setState({
-            subject,
-            navigationDtl: { first: true, last: true },
-            undoButtonDisabled: false
-        });
-        // this.populateSubjectName(subject.parentSubjectId);
+        this.setState({ subject, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.disableAddButton(true);
     }
 
     saveSubject = async () => {
@@ -140,12 +140,8 @@ class Subject extends Component {
                 if (isSuccessfullResponse(res)) {
                     console.log("Post: Object received: ", res.data);
                     const { subject, navigationDtl } = res.data;
-                    this.setState({
-                        subject,
-                        navigationDtl,
-                        saveButtonDisabled: true,
-                        undoButtonDisabled: true
-                    });
+                    this.setState({ subject, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.disableAddButton(false);
                     await this.populateSubjects();
                 }
             } catch (error) {
@@ -164,10 +160,11 @@ class Subject extends Component {
     }
 
     deleteSubject = async () => {
-        if (this.state.subject.subjectId != null) {
-            console.log("Delete: Subject ID sent: ", this.state.subject.subjectId);
+        const subject = {...this.state.subject};
+        if (subject.subjectId !== undefined && subject.subjectId !== null) {
+            console.log("Delete: Subject ID sent: ", subject.subjectId);
             const options = {
-                url: API_SUBJECT_URL + this.state.subject.subjectId,
+                url: API_SUBJECT_URL + subject.subjectId,
                 method: 'DELETE'
             };
             try {
@@ -176,12 +173,15 @@ class Subject extends Component {
                     console.log("Delete: Response: ", res);
                     const { subject, navigationDtl } = res.data;
                     this.setState({ subject, navigationDtl, saveButtonDisabled: true });
+                    this.disableAddButton(false);
                     await this.populateSubjects();
                 }
             } catch (error) {
                 console.log(error);
 
             }
+        } else {
+            this.undoChanges();
         }
         this.setState({
             subjectAlert: false
@@ -246,6 +246,7 @@ class Subject extends Component {
             this.firstSubject();
         }
         this.setState({ undoButtonDisabled: true });
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -445,7 +446,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstSubject}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
               </Button>
 
@@ -453,7 +454,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousSubject}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
               </Button>
 
@@ -461,7 +462,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextSubject}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
               </Button>
 
@@ -469,7 +470,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastSubject}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
               </Button>
 
@@ -479,8 +480,8 @@ class Subject extends Component {
                         <Button
                             variant="primary"
                             disabled={addButtonDisabled}
-                            onClick={this.newSubject}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            onClick={this.addSubject}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
               </Button>
 
@@ -488,7 +489,7 @@ class Subject extends Component {
                             variant="primary"
                             disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ subjectAlert: true })}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
               </Button>
 
@@ -511,7 +512,7 @@ class Subject extends Component {
                             variant="primary"
                             onClick={() => this.saveSubjectShowMessage(
                                 "Subject saved successfully.")}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
               </Button>
@@ -519,7 +520,7 @@ class Subject extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
               </Button>

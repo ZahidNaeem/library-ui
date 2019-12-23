@@ -59,20 +59,23 @@ class Author extends Component {
         console.log(value);
         const author = { ...this.state.author };
         author[name] = name === 'authorName' ? value.toUpperCase() : value;
-        this.enableSaveUndoButton(author);
         this.setState({ author });
+        this.enableSaveUndoButton();
     }
 
-    enableSaveUndoButton = (author) => {
-        let saveButtonDisabled = true;
-        if (author.authorName === undefined || author.authorName === null || author.authorName === '') {
-            saveButtonDisabled = true;
-        } else {
-            saveButtonDisabled = false;
-        }
+    validateForm = () => {
+        const { author } = this.state;
+        return !(author.authorName === undefined || author.authorName === null || author.authorName === '');
+    }
+
+    enableSaveUndoButton = () => {
+        const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
+    disableAddButton = (boolean) => {
+    this.setState({ addButtonDisabled: boolean });
+}
     /* handleComboboxChange = (value, name) => {
         let author = { ...this.state.author };
         author[name] = value.toUpperCase();
@@ -85,10 +88,10 @@ class Author extends Component {
         this.setState({ author, saveButtonDisabled });
     } */
 
-    newAuthor = () => {
+    addAuthor = () => {
         const author = {};
-        author.authorStocks = [];
         this.setState({ author, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.disableAddButton(true);
     }
 
     saveAuthor = async () => {
@@ -108,6 +111,7 @@ class Author extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { author, navigationDtl } = res.data;
                     this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -125,10 +129,11 @@ class Author extends Component {
     }
 
     deleteAuthor = async () => {
-        if (this.state.author.authorId != null) {
-            console.log("Delete: Author ID sent: ", this.state.author.authorId);
+        const author = {...this.state.author};
+        if (author.authorId !== undefined && author.authorId !== null) {
+            console.log("Delete: Author ID sent: ", author.authorId);
             const options = {
-                url: API_AUTHOR_URL + this.state.author.authorId,
+                url: API_AUTHOR_URL + author.authorId,
                 method: 'DELETE'
             };
             try {
@@ -137,11 +142,14 @@ class Author extends Component {
                     console.log("Delete: Response: ", res);
                     const { author, navigationDtl } = res.data;
                     this.setState({ author, navigationDtl, saveButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
 
             }
+        } else {
+            this.undoChanges();
         }
         this.setState({
             authorAlert: false
@@ -206,6 +214,7 @@ class Author extends Component {
             this.firstAuthor();
         }
         this.setState({ undoButtonDisabled: true });
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -300,7 +309,7 @@ class Author extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstAuthor}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
                         </Button>
 
@@ -308,7 +317,7 @@ class Author extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousAuthor}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
                         </Button>
 
@@ -316,7 +325,7 @@ class Author extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextAuthor}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
                         </Button>
 
@@ -324,7 +333,7 @@ class Author extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastAuthor}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
                         </Button>
 
@@ -334,8 +343,8 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             disabled={addButtonDisabled}
-                            onClick={this.newAuthor}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            onClick={this.addAuthor}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
                         </Button>
 
@@ -343,7 +352,7 @@ class Author extends Component {
                             variant="primary"
                             disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ authorAlert: true })}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                         </Button>
 
@@ -365,7 +374,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.saveAuthorShowMessage("Author saved successfully.")}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                         </Button>
@@ -373,7 +382,7 @@ class Author extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                         </Button>

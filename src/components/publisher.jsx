@@ -59,19 +59,23 @@ class Publisher extends Component {
         console.log(value);
         const publisher = { ...this.state.publisher };
         publisher[name] = name === 'publisherName' ? value.toUpperCase() : value;
-        this.enableSaveUndoButton(publisher);
         this.setState({ publisher });
+        this.enableSaveUndoButton();
     }
 
-    enableSaveUndoButton = (publisher) => {
-        let saveButtonDisabled = true;
-        if (publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === '') {
-            saveButtonDisabled = true;
-        } else {
-            saveButtonDisabled = false;
-        }
+    validateForm = () => {
+        const { publisher } = this.state;
+        return !(publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === '');
+    }
+    
+    enableSaveUndoButton = () => {
+        const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
+
+    disableAddButton = (boolean) => {
+    this.setState({ addButtonDisabled: boolean });
+}
 
     /* handleComboboxChange = (value, name) => {
         let publisher = { ...this.state.publisher };
@@ -85,10 +89,10 @@ class Publisher extends Component {
         this.setState({ publisher, saveButtonDisabled });
     } */
 
-    newPublisher = () => {
+    addPublisher = () => {
         const publisher = {};
-        publisher.publisherStocks = [];
         this.setState({ publisher, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.disableAddButton(true);
     }
 
     savePublisher = async () => {
@@ -108,6 +112,7 @@ class Publisher extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { publisher, navigationDtl } = res.data;
                     this.setState({ publisher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -125,10 +130,11 @@ class Publisher extends Component {
     }
 
     deletePublisher = async () => {
-        if (this.state.publisher.publisherId != null) {
-            console.log("Delete: Publisher ID sent: ", this.state.publisher.publisherId);
+        const publisher = {...this.state.publisher};
+        if (publisher.publisherId !== undefined && publisher.publisherId !== null) {
+            console.log("Delete: Publisher ID sent: ", publisher.publisherId);
             const options = {
-                url: API_PUBLISHER_URL + this.state.publisher.publisherId,
+                url: API_PUBLISHER_URL + publisher.publisherId,
                 method: 'DELETE'
             };
             try {
@@ -137,11 +143,14 @@ class Publisher extends Component {
                     console.log("Delete: Response: ", res);
                     const { publisher, navigationDtl } = res.data;
                     this.setState({ publisher, navigationDtl, saveButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
 
             }
+        } else {
+            this.undoChanges();
         }
         this.setState({
             publisherAlert: false
@@ -206,6 +215,7 @@ class Publisher extends Component {
             this.firstPublisher();
         }
         this.setState({ undoButtonDisabled: true });
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -300,7 +310,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstPublisher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
                             </Button>
 
@@ -308,7 +318,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousPublisher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
                             </Button>
 
@@ -316,7 +326,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextPublisher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
                             </Button>
 
@@ -324,7 +334,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastPublisher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
                             </Button>
 
@@ -334,8 +344,8 @@ class Publisher extends Component {
                         <Button
                             variant="primary"
                             disabled={addButtonDisabled}
-                            onClick={this.newPublisher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            onClick={this.addPublisher}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
                             </Button>
 
@@ -343,7 +353,7 @@ class Publisher extends Component {
                             variant="primary"
                             disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ publisherAlert: true })}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                             </Button>
 
@@ -365,7 +375,7 @@ class Publisher extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                             </Button>
@@ -373,7 +383,7 @@ class Publisher extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                             </Button>

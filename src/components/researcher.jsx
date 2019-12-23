@@ -59,19 +59,23 @@ class Researcher extends Component {
         console.log(value);
         const researcher = { ...this.state.researcher };
         researcher[name] = name === 'researcherName' ? value.toUpperCase() : value;
-        this.enableSaveUndoButton(researcher);
         this.setState({ researcher });
+        this.enableSaveUndoButton();
     }
 
-    enableSaveUndoButton = (researcher) => {
-        let saveButtonDisabled = true;
-        if (researcher.researcherName === undefined || researcher.researcherName === null || researcher.researcherName === '') {
-            saveButtonDisabled = true;
-        } else {
-            saveButtonDisabled = false;
-        }
+    validateForm = () => {
+        const { researcher } = this.state;
+        return !(researcher.researcherName === undefined || researcher.researcherName === null || researcher.researcherName === '');
+    }
+    
+    enableSaveUndoButton = () => {
+        const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
+
+    disableAddButton = (boolean) => {
+    this.setState({ addButtonDisabled: boolean });
+}
 
     /* handleComboboxChange = (value, name) => {
         let researcher = { ...this.state.researcher };
@@ -85,10 +89,10 @@ class Researcher extends Component {
         this.setState({ researcher, saveButtonDisabled });
     } */
 
-    newResearcher = () => {
+    addResearcher = () => {
         const researcher = {};
-        researcher.researcherStocks = [];
         this.setState({ researcher, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.disableAddButton(true);
     }
 
     saveResearcher = async () => {
@@ -108,6 +112,7 @@ class Researcher extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { researcher, navigationDtl } = res.data;
                     this.setState({ researcher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -125,10 +130,11 @@ class Researcher extends Component {
     }
 
     deleteResearcher = async () => {
-        if (this.state.researcher.researcherId != null) {
-            console.log("Delete: Researcher ID sent: ", this.state.researcher.researcherId);
+        const researcher = {...this.state.researcher};
+        if (researcher.researcherId !== undefined && researcher.researcherId !== null) {
+            console.log("Delete: Researcher ID sent: ", researcher.researcherId);
             const options = {
-                url: API_RESEARCHER_URL + this.state.researcher.researcherId,
+                url: API_RESEARCHER_URL + researcher.researcherId,
                 method: 'DELETE'
             };
             try {
@@ -137,11 +143,14 @@ class Researcher extends Component {
                     console.log("Delete: Response: ", res);
                     const { researcher, navigationDtl } = res.data;
                     this.setState({ researcher, navigationDtl, saveButtonDisabled: true });
+                    this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
 
             }
+        } else {
+            this.undoChanges();
         }
         this.setState({
             researcherAlert: false
@@ -206,6 +215,7 @@ class Researcher extends Component {
             this.firstResearcher();
         }
         this.setState({ undoButtonDisabled: true });
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -300,7 +310,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.firstResearcher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
                             </Button>
 
@@ -308,7 +318,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.first}
                             onClick={this.previousResearcher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
                             </Button>
 
@@ -316,7 +326,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.nextResearcher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
                             </Button>
 
@@ -324,7 +334,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={navigationDtl.last}
                             onClick={this.lastResearcher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
                             </Button>
 
@@ -334,8 +344,8 @@ class Researcher extends Component {
                         <Button
                             variant="primary"
                             disabled={addButtonDisabled}
-                            onClick={this.newResearcher}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            onClick={this.addResearcher}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
                             </Button>
 
@@ -343,7 +353,7 @@ class Researcher extends Component {
                             variant="primary"
                             disabled={deleteButtonDisabled}
                             onClick={() => this.setState({ researcherAlert: true })}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                             </Button>
 
@@ -365,7 +375,7 @@ class Researcher extends Component {
                         <Button
                             variant="primary"
                             onClick={() => this.saveResearcherShowMessage("Researcher saved successfully.")}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
                             </Button>
@@ -373,7 +383,7 @@ class Researcher extends Component {
                         <Button
                             variant="primary"
                             onClick={this.undoChanges}
-                            className="mr-1" style={SMALL_BUTTON_STYLE}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                             </Button>
