@@ -8,6 +8,7 @@ import Researcher from './researcher';
 import Shelf from './shelf';
 import Book from './book';
 import Dashboard from './common/dashboard';
+import SearchBook from './searchBook';
 
 class PageContent extends Component {
 
@@ -29,6 +30,8 @@ class PageContent extends Component {
       return <><h1 className="text-center h3 mb-4 text-gray-800">Shelf Registration</h1><Shelf /></>;
     } else if (pathname === "/book") {
       return <><h1 className="text-center h3 mb-4 text-gray-800">Book Registration</h1><Book /></>;
+    } else if (pathname === "/searchBook") {
+      return <><h1 className="text-center h3 mb-4 text-gray-800">Search Book</h1><SearchBook /></>;
     }
   }
   render() {

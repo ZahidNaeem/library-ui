@@ -129,6 +129,12 @@ const SideBar = () => {
           <span>Book</span></Link>
       </li>
 
+      <li className="nav-item">
+        <Link className="nav-link" to="/searchBook">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Search Book</span></Link>
+      </li>
+
 
 
       <hr className="sidebar-divider d-none d-md-block" />
