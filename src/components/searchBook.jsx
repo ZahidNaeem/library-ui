@@ -97,7 +97,7 @@ class SearchBook extends Component {
                                             name="volumeName"
                                             placeholder="Volume Number"
                                             aria-label="Volume Number"
-                                            value={book.volumeName || ''}
+                                            value={book.bookName || ''}
                                             required
                                             onChange={e => this.handleVolumeChange(e, index)}
                                         />
@@ -108,7 +108,7 @@ class SearchBook extends Component {
                                             placeholder="Select Rack"
                                             value={book.rack || ''}
                                             onChange={(name, value) => this.handleSelectChange(name, value, index)}
-                                            options={racks}
+                                            options={authors}
                                         />
                                     </td>
                                     <td>
