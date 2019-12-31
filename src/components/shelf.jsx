@@ -57,7 +57,7 @@ class Shelf extends Component {
     handleShelfChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
-        console.log(value);
+        console.log("Target value", value);
         const shelf = { ...this.state.shelf };
         shelf[name] = name === 'shelfName' ? value.toUpperCase() : value;
         this.setState({ shelf });
@@ -68,8 +68,10 @@ class Shelf extends Component {
         const { shelf } = this.state;
         let validateBook = !(shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '');
         if (validateBook === true) {
-            const invalidRacks = shelf.racks.filter(rack => rack.rackName === undefined || rack.rackName === null || rack.rackName === '');
-            validateBook = invalidRacks.length < 1;
+            if (shelf.racks !== null) {
+                const invalidRacks = shelf.racks.filter(rack => rack.rackName === undefined || rack.rackName === null || rack.rackName === '');
+                validateBook = invalidRacks.length < 1;
+            }
         }
         return validateBook;
     }
@@ -80,8 +82,8 @@ class Shelf extends Component {
     }
 
     disableAddButton = (boolean) => {
-    this.setState({ addButtonDisabled: boolean });
-}
+        this.setState({ addButtonDisabled: boolean });
+    }
 
     /* handleComboboxChange = (value, name) => {
         let shelf = { ...this.state.shelf };
@@ -146,7 +148,7 @@ class Shelf extends Component {
     }
 
     deleteShelf = async () => {
-        const shelf = {...this.state.shelf};
+        const shelf = { ...this.state.shelf };
         if (shelf.shelfId !== undefined && shelf.shelfId !== null) {
             console.log("Delete: Shelf ID sent: ", shelf.shelfId);
             const options = {

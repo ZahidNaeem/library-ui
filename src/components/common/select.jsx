@@ -42,7 +42,10 @@ class MySelect extends Component {
 
     onChange = (value, options) => {
         const actValue = value !== null ? value.value : null;
-        this.props.onChange(this.props.name, actValue);
+        
+        if(this.props.onChange !== undefined){
+            this.props.onChange(this.props.name, actValue);
+        }
         this.populateSelectedOption(actValue, options);
     }
 

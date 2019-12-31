@@ -56,7 +56,7 @@ class Researcher extends Component {
     handleResearcherChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
-        console.log(value);
+        console.log("Target value", value);
         const researcher = { ...this.state.researcher };
         researcher[name] = name === 'researcherName' ? value.toUpperCase() : value;
         this.setState({ researcher });

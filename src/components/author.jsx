@@ -56,7 +56,7 @@ class Author extends Component {
     handleAuthorChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
-        console.log(value);
+        console.log("Target value", value);
         const author = { ...this.state.author };
         author[name] = name === 'authorName' ? value.toUpperCase() : value;
         this.setState({ author });

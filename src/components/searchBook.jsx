@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
-import { Form, InputGroup, FormControl, Table } from 'react-bootstrap';
+import { Form, InputGroup, FormControl, Table, Button } from 'react-bootstrap';
 import MySelect from './common/select';
-import { INPUT_GROUP_TEXT_STYLE, STRETCH_STYLE, INPUT_DATE_STYLE } from './constant';
+import {
+    INPUT_GROUP_TEXT_STYLE,
+    STRETCH_STYLE,
+    INPUT_DATE_STYLE,
+    API_AUTHOR_URL,
+    API_SUBJECT_URL,
+    API_PUBLISHER_URL,
+    API_RESEARCHER_URL,
+    API_BOOK_URL
+} from './constant';
+import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils';
 
 class SearchBook extends Component {
     state = {
@@ -12,8 +22,147 @@ class SearchBook extends Component {
         researchers: [],
         books: []
     }
+
+    async componentDidMount() {
+        await this.populateAuthors();
+        await this.populateSubjects();
+        await this.populatePublishers();
+        await this.populateResearchers();
+    }
+
+    handleSelectChange = (name, value) => {
+        console.log("handleSelectChange name", name);
+        console.log("handleSelectChange value", value);
+        const { searchBookRequest } = this.state;
+        searchBookRequest[name] = value;
+        this.setState({ searchBookRequest });
+    }
+
+    async populateSubjects() {
+        console.log("Start populate subjects");
+        const subjects = [];
+        const options = {
+            url: API_SUBJECT_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate subjects");
+                res.data.forEach(element => {
+                    subjects.push({
+                        value: element.subjectId,
+                        label: element.subjectName,
+                        parent: element.parentSubjectId
+                    });
+                });
+            }
+            console.log("Subjects:", subjects);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ subjects });
+    }
+
+    async populateAuthors() {
+        console.log("Start populate authors");
+        const authors = [];
+        const options = {
+            url: API_AUTHOR_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate authors");
+                res.data.forEach(element => {
+                    authors.push({
+                        value: element.authorId,
+                        label: element.authorName,
+                        parent: element.parentAuthorId
+                    });
+                });
+            }
+            console.log("Authors:", authors);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ authors });
+    }
+
+    async populatePublishers() {
+        console.log("Start populate publishers");
+        const publishers = [];
+        const options = {
+            url: API_PUBLISHER_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate publishers");
+                res.data.forEach(element => {
+                    publishers.push({
+                        value: element.publisherId,
+                        label: element.publisherName,
+                        parent: element.parentPublisherId
+                    });
+                });
+            }
+            console.log("Publishers:", publishers);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ publishers });
+    }
+
+    async populateResearchers() {
+        console.log("Start populate researchers");
+        const researchers = [];
+        const options = {
+            url: API_RESEARCHER_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate researchers");
+                res.data.forEach(element => {
+                    researchers.push({
+                        value: element.researcherId,
+                        label: element.researcherName,
+                        parent: element.parentResearcherId
+                    });
+                });
+            }
+            console.log("Researchers:", researchers);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ researchers });
+    }
+
+    searchBook = async () => {
+        const searchBookRequest = {...this.state.searchBookRequest};
+                console.log("Search Book: Object sent: ", this.state.searchBookRequest);
+                const options = {
+                    url: API_BOOK_URL + 'search',
+                    method: 'POST',
+                    data: searchBookRequest
+                };
+                try {
+                    const res = await request(options);
+                    if (isSuccessfullResponse(res)) {
+                        console.log("Search Book: Object received: ", res.data);
+                        this.setState({ books: res.data });
+                    }
+                } catch (error) {
+                    throw error.response.data;
+                }
+        }
+
     render() {
-        const {searchBookRequest, authors, subjects, publishers, researchers, books} = this.state;
+        const { searchBookRequest, authors, subjects, publishers, researchers, books } = this.state;
         return (
             <div>
                 <Form dir="rtl">
@@ -30,8 +179,6 @@ class SearchBook extends Component {
                                 options={authors}
                             />
                         </div>
-                    </InputGroup>
-                    <InputGroup className="mb-3">
                         <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Subject</InputGroup.Text>
                         </InputGroup.Prepend>
@@ -58,9 +205,7 @@ class SearchBook extends Component {
                                 options={publishers}
                             />
                         </div>
-                    </InputGroup>
-                    <InputGroup className="mb-3">
-                        <InputGroup.Prepend>
+						<InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Researcher</InputGroup.Text>
                         </InputGroup.Prepend>
                         <div style={STRETCH_STYLE}>
@@ -73,59 +218,67 @@ class SearchBook extends Component {
                             />
                         </div>
                     </InputGroup>
+                    <InputGroup className="mb-3">
+                        <Button
+                            variant="primary"
+                            onClick={this.searchBook}
+                            // className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>Search
+                        </Button>
+                    </InputGroup>
                     <Table
-                    striped
-                    bordered
-                    hover
-                // responsive
-                >
-                    <thead>
-                        <tr>
-                            <th style={INPUT_DATE_STYLE}>Volume Number</th>
-                            <th style={STRETCH_STYLE}>Rack</th>
-                            <th style={STRETCH_STYLE}>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            books && books.map((book, index) => (
-                                <tr key={book.bookId}
-                                >
-                                    <td>
-                                        <FormControl
-                                            // type="number"
-                                            name="volumeName"
-                                            placeholder="Volume Number"
-                                            aria-label="Volume Number"
-                                            value={book.bookName || ''}
-                                            required
-                                            onChange={e => this.handleVolumeChange(e, index)}
-                                        />
-                                    </td>
-                                    <td>
-                                        <MySelect
-                                            name="rack"
-                                            placeholder="Select Rack"
-                                            value={book.rack || ''}
-                                            onChange={(name, value) => this.handleSelectChange(name, value, index)}
-                                            options={authors}
-                                        />
-                                    </td>
-                                    <td>
-                                        <FormControl
-                                            type="text"
-                                            name="remarks"
-                                            placeholder="Remarks"
-                                            aria-label="Remarks"
-                                            value={book.remarks || ''}
-                                            onChange={e => this.handleVolumeChange(e, index)}
-                                        />
-                                    </td>
+                        striped
+                        bordered
+                        hover
+                    // responsive
+                    >
+                        <thead>
+                            <tr>
+                                <th style={INPUT_DATE_STYLE}>Book</th>
+                                <th style={STRETCH_STYLE}>Rack</th>
+                                <th style={STRETCH_STYLE}>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                books && books.map((book, index) => (
+                                    <tr key={book.bookId}
+                                    >
+                                        <td>
+                                            <FormControl
+                                                // type="number"
+                                                name="bookName"
+                                                placeholder="Book"
+                                                aria-label="Book"
+                                                value={book.bookName || ''}
+                                                required
+                                                onChange={e => this.handleVolumeChange(e, index)}
+                                            />
+                                        </td>
+                                        <td>
+                                            <MySelect
+                                                name="rack"
+                                                placeholder="Select Rack"
+                                                value={book.rack || ''}
+                                                onChange={(name, value) => this.handleSelectChange(name, value, index)}
+                                                options={authors}
+                                            />
+                                        </td>
+                                        <td>
+                                            <FormControl
+                                                type="text"
+                                                name="remarks"
+                                                placeholder="Remarks"
+                                                aria-label="Remarks"
+                                                value={book.remarks || ''}
+                                                onChange={e => this.handleVolumeChange(e, index)}
+                                            />
+                                        </td>
                                     </tr>
-                            ))
-                        }
-                    </tbody>
-                </Table>
+                                ))
+                            }
+                        </tbody>
+                    </Table>
                 </Form>
             </div>
         );

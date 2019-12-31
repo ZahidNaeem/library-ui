@@ -56,7 +56,7 @@ class Publisher extends Component {
     handlePublisherChange = (event) => {
         const { name, value } = event.target;
         console.log("Target name", name);
-        console.log(value);
+        console.log("Target value", value);
         const publisher = { ...this.state.publisher };
         publisher[name] = name === 'publisherName' ? value.toUpperCase() : value;
         this.setState({ publisher });

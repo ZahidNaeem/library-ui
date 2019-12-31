@@ -96,8 +96,10 @@ class Book extends Component {
         const { book } = this.state;
         let validateBook = !(book.bookName === undefined || book.bookName === null || book.bookName === '');
         if (validateBook === true) {
-            const invalidVolumes = book.volumes.filter(volume => volume.volumeName === undefined || volume.volumeName === null || volume.volumeName === '');
-            validateBook = invalidVolumes.length < 1;
+            if (book.volumes !== null) {
+                const invalidVolumes = book.volumes.filter(volume => volume.volumeName === undefined || volume.volumeName === null || volume.volumeName === '');
+                validateBook = invalidVolumes.length < 1;
+            }
         }
         return validateBook;
     }
@@ -108,8 +110,8 @@ class Book extends Component {
     }
 
     disableAddButton = (boolean) => {
-    this.setState({ addButtonDisabled: boolean });
-}
+        this.setState({ addButtonDisabled: boolean });
+    }
 
     /* handleComboboxChange = (value, name) => {
         let book = { ...this.state.book };
@@ -174,7 +176,7 @@ class Book extends Component {
     }
 
     deleteBook = async () => {
-        const book = {...this.state.book};
+        const book = { ...this.state.book };
         if (book.bookId !== undefined && book.bookId !== null) {
             console.log("Delete: Book ID sent: ", book.bookId);
             const options = {
