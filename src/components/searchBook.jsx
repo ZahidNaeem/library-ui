@@ -143,23 +143,23 @@ class SearchBook extends Component {
     }
 
     searchBook = async () => {
-        const searchBookRequest = {...this.state.searchBookRequest};
-                console.log("Search Book: Object sent: ", this.state.searchBookRequest);
-                const options = {
-                    url: API_BOOK_URL + 'search',
-                    method: 'POST',
-                    data: searchBookRequest
-                };
-                try {
-                    const res = await request(options);
-                    if (isSuccessfullResponse(res)) {
-                        console.log("Search Book: Object received: ", res.data);
-                        this.setState({ books: res.data });
-                    }
-                } catch (error) {
-                    throw error.response.data;
-                }
+        const searchBookRequest = { ...this.state.searchBookRequest };
+        console.log("Search Book: Object sent: ", this.state.searchBookRequest);
+        const options = {
+            url: API_BOOK_URL + 'search',
+            method: 'POST',
+            data: searchBookRequest
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Search Book: Object received: ", res.data);
+                this.setState({ books: res.data });
+            }
+        } catch (error) {
+            throw error.response.data;
         }
+    }
 
     render() {
         const { searchBookRequest, authors, subjects, publishers, researchers, books } = this.state;
@@ -205,7 +205,7 @@ class SearchBook extends Component {
                                 options={publishers}
                             />
                         </div>
-						<InputGroup.Prepend>
+                        <InputGroup.Prepend>
                             <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Researcher</InputGroup.Text>
                         </InputGroup.Prepend>
                         <div style={STRETCH_STYLE}>
@@ -244,36 +244,9 @@ class SearchBook extends Component {
                                 books && books.map((book, index) => (
                                     <tr key={book.bookId}
                                     >
-                                        <td>
-                                            <FormControl
-                                                // type="number"
-                                                name="bookName"
-                                                placeholder="Book"
-                                                aria-label="Book"
-                                                value={book.bookName || ''}
-                                                required
-                                                onChange={e => this.handleVolumeChange(e, index)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <MySelect
-                                                name="rack"
-                                                placeholder="Select Rack"
-                                                value={book.rack || ''}
-                                                onChange={(name, value) => this.handleSelectChange(name, value, index)}
-                                                options={authors}
-                                            />
-                                        </td>
-                                        <td>
-                                            <FormControl
-                                                type="text"
-                                                name="remarks"
-                                                placeholder="Remarks"
-                                                aria-label="Remarks"
-                                                value={book.remarks || ''}
-                                                onChange={e => this.handleVolumeChange(e, index)}
-                                            />
-                                        </td>
+                                        <td>{book.bookName || ''}</td>
+                                        <td>{book.rack || ''}</td>
+                                        <td>{book.remarks || ''}</td>
                                     </tr>
                                 ))
                             }
