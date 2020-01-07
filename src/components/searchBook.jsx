@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Form, InputGroup, FormControl, Table, Button } from 'react-bootstrap';
+import { Form, InputGroup, Button, Table } from 'react-bootstrap';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import MySelect from './common/select';
 import {
     INPUT_GROUP_TEXT_STYLE,
@@ -9,7 +10,8 @@ import {
     API_SUBJECT_URL,
     API_PUBLISHER_URL,
     API_RESEARCHER_URL,
-    API_BOOK_URL
+    API_BOOK_URL,
+    API_VOLUME_URL
 } from './constant';
 import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils';
 
@@ -20,7 +22,9 @@ class SearchBook extends Component {
         subjects: [],
         publishers: [],
         researchers: [],
-        books: []
+        books: [],
+        volumes: [],
+        expandedRows: []
     }
 
     async componentDidMount() {
@@ -142,6 +146,25 @@ class SearchBook extends Component {
         this.setState({ researchers });
     }
 
+    async populateVolumes(bookId) {
+        console.log("Start populate volumes");
+        const options = {
+            url: API_VOLUME_URL + 'book/' + bookId,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate volumes");
+                const volumes = res.data;
+                console.log("Volumes:", volumes);
+                this.setState({ volumes });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     searchBook = async () => {
         const searchBookRequest = { ...this.state.searchBookRequest };
         console.log("Search Book: Object sent: ", this.state.searchBookRequest);
@@ -161,8 +184,59 @@ class SearchBook extends Component {
         }
     }
 
+    handleRowClick = (rowId) => {
+        console.log("handleRowClick called with rowid" , rowId);
+
+        const currentExpandedRows = this.state.expandedRows;
+        const isRowCurrentlyExpanded = currentExpandedRows.includes(rowId);
+
+        const newExpandedRows = isRowCurrentlyExpanded ?
+            currentExpandedRows.filter(id => id !== rowId) :
+            currentExpandedRows.concat(rowId);
+
+        this.setState({ expandedRows: newExpandedRows });
+    }
+
+    renderBookDetails = (book) => {
+        const clickCallback = this.handleRowClick(book.id);
+        const bookDetailsRows = [
+            <tr onClick={clickCallback} key={"row-data-" + book.bookId}>
+                <td>{book.bookId}</td>
+                <td>{book.bookName}</td>
+                <td>{book.publicationDate}</td>
+                <td>{book.authorName}</td>
+                <td>{book.subjectName}</td>
+                <td>{book.publisherName}</td>
+                <td>{book.researcherName}</td>
+            </tr>
+        ];
+
+        if (this.state.expandedRows.includes(book.bookId)) {
+            const volumes = { ...this.state.volumes };
+            volumes.forEach(volume => {
+                bookDetailsRows.push(
+                    <tr key={"row-expanded-" + volume.volumeId}>
+                        <td>{volume.volumeName}</td>
+                        <td>{volume.rackName}</td>
+                        <td>{volume.remarks}</td>
+                    </tr>
+                );
+            });
+        }
+
+        return bookDetailsRows;
+    }
+
     render() {
-        const { searchBookRequest, authors, subjects, publishers, researchers, books } = this.state;
+        const { searchBookRequest, authors, subjects, publishers, researchers, books, volumes } = this.state;
+
+        let allBookDetailsRows = [];
+
+        books.forEach(book => {
+            const perBookRows = this.renderBookDetails(book);
+            allBookDetailsRows = allBookDetailsRows.concat(perBookRows);
+        });
+
         return (
             <div>
                 <Form dir="rtl">
@@ -226,7 +300,7 @@ class SearchBook extends Component {
                             active>Search
                         </Button>
                     </InputGroup>
-                    <Table
+                    {/* <Table
                         striped
                         bordered
                         hover
@@ -250,6 +324,28 @@ class SearchBook extends Component {
                                     </tr>
                                 ))
                             }
+                        </tbody>
+                    </Table> */}
+                    <Table
+                        striped
+                        bordered
+                        hover
+                    // responsive
+                    >
+                        <thead>
+
+                            <tr>
+                                <th> Book ID</th>
+                                <th>Book Name</th>
+                                <th>Publication Date</th>
+                                <th>Author Name</th>
+                                <th>Subject Name</th>
+                                <th>Publisher Name</th>
+                                <th>Researcher Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {allBookDetailsRows}
                         </tbody>
                     </Table>
                 </Form>
