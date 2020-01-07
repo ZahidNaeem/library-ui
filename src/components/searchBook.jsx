@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Form, InputGroup, Button, Table } from 'react-bootstrap';
-import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import MySelect from './common/select';
 import {
     INPUT_GROUP_TEXT_STYLE,
@@ -15,6 +14,7 @@ import {
 } from './constant';
 import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils';
 
+let expanded = false;
 class SearchBook extends Component {
     state = {
         searchBookRequest: {},
@@ -24,7 +24,7 @@ class SearchBook extends Component {
         researchers: [],
         books: [],
         volumes: [],
-        expandedRows: []
+        bookDetailsRows: []
     }
 
     async componentDidMount() {
@@ -146,10 +146,30 @@ class SearchBook extends Component {
         this.setState({ researchers });
     }
 
-    async populateVolumes(bookId) {
+    async populateBooks() {
+        const searchBookRequest = { ...this.state.searchBookRequest };
+        console.log("Search Book: Object sent: ", this.state.searchBookRequest);
+        const options = {
+            url: API_BOOK_URL + 'search',
+            method: 'POST',
+            data: searchBookRequest
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Search Book: Object received: ", res.data);
+                this.setState({ books: res.data });
+                await this.populateVolumes();
+            }
+        } catch (error) {
+            throw error.response.data;
+        }
+    }
+
+    async populateVolumes() {
         console.log("Start populate volumes");
         const options = {
-            url: API_VOLUME_URL + 'book/' + bookId,
+            url: API_VOLUME_URL + 'resp/all',
             method: 'GET'
         };
         try {
@@ -166,76 +186,72 @@ class SearchBook extends Component {
     }
 
     searchBook = async () => {
-        const searchBookRequest = { ...this.state.searchBookRequest };
-        console.log("Search Book: Object sent: ", this.state.searchBookRequest);
-        const options = {
-            url: API_BOOK_URL + 'search',
-            method: 'POST',
-            data: searchBookRequest
-        };
-        try {
-            const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Search Book: Object received: ", res.data);
-                this.setState({ books: res.data });
+        await this.populateBooks();
+        await this.populateVolumes();
+    }
+
+    handleRowClick = () => {
+        console.log("handleRowClick before", expanded);
+        expanded = !expanded;
+        console.log("handleRowClick after", expanded);
+        
+    }
+
+    renderBookDetails = () => {
+        const books = [...this.state.books];
+        let volumes = [...this.state.volumes];
+        // const clickCallback = this.handleRowClick(book.id);
+        const bookDetailsRows = [];
+
+        books.forEach(book => {
+            bookDetailsRows.push(
+                <tr
+                    key={"row-data-" + book.bookId}
+                    onClick={this.handleRowClick}>
+                    <td>{book.bookId}</td>
+                    <td>{book.bookName}</td>
+                    <td>{book.publicationDate}</td>
+                    <td>{book.authorName}</td>
+                    <td>{book.subjectName}</td>
+                    <td>{book.publisherName}</td>
+                    <td>{book.researcherName}</td>
+                </tr>
+            );
+
+            if (expanded === true) {
+                const filteredVolumes = volumes.filter(volume => volume.bookId === book.bookId);
+                filteredVolumes.forEach(volume => {
+                    bookDetailsRows.push(
+                        <tr key={"row-expanded-" + volume.volumeId}>
+                            <td>{volume.volumeName}</td>
+                            <td>{volume.rackName}</td>
+                            <td>{volume.remarks}</td>
+                        </tr>
+                    );
+                });
             }
-        } catch (error) {
-            throw error.response.data;
-        }
-    }
+        });
 
-    handleRowClick = (rowId) => {
-        console.log("handleRowClick called with rowid" , rowId);
+        // if (this.state.expandedRows.includes(book.bookId)) {
+        //     const volumes = { ...this.state.volumes };
+        //     volumes.forEach(volume => {
+        //         bookDetailsRows.push(
+        //             <tr key={"row-expanded-" + volume.volumeId}>
+        //                 <td>{volume.volumeName}</td>
+        //                 <td>{volume.rackName}</td>
+        //                 <td>{volume.remarks}</td>
+        //             </tr>
+        //         );
+        //     });
+        // }
 
-        const currentExpandedRows = this.state.expandedRows;
-        const isRowCurrentlyExpanded = currentExpandedRows.includes(rowId);
-
-        const newExpandedRows = isRowCurrentlyExpanded ?
-            currentExpandedRows.filter(id => id !== rowId) :
-            currentExpandedRows.concat(rowId);
-
-        this.setState({ expandedRows: newExpandedRows });
-    }
-
-    renderBookDetails = (book) => {
-        const clickCallback = this.handleRowClick(book.id);
-        const bookDetailsRows = [
-            <tr onClick={clickCallback} key={"row-data-" + book.bookId}>
-                <td>{book.bookId}</td>
-                <td>{book.bookName}</td>
-                <td>{book.publicationDate}</td>
-                <td>{book.authorName}</td>
-                <td>{book.subjectName}</td>
-                <td>{book.publisherName}</td>
-                <td>{book.researcherName}</td>
-            </tr>
-        ];
-
-        if (this.state.expandedRows.includes(book.bookId)) {
-            const volumes = { ...this.state.volumes };
-            volumes.forEach(volume => {
-                bookDetailsRows.push(
-                    <tr key={"row-expanded-" + volume.volumeId}>
-                        <td>{volume.volumeName}</td>
-                        <td>{volume.rackName}</td>
-                        <td>{volume.remarks}</td>
-                    </tr>
-                );
-            });
-        }
-
-        return bookDetailsRows;
+        this.setState({bookDetailsRows});
     }
 
     render() {
         const { searchBookRequest, authors, subjects, publishers, researchers, books, volumes } = this.state;
 
-        let allBookDetailsRows = [];
-
-        books.forEach(book => {
-            const perBookRows = this.renderBookDetails(book);
-            allBookDetailsRows = allBookDetailsRows.concat(perBookRows);
-        });
+        let allBookDetailsRows = this.renderBookDetails();
 
         return (
             <div>
