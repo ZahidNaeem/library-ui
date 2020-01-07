@@ -187,19 +187,21 @@ class SearchBook extends Component {
 
     searchBook = async () => {
         await this.populateBooks();
-        await this.populateVolumes();
+        await this.populateVolumes();        
+        this.renderBookDetails();
     }
 
     handleRowClick = () => {
         console.log("handleRowClick before", expanded);
         expanded = !expanded;
         console.log("handleRowClick after", expanded);
-        
     }
 
     renderBookDetails = () => {
+        console.log("renderBookDetails called");
+        
         const books = [...this.state.books];
-        let volumes = [...this.state.volumes];
+        const volumes = [...this.state.volumes];  
         // const clickCallback = this.handleRowClick(book.id);
         const bookDetailsRows = [];
 
@@ -249,9 +251,7 @@ class SearchBook extends Component {
     }
 
     render() {
-        const { searchBookRequest, authors, subjects, publishers, researchers, books, volumes } = this.state;
-
-        let allBookDetailsRows = this.renderBookDetails();
+        const { searchBookRequest, authors, subjects, publishers, researchers, books, volumes, bookDetailsRows } = this.state;
 
         return (
             <div>
@@ -361,7 +361,7 @@ class SearchBook extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {allBookDetailsRows}
+                            {bookDetailsRows}
                         </tbody>
                     </Table>
                 </Form>
