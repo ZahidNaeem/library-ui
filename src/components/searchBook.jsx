@@ -222,7 +222,7 @@ class SearchBook extends Component {
                     onClick={() => this.handleRowClick(book.bookId)}>
                     <td>{book.bookId}</td>
                     <td>{book.bookName}</td>
-                    <td>{book.publicationDate}</td>
+                    <td>{book.publicationDate.split("T")[0]}</td>
                     <td>{book.authorName}</td>
                     <td>{book.subjectName}</td>
                     <td>{book.publisherName}</td>
@@ -243,8 +243,8 @@ class SearchBook extends Component {
                     );
                 });
                 bookDetailsRows.push(
-                    <tr>
-                        <td colspan="7">
+                    <tr  key={"row-data-child-" + book.bookId}>
+                        <td colSpan="7">
                             <Table
                              style={{ background: "#fff" }}
                                 striped
