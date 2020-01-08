@@ -14,7 +14,8 @@ import {
 } from './constant';
 import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils';
 
-let expanded = false;
+let expanded = null;
+let isExpanded = false;
 class SearchBook extends Component {
     state = {
         searchBookRequest: {},
@@ -187,21 +188,30 @@ class SearchBook extends Component {
 
     searchBook = async () => {
         await this.populateBooks();
-        await this.populateVolumes();        
+        await this.populateVolumes();
         this.renderBookDetails();
     }
 
-    handleRowClick = () => {
-        console.log("handleRowClick before", expanded);
-        expanded = !expanded;
-        console.log("handleRowClick after", expanded);
+    handleRowClick = (rowId) => {
+        console.log("expanded before", expanded);
+        console.log("isExpanded before", isExpanded);
+        if (rowId === expanded) {
+            isExpanded = !isExpanded;
+        } else {
+            isExpanded = true;
+        }
+        expanded = rowId;
+        console.log("expanded after", expanded);
+        console.log("isExpanded after", isExpanded);
+        this.renderBookDetails();
     }
 
     renderBookDetails = () => {
         console.log("renderBookDetails called");
-        
+        console.log("Expanded", expanded);
+
         const books = [...this.state.books];
-        const volumes = [...this.state.volumes];  
+        const volumes = [...this.state.volumes];
         // const clickCallback = this.handleRowClick(book.id);
         const bookDetailsRows = [];
 
@@ -209,7 +219,7 @@ class SearchBook extends Component {
             bookDetailsRows.push(
                 <tr
                     key={"row-data-" + book.bookId}
-                    onClick={this.handleRowClick}>
+                    onClick={() => this.handleRowClick(book.bookId)}>
                     <td>{book.bookId}</td>
                     <td>{book.bookName}</td>
                     <td>{book.publicationDate}</td>
@@ -220,10 +230,11 @@ class SearchBook extends Component {
                 </tr>
             );
 
-            if (expanded === true) {
+            if (expanded === book.bookId && isExpanded === true) {
+                const volumeRows = [];
                 const filteredVolumes = volumes.filter(volume => volume.bookId === book.bookId);
                 filteredVolumes.forEach(volume => {
-                    bookDetailsRows.push(
+                    volumeRows.push(
                         <tr key={"row-expanded-" + volume.volumeId}>
                             <td>{volume.volumeName}</td>
                             <td>{volume.rackName}</td>
@@ -231,23 +242,34 @@ class SearchBook extends Component {
                         </tr>
                     );
                 });
+                bookDetailsRows.push(
+                    <tr>
+                        <td colspan="7">
+                            <Table
+                             style={{ background: "#fff" }}
+                                striped
+                                bordered
+                                hover
+                            // responsive
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Volume Number</th>
+                                        <th>Rack</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {volumeRows}
+                                </tbody>
+                            </Table>
+                        </td>
+                    </tr>
+                );
             }
         });
 
-        // if (this.state.expandedRows.includes(book.bookId)) {
-        //     const volumes = { ...this.state.volumes };
-        //     volumes.forEach(volume => {
-        //         bookDetailsRows.push(
-        //             <tr key={"row-expanded-" + volume.volumeId}>
-        //                 <td>{volume.volumeName}</td>
-        //                 <td>{volume.rackName}</td>
-        //                 <td>{volume.remarks}</td>
-        //             </tr>
-        //         );
-        //     });
-        // }
-
-        this.setState({bookDetailsRows});
+        this.setState({ bookDetailsRows });
     }
 
     render() {
@@ -316,36 +338,11 @@ class SearchBook extends Component {
                             active>Search
                         </Button>
                     </InputGroup>
-                    {/* <Table
-                        striped
-                        bordered
-                        hover
-                    // responsive
-                    >
-                        <thead>
-                            <tr>
-                                <th style={INPUT_DATE_STYLE}>Book</th>
-                                <th style={STRETCH_STYLE}>Rack</th>
-                                <th style={STRETCH_STYLE}>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                books && books.map((book, index) => (
-                                    <tr key={book.bookId}
-                                    >
-                                        <td>{book.bookName || ''}</td>
-                                        <td>{book.rack || ''}</td>
-                                        <td>{book.remarks || ''}</td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </Table> */}
                     <Table
+                        style={{ textAlign: "right" }}
                         striped
                         bordered
-                        hover
+                        // hover
                     // responsive
                     >
                         <thead>
