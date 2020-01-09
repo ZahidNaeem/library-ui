@@ -109,7 +109,7 @@ class App extends Component {
             return (
                 <Switch>
                     {/* <Route exact path="/" render={(props) => <Main {...props} handleLogout={this.handleLogout} />} /> */}
-                    <Route exact path="(/|/author|/subject|/publisher|/researcher|/shelf|/book|/searchBook|/dashboard)"
+                    <Route exact path="(/|/author|/subject|/publisher|/researcher|/shelf|/book|/searchBook|/reader|/bookIssue|/bookReceipt|/dashboard)"
                         render={(props) =>
                             <Main {...props}
                                 currentUser={currentUser}

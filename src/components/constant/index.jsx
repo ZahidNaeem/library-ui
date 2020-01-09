@@ -7,6 +7,9 @@ export const API_SHELF_URL = API_BASE_URL + 'shelves/';
 export const API_RACK_URL = API_BASE_URL + 'racks/';
 export const API_BOOK_URL = API_BASE_URL + 'books/';
 export const API_VOLUME_URL = API_BASE_URL + 'volumes/';
+export const API_READER_URL = API_BASE_URL + 'readers/';
+export const API_BOOK_TRANS_HEADER_URL = API_BASE_URL + 'bookTransHeaders/';
+export const API_BOOK_TRANS_LINE_URL = API_BASE_URL + 'bookTransLines/';
 
 export const BUTTON_FIRST = 'الأول';
 export const BUTTON_PREVIOUS = 'السابق';

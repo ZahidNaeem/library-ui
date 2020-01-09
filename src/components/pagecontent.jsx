@@ -9,6 +9,9 @@ import Shelf from './shelf';
 import Book from './book';
 import Dashboard from './common/dashboard';
 import SearchBook from './searchBook';
+import Reader from './reader';
+import BookTransHeaderIssue from './bookTransHeaderIssue';
+import BookTransHeaderReceipt from './bookTransHeaderReceipt';
 
 class PageContent extends Component {
 
@@ -32,6 +35,12 @@ class PageContent extends Component {
       return <><h1 className="text-center h3 mb-4 text-gray-800">Book Registration</h1><Book /></>;
     } else if (pathname === "/searchBook") {
       return <><h1 className="text-center h3 mb-4 text-gray-800">Search Book</h1><SearchBook /></>;
+    } else if (pathname === "/reader") {
+      return <><h1 className="text-center h3 mb-4 text-gray-800">Reader</h1><Reader /></>;
+    } else if (pathname === "/bookIssue") {
+      return <><h1 className="text-center h3 mb-4 text-gray-800">Book Issuance</h1><BookTransHeaderIssue /></>;
+    } else if (pathname === "/bookReceipt") {
+      return <><h1 className="text-center h3 mb-4 text-gray-800">Book Receipt</h1><BookTransHeaderReceipt /></>;
     }
   }
   render() {

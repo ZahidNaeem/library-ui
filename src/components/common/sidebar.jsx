@@ -8,9 +8,9 @@ const SideBar = () => {
 
       <a className="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
         <div className="sidebar-brand-icon rotate-n-15">
-          <i className="fas fa-laugh-wink"></i>
+          {/* <i className="fas fa-laugh-wink"></i> */}
         </div>
-        <div className="sidebar-brand-text mx-3">POS Admin</div>
+        <div className="sidebar-brand-text mx-3">Library Management</div>
       </a>
 
 
@@ -135,7 +135,23 @@ const SideBar = () => {
           <span>Search Book</span></Link>
       </li>
 
+      <li className="nav-item">
+        <Link className="nav-link" to="/reader">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Reader</span></Link>
+      </li>
 
+      <li className="nav-item">
+        <Link className="nav-link" to="/bookIssue">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Book Issuance</span></Link>
+      </li>
+
+      <li className="nav-item">
+        <Link className="nav-link" to="/bookReceipt">
+          <i className="fas fa-fw fa-table"></i>
+          <span>Book Receipt</span></Link>
+      </li>
 
       <hr className="sidebar-divider d-none d-md-block" />
 
