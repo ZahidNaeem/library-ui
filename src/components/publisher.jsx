@@ -96,8 +96,7 @@ class Publisher extends Component {
     }
 
     savePublisher = async () => {
-        const { publisherName } = this.state.publisher;
-        if (publisherName === undefined || publisherName === null || publisherName === '') {
+        if (this.validateForm() === false) {
             toast.error("Publisher name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.publisher);

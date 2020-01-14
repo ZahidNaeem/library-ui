@@ -68,7 +68,7 @@ class Shelf extends Component {
         const { shelf } = this.state;
         let validateBook = !(shelf.shelfName === undefined || shelf.shelfName === null || shelf.shelfName === '');
         if (validateBook === true) {
-            if (shelf.racks !== null) {
+            if (shelf.racks !== undefined && shelf.racks !== null) {
                 const invalidRacks = shelf.racks.filter(rack => rack.rackName === undefined || rack.rackName === null || rack.rackName === '');
                 validateBook = invalidRacks.length < 1;
             }
@@ -81,9 +81,9 @@ class Shelf extends Component {
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
-    disableAddButton = (boolean) => {
-        this.setState({ addButtonDisabled: boolean });
-    }
+    // disableAddButton = (boolean) => {
+    //     this.setState({ addButtonDisabled: boolean });
+    // }
 
     /* handleComboboxChange = (value, name) => {
         let shelf = { ...this.state.shelf };
@@ -99,9 +99,9 @@ class Shelf extends Component {
 
     addShelf = () => {
         const shelf = {};
-        shelf.racks = [];
+        // shelf.racks = [];
         this.setState({ shelf, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
-        this.disableAddButton(true);
+        // this.disableAddButton(true);
     }
 
     addRackIntoShelf = (racks) => {
@@ -114,8 +114,7 @@ class Shelf extends Component {
     }
 
     saveShelf = async () => {
-        const { shelfName } = this.state.shelf;
-        if (shelfName === undefined || shelfName === null || shelfName === '') {
+        if (this.validateForm() === false) {
             toast.error("Shelf name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.shelf);
@@ -130,7 +129,7 @@ class Shelf extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { shelf, navigationDtl } = res.data;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -161,7 +160,7 @@ class Shelf extends Component {
                     console.log("Delete: Response: ", res);
                     const { shelf, navigationDtl } = res.data;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
@@ -233,7 +232,7 @@ class Shelf extends Component {
             this.firstShelf();
         }
         this.setState({ undoButtonDisabled: true });
-        this.disableAddButton(false);
+        // this.disableAddButton(false);
     }
 
     userRoles = async () => {

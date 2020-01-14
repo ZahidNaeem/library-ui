@@ -95,8 +95,7 @@ class Reader extends Component {
     }
 
     saveReader = async () => {
-        const { readerName } = this.state.reader;
-        if (readerName === undefined || readerName === null || readerName === '') {
+        if (this.validateForm() === false) {
             toast.error("Reader name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.reader);

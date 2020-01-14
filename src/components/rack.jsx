@@ -69,10 +69,10 @@ class Rack extends Component {
 
         let newRack = {};
 
-        if (shelf.racks === null) {
+        if (shelf === null) {
             alert("Please add shelf, then add rack");
             return;
-        } else if (shelf.racks === undefined) {
+        } else if (shelf.racks === undefined || shelf.racks === null) {
             shelf['racks'] = [];
         }
 
@@ -157,7 +157,7 @@ class Rack extends Component {
                     <tbody>
                         {
                             racks && racks.map((rack, index) => (
-                                <tr key={rack.rackId}
+                                <tr key={"row-" + rack.rackId}
                                 >
                                     <td>
                                         <FormControl

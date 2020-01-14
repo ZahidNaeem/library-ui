@@ -15,36 +15,38 @@ import {
 class BookTransLine extends Component {
 
     state = {
-        bookTransHeader: {},
+        bookTransLines: [],
         bookTransLineAlert: false
     }
 
     componentWillReceiveProps(props) {
         // You don't have to do this check first, but it can help prevent an unneeded render
-        if (props.bookTransHeader !== this.state.bookTransHeader) {
-            const { bookTransHeader } = props;
-            this.setState({ bookTransHeader });
+        console.log("BookTransLine props changed");
+        
+        if (props.bookTransLines !== this.state.bookTransLines) {
+            const { bookTransLines } = props;
+            this.setState({ bookTransLines });
         }
     }
 
-    handleBookTransLineChange = async (event, index) => {
-        const { name, value } = event.target;
-        const bookTransHeader = { ...this.state.bookTransHeader };
-        const bookTransLines = [...this.state.bookTransHeader.bookTransLines];
-        console.log("Target name", name);
-        console.log("Index: ", index);
-        console.log("Value: ", value);
-        console.log("Cell old value: ", bookTransLines[index][name]);
-        bookTransLines[index][name] = value;
-        bookTransHeader.bookTransLines = bookTransLines;
-        try {
-            await this.props.addBookTransLineIntoBookTransHeader(bookTransLines);
-            this.setState({ bookTransHeader });
-            this.props.enableSaveUndoButton();
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    // handleBookTransLineChange = async (event, index) => {
+    //     const { name, value } = event.target;
+    //     const bookTransHeader = { ...this.state.bookTransHeader };
+    //     const bookTransLines = [...this.state.bookTransHeader.bookTransLines];
+    //     console.log("Target name", name);
+    //     console.log("Index: ", index);
+    //     console.log("Value: ", value);
+    //     console.log("Cell old value: ", bookTransLines[index][name]);
+    //     bookTransLines[index][name] = value;
+    //     bookTransHeader.bookTransLines = bookTransLines;
+    //     try {
+    //         await this.props.addBookTransLineIntoBookTransHeader(bookTransLines);
+    //         this.setState({ bookTransHeader });
+    //         this.props.enableSaveUndoButton();
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
 
     // handleSelectChange = async (name, value, index) => {
     //     const bookTransHeader = { ...this.state.bookTransHeader };
@@ -65,23 +67,12 @@ class BookTransLine extends Component {
     // }
 
     addBookTransLine = async () => {
-        let bookTransHeader = { ...this.state.bookTransHeader };
-
+        let bookTransLines = [...this.state.bookTransLines];
         let newBookTransLine = {};
-
-        if (bookTransHeader.bookTransLines === null) {
-            alert("Please add bookTransHeader, then add bookTransLine");
-            return;
-        } else if (bookTransHeader.bookTransLines === undefined) {
-            bookTransHeader['bookTransLines'] = [];
-        }
-
-        let bookTransLines = [...bookTransHeader.bookTransLines];
         bookTransLines.push(newBookTransLine);
-        bookTransHeader.bookTransLines = bookTransLines;
         try {
             await this.props.addBookTransLineIntoBookTransHeader(bookTransLines);
-            this.setState({ bookTransHeader });
+            this.setState({ bookTransLines });
             this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
@@ -95,8 +86,7 @@ class BookTransLine extends Component {
         } */
 
     deleteBookTransLine = async (index) => {
-        let bookTransHeader = { ...this.state.bookTransHeader };
-        let bookTransLines = [...bookTransHeader.bookTransLines];
+        let bookTransLines = [...this.state.bookTransLines];
         let id = bookTransLines[index]['lineId'];
         if (id != null) {
             const options = {
@@ -113,10 +103,9 @@ class BookTransLine extends Component {
             }
         }
         bookTransLines.splice(index, 1);
-        bookTransHeader.bookTransLines = bookTransLines;
         try {
             await this.props.addBookTransLineIntoBookTransHeader(bookTransLines);
-            this.setState({ bookTransHeader, bookTransLineAlert: false });
+            this.setState({ bookTransLines, bookTransLineAlert: false });
         } catch (error) {
             console.log(error);
         }
@@ -124,14 +113,14 @@ class BookTransLine extends Component {
 
 
     render() {
-        const { bookTransLines } = this.state.bookTransHeader;
+        const { bookTransLines } = this.state;
         const { fieldsDisabled, addButtondisabled, deleteButtondisabled } = this.props;
 
         return (
             <>
                 <br />
                 <h3 className="text-center h3 mb-4 text-gray-800">Book Details</h3>
-                <ButtonToolbar className="mb-2">
+                {/* <ButtonToolbar className="mb-2">
                     <Button
                         variant="primary"
                         disabled={addButtondisabled}
@@ -139,7 +128,7 @@ class BookTransLine extends Component {
                         className="ml-1" style={LARGE_BUTTON_STYLE}
                         active>Add Book Details
                                             </Button>
-                </ButtonToolbar>
+                </ButtonToolbar> */}
                 <Table
                     striped
                     bordered
@@ -149,7 +138,8 @@ class BookTransLine extends Component {
                     <thead>
 
                         <tr>
-                            <th style={INPUT_DATE_STYLE}>BookTransLine Number</th>
+                            <th style={INPUT_DATE_STYLE}>Book</th>
+                            <th style={INPUT_DATE_STYLE}>Volume</th>
                             <th style={STRETCH_STYLE}>Remarks</th>
                             <th style={EXTRA_SMALL_BUTTON_STYLE}>Delete</th>
                         </tr>
@@ -157,31 +147,11 @@ class BookTransLine extends Component {
                     <tbody>
                         {
                             bookTransLines && bookTransLines.map((bookTransLine, index) => (
-                                <tr key={bookTransLine.lineId}
+                                <tr key={"row-" + bookTransLine.lineId}
                                 >
-                                    <td>
-                                        <FormControl
-                                            // type="number"
-                                            name="bookTransLineName"
-                                            placeholder="BookTransLine Number"
-                                            aria-label="BookTransLine Number"
-                                            value={bookTransLine.bookTransLineName || ''}
-                                            required
-                                            disabled={fieldsDisabled}
-                                            onChange={e => this.handleBookTransLineChange(e, index)}
-                                        />
-                                    </td>
-                                    <td>
-                                        <FormControl
-                                            type="text"
-                                            name="remarks"
-                                            placeholder="Remarks"
-                                            aria-label="Remarks"
-                                            value={bookTransLine.remarks || ''}
-                                            disabled={fieldsDisabled}
-                                            onChange={e => this.handleBookTransLineChange(e, index)}
-                                        />
-                                    </td>
+                                    <td>{bookTransLine.bookName}</td>
+                                    <td>{bookTransLine.volumeName}</td>
+                                    <td>{bookTransLine.remarks}</td>
                                     <td>
                                         <Button
                                             variant="primary"

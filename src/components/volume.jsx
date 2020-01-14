@@ -28,7 +28,7 @@ class Volume extends Component {
         if (props.book !== this.state.book) {
             const { book } = props;
             this.setState({ book });
-        }
+        }        
     }
 
     async componentDidMount() {
@@ -74,17 +74,16 @@ class Volume extends Component {
 
     addVolume = async () => {
         let book = { ...this.state.book };
-
         let newVolume = {};
 
-        if (book.volumes === null) {
+        if (book === null) {
             alert("Please add book, then add volume");
             return;
-        } else if (book.volumes === undefined) {
+        } else if (book.volumes === undefined || book.volumes === null) {
             book['volumes'] = [];
         }
 
-        let volumes = [...book.volumes];
+        const { volumes } = book;
         volumes.push(newVolume);
         book.volumes = volumes;
         try {
@@ -193,7 +192,7 @@ class Volume extends Component {
                     <tbody>
                         {
                             volumes && volumes.map((volume, index) => (
-                                <tr key={volume.volumeId}
+                                <tr key={"row-" + volume.volumeId}
                                 >
                                     <td>
                                         <FormControl

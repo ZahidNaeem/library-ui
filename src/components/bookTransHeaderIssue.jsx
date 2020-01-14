@@ -4,9 +4,13 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
+import MySelect from './common/select'
 import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
 import {
     API_BOOK_TRANS_HEADER_URL,
+    API_READER_URL,
+    API_BOOK_URL,
+    API_VOLUME_URL,
     INPUT_GROUP_TEXT_STYLE,
     STRETCH_STYLE,
     SMALL_BUTTON_STYLE,
@@ -25,10 +29,17 @@ class BookTransHeaderIssue extends Component {
 
     state = {
         bookTransHeader: {
-            transType: 'ISSUE'
+            transType: 'ISSUE',
+            transDate: null,
+            reader: null,
+            remarks: null,
+            bookTransLines: []
         },
         navigationDtl: {},
         bookTransHeaderAlert: false,
+        readers: [],
+        books: [],
+        volumes: [],
         fieldsDisabled: true,
         addButtonDisabled: true,
         deleteButtonDisabled: true,
@@ -37,6 +48,9 @@ class BookTransHeaderIssue extends Component {
     }
 
     async componentDidMount() {
+        await this.populateReaders();
+        await this.populateBooks();
+        await this.populateVolumes();
         this.firstBookTransHeader();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
@@ -61,21 +75,62 @@ class BookTransHeaderIssue extends Component {
         console.log("Target name", name);
         console.log("Target value", value);
         const bookTransHeader = { ...this.state.bookTransHeader };
-        bookTransHeader[name] = name === 'bookTransHeaderName' ? value.toUpperCase() : value;
+        bookTransHeader[name] = value;
         this.setState({ bookTransHeader });
         this.enableSaveUndoButton();
     }
 
+    handleSelectChange = (name, value) => {
+        console.log("handleSelectChange name", name);
+        console.log("handleSelectChange value", value);
+        const { bookTransHeader } = this.state;
+        bookTransHeader[name] = value;
+        this.setState({ bookTransHeader });
+        this.enableSaveUndoButton();
+    }
+
+    handleBookChange = (name, value) => {
+        console.log("handleSelectChange name", name);
+        console.log("handleSelectChange value", value);
+        const volumes = [...this.state.volumes];
+
+        const filteredVolumes = volumes.filter(volume => volume.bookId === value);
+        console.log("Filtered Volumes", filteredVolumes);
+
+        const { bookTransHeader } = this.state;
+        if (bookTransHeader.bookTransLines === undefined || bookTransHeader.bookTransLines === null) {
+            bookTransHeader.bookTransLines = [];
+        }
+
+        filteredVolumes.forEach(volume => {
+            bookTransHeader.bookTransLines.push({
+                volume: volume.volumeId,
+                bookId: volume.bookId,
+                volumeName: volume.volumeName,
+                bookName: volume.bookName,
+                rackName: volume.rackName,
+                remarks: volume.remarks
+            });
+        });
+        this.setState({ bookTransHeader });
+    }
+
     validateForm = () => {
         const { bookTransHeader } = this.state;
-        let validateBook = !(bookTransHeader.bookTransHeaderName === undefined || bookTransHeader.bookTransHeaderName === null || bookTransHeader.bookTransHeaderName === '');
-        if (validateBook === true) {
-            if (bookTransHeader.bookTransLines !== null) {
-                const invalidBookTransLines = bookTransHeader.bookTransLines.filter(bookTransLine => bookTransLine.bookTransLineName === undefined || bookTransLine.bookTransLineName === null || bookTransLine.bookTransLineName === '');
-                validateBook = invalidBookTransLines.length < 1;
+        console.log("transDate", bookTransHeader.transDate);
+        console.log("reader", bookTransHeader.reader);
+
+        let validateBookTrans = !(
+            bookTransHeader.transDate === undefined || bookTransHeader.transDate === null || bookTransHeader.transDate === '' ||
+            bookTransHeader.reader === undefined || bookTransHeader.reader === null || bookTransHeader.reader === ''
+        );
+        if (validateBookTrans === true) {
+            if (bookTransHeader.bookTransLines !== undefined && bookTransHeader.bookTransLines !== null) {
+                const invalidBookTransLines = bookTransHeader.bookTransLines.filter(bookTransLine => bookTransLine.volume === undefined || bookTransLine.volume === null || bookTransLine.volume === '');
+                validateBookTrans = invalidBookTransLines.length < 1;
             }
         }
-        return validateBook;
+        return validateBookTrans;
     }
 
     enableSaveUndoButton = () => {
@@ -83,9 +138,9 @@ class BookTransHeaderIssue extends Component {
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
-    disableAddButton = (boolean) => {
-        this.setState({ addButtonDisabled: boolean });
-    }
+    // disableAddButton = (boolean) => {
+    //     this.setState({ addButtonDisabled: boolean });
+    // }
 
     /* handleComboboxChange = (value, name) => {
         let bookTransHeader = { ...this.state.bookTransHeader };
@@ -101,9 +156,9 @@ class BookTransHeaderIssue extends Component {
 
     addBookTransHeader = () => {
         const bookTransHeader = {};
-        bookTransHeader.bookTransLines = [];
+        // bookTransHeader.bookTransLines = [];
         this.setState({ bookTransHeader, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
-        this.disableAddButton(true);
+        // this.disableAddButton(true);
     }
 
     addBookTransLineIntoBookTransHeader = (bookTransLines) => {
@@ -112,13 +167,14 @@ class BookTransHeaderIssue extends Component {
         //     bookTransLine['bookTransHeader'] = bookTransHeader.headerId;
         // });
         bookTransHeader.bookTransLines = bookTransLines;
-        this.setState({ bookTransHeader });
+        this.setState({ bookTransHeader }, () => { console.log("bookTransHeader", bookTransHeader) }
+        );
     }
 
     saveBookTransHeader = async () => {
-        const { bookTransHeaderName } = this.state.bookTransHeader;
-        if (bookTransHeaderName === undefined || bookTransHeaderName === null || bookTransHeaderName === '') {
-            toast.error("BookTransHeader name is required field");
+
+        if (this.validateForm() === false) {
+            toast.error("Issuance date and reader are required fields");
         } else {
             console.log("Post: Object sent: ", this.state.bookTransHeader);
             const options = {
@@ -132,7 +188,7 @@ class BookTransHeaderIssue extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { bookTransHeader, navigationDtl } = res.data;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -163,7 +219,7 @@ class BookTransHeaderIssue extends Component {
                     console.log("Delete: Response: ", res);
                     const { bookTransHeader, navigationDtl } = res.data;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
@@ -235,7 +291,7 @@ class BookTransHeaderIssue extends Component {
             this.firstBookTransHeader();
         }
         this.setState({ undoButtonDisabled: true });
-        this.disableAddButton(false);
+        // this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -273,9 +329,96 @@ class BookTransHeaderIssue extends Component {
         }
     }
 
+    async populateReaders() {
+        console.log("Start populate readers");
+        const readers = [];
+        const options = {
+            url: API_READER_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate readers");
+                res.data.forEach(element => {
+                    readers.push({
+                        value: element.readerId,
+                        label: element.readerName
+                    });
+                });
+            }
+            console.log("Readers:", readers);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ readers });
+    }
+
+    async populateBooks() {
+        console.log("Start populate books");
+        const books = [];
+        const options = {
+            url: API_BOOK_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate books");
+                res.data.forEach(element => {
+                    books.push({
+                        value: element.bookId,
+                        label: element.bookName
+                    });
+                });
+            }
+            console.log("Books:", books);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ books });
+    }
+
+    async populateVolumes() {
+        console.log("Start populate volumes");
+        let volumes = [];
+        const options = {
+            url: API_VOLUME_URL + 'resp/all',
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            if (isSuccessfullResponse(res)) {
+                console.log("Stop populate volumes");
+                // res.data.forEach(element => {
+                //     volumes.push({
+                //         value: element.volumeId,
+                //         label: element.volumeName,
+                //         bookId: element.bookId
+                //     });
+                // });
+            }
+            volumes = res.data;
+            console.log("Volumes:", volumes);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setState({ volumes });
+    }
 
     render() {
-        const { bookTransHeader, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const {
+            bookTransHeader,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            readers,
+            books
+        } = this.state;
+
 
         return (
             <>
@@ -296,17 +439,50 @@ class BookTransHeaderIssue extends Component {
 
                     <InputGroup className="mb-3">
                         <InputGroup.Prepend>
-                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>BookTransHeader Name</InputGroup.Text>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Issuance Date</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl
-                            name="bookTransHeaderName"
-                            placeholder="BookTransHeader Name"
-                            aria-label="BookTransHeader Name"
-                            value={bookTransHeader.bookTransHeaderName || ''}
+                            type="date"
+                            name="transDate"
+                            placeholder="Issuance Date"
+                            aria-label="Issuance Date"
+                            value={bookTransHeader.transDate != null ? bookTransHeader.transDate.split("T")[0] : ''}
                             required
                             disabled={fieldsDisabled}
                             onChange={this.handleBookTransHeaderChange}
                         />
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Reader</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="reader"
+                                placeholder="Select Reader"
+                                value={bookTransHeader.reader}
+                                onChange={this.handleSelectChange}
+                                disabled={fieldsDisabled}
+                                options={readers}
+                            />
+                        </div>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text style={INPUT_GROUP_TEXT_STYLE}>Book</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <div style={STRETCH_STYLE}>
+                            <MySelect
+                                name="book"
+                                placeholder="Select Book"
+                                // value={bookTransHeader.reader}
+                                onChange={this.handleBookChange}
+                                disabled={fieldsDisabled}
+                                options={books}
+                            />
+                        </div>
                     </InputGroup>
 
                     <InputGroup className="mb-3">
@@ -409,7 +585,7 @@ class BookTransHeaderIssue extends Component {
                         </Button>
                     </ButtonToolbar>
                     <BookTransLine
-                        bookTransHeader={bookTransHeader}
+                        bookTransLines={bookTransHeader.bookTransLines}
                         addBookTransLineIntoBookTransHeader={this.addBookTransLineIntoBookTransHeader}
                         enableSaveUndoButton={this.enableSaveUndoButton}
                         fieldsDisabled={fieldsDisabled}

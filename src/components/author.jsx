@@ -95,8 +95,7 @@ class Author extends Component {
     }
 
     saveAuthor = async () => {
-        const { authorName } = this.state.author;
-        if (authorName === undefined || authorName === null || authorName === '') {
+        if (this.validateForm() === false) {
             toast.error("Author name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.author);

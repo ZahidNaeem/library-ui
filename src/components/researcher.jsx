@@ -96,8 +96,7 @@ class Researcher extends Component {
     }
 
     saveResearcher = async () => {
-        const { researcherName } = this.state.researcher;
-        if (researcherName === undefined || researcherName === null || researcherName === '') {
+        if (this.validateForm() === false) {
             toast.error("Researcher name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.researcher);

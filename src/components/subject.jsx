@@ -124,9 +124,7 @@ class Subject extends Component {
     }
 
     saveSubject = async () => {
-        const { subjectName } = this.state.subject;
-        if (subjectName === undefined || subjectName === null || subjectName
-            === '') {
+        if (this.validateForm() === false) {
             toast.error("Subject name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.subject);

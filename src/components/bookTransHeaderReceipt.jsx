@@ -70,7 +70,7 @@ class BookTransHeaderReceipt extends Component {
         const { bookTransHeader } = this.state;
         let validateBook = !(bookTransHeader.bookTransHeaderName === undefined || bookTransHeader.bookTransHeaderName === null || bookTransHeader.bookTransHeaderName === '');
         if (validateBook === true) {
-            if (bookTransHeader.bookTransLines !== null) {
+            if (bookTransHeader.bookTransLines !== undefined && bookTransHeader.bookTransLines !== null) {
                 const invalidBookTransLines = bookTransHeader.bookTransLines.filter(bookTransLine => bookTransLine.bookTransLineName === undefined || bookTransLine.bookTransLineName === null || bookTransLine.bookTransLineName === '');
                 validateBook = invalidBookTransLines.length < 1;
             }
@@ -83,9 +83,9 @@ class BookTransHeaderReceipt extends Component {
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
-    disableAddButton = (boolean) => {
-        this.setState({ addButtonDisabled: boolean });
-    }
+    // disableAddButton = (boolean) => {
+    //     this.setState({ addButtonDisabled: boolean });
+    // }
 
     /* handleComboboxChange = (value, name) => {
         let bookTransHeader = { ...this.state.bookTransHeader };
@@ -101,9 +101,9 @@ class BookTransHeaderReceipt extends Component {
 
     addBookTransHeader = () => {
         const bookTransHeader = {};
-        bookTransHeader.bookTransLines = [];
+        // bookTransHeader.bookTransLines = [];
         this.setState({ bookTransHeader, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
-        this.disableAddButton(true);
+        // this.disableAddButton(true);
     }
 
     addBookTransLineIntoBookTransHeader = (bookTransLines) => {
@@ -132,7 +132,7 @@ class BookTransHeaderReceipt extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { bookTransHeader, navigationDtl } = res.data;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -163,7 +163,7 @@ class BookTransHeaderReceipt extends Component {
                     console.log("Delete: Response: ", res);
                     const { bookTransHeader, navigationDtl } = res.data;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
@@ -235,7 +235,7 @@ class BookTransHeaderReceipt extends Component {
             this.firstBookTransHeader();
         }
         this.setState({ undoButtonDisabled: true });
-        this.disableAddButton(false);
+        // this.disableAddButton(false);
     }
 
     userRoles = async () => {

@@ -96,7 +96,7 @@ class Book extends Component {
         const { book } = this.state;
         let validateBook = !(book.bookName === undefined || book.bookName === null || book.bookName === '');
         if (validateBook === true) {
-            if (book.volumes !== null) {
+            if (book.volumes !== undefined && book.volumes !== null) {
                 const invalidVolumes = book.volumes.filter(volume => volume.volumeName === undefined || volume.volumeName === null || volume.volumeName === '');
                 validateBook = invalidVolumes.length < 1;
             }
@@ -109,9 +109,9 @@ class Book extends Component {
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
-    disableAddButton = (boolean) => {
-        this.setState({ addButtonDisabled: boolean });
-    }
+    // disableAddButton = (boolean) => {
+    //     this.setState({ addButtonDisabled: boolean });
+    // }
 
     /* handleComboboxChange = (value, name) => {
         let book = { ...this.state.book };
@@ -127,9 +127,9 @@ class Book extends Component {
 
     addBook = () => {
         const book = {};
-        book.volumes = [];
+        // book.volumes = [];
         this.setState({ book, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
-        this.disableAddButton(true);
+        // this.disableAddButton(true);
     }
 
     addVolumeIntoBook = (volumes) => {
@@ -142,8 +142,7 @@ class Book extends Component {
     }
 
     saveBook = async () => {
-        const { bookName } = this.state.book;
-        if (bookName === undefined || bookName === null || bookName === '') {
+        if (this.validateForm() === false) {
             toast.error("Book name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.book);
@@ -158,7 +157,7 @@ class Book extends Component {
                     console.log("Post: Object received: ", res.data);
                     const { book, navigationDtl } = res.data;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 throw error.response.data;
@@ -189,7 +188,7 @@ class Book extends Component {
                     console.log("Delete: Response: ", res);
                     const { book, navigationDtl } = res.data;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
+                    // this.disableAddButton(false);
                 }
             } catch (error) {
                 console.log(error);
@@ -261,7 +260,7 @@ class Book extends Component {
             this.firstBook();
         }
         this.setState({ undoButtonDisabled: true });
-        this.disableAddButton(false);
+        // this.disableAddButton(false);
     }
 
     userRoles = async () => {
