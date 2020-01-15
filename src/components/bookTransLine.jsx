@@ -21,8 +21,8 @@ class BookTransLine extends Component {
 
     componentWillReceiveProps(props) {
         // You don't have to do this check first, but it can help prevent an unneeded render
-        console.log("BookTransLine props changed");
-        
+        console.log("BookTransLine props", props);
+
         if (props.bookTransLines !== this.state.bookTransLines) {
             const { bookTransLines } = props;
             this.setState({ bookTransLines });
@@ -66,18 +66,18 @@ class BookTransLine extends Component {
     //     this.setState({ bookTransHeader });
     // }
 
-    addBookTransLine = async () => {
-        let bookTransLines = [...this.state.bookTransLines];
-        let newBookTransLine = {};
-        bookTransLines.push(newBookTransLine);
-        try {
-            await this.props.addBookTransLineIntoBookTransHeader(bookTransLines);
-            this.setState({ bookTransLines });
-            this.props.enableSaveUndoButton();
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    // addBookTransLine = async () => {
+    //     let bookTransLines = [...this.state.bookTransLines];
+    //     let newBookTransLine = {};
+    //     bookTransLines.push(newBookTransLine);
+    //     try {
+    //         await this.props.addBookTransLineIntoBookTransHeader(bookTransLines);
+    //         this.setState({ bookTransLines });
+    //         this.props.enableSaveUndoButton();
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
 
     /*     saveBookTransLine = () => {
             console.log("BookTransHeader at save: ", this.state.bookTransHeader);
@@ -147,7 +147,7 @@ class BookTransLine extends Component {
                     <tbody>
                         {
                             bookTransLines && bookTransLines.map((bookTransLine, index) => (
-                                <tr key={"row-" + bookTransLine.lineId}
+                                <tr key={`row-${bookTransLine.lineId}-${bookTransLine.volume}-${bookTransLine.bookTransHeader}`}
                                 >
                                     <td>{bookTransLine.bookName}</td>
                                     <td>{bookTransLine.volumeName}</td>

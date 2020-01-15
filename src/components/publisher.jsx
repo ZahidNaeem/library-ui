@@ -34,7 +34,7 @@ class Publisher extends Component {
     }
 
     async componentDidMount() {
-        this.firstPublisher();
+        await this.firstPublisher();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -187,8 +187,8 @@ class Publisher extends Component {
         }
     }
 
-    firstPublisher = () => {
-        this.saveAndNavigatePublisher('first');
+    firstPublisher = async () => {
+        await this.saveAndNavigatePublisher('first');
     }
 
     previousPublisher = () => {

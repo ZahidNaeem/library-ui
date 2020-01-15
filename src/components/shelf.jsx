@@ -35,7 +35,7 @@ class Shelf extends Component {
     }
 
     async componentDidMount() {
-        this.firstShelf();
+        await this.firstShelf();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -205,8 +205,8 @@ class Shelf extends Component {
         }
     }
 
-    firstShelf = () => {
-        this.saveAndNavigateShelf('first');
+    firstShelf = async () => {
+        await this.saveAndNavigateShelf('first');
     }
 
     previousShelf = () => {

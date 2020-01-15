@@ -29,11 +29,7 @@ class BookTransHeaderIssue extends Component {
 
     state = {
         bookTransHeader: {
-            transType: 'ISSUE',
-            transDate: null,
-            reader: null,
-            remarks: null,
-            bookTransLines: []
+            transType: 'ISSUE'
         },
         navigationDtl: {},
         bookTransHeaderAlert: false,
@@ -51,7 +47,7 @@ class BookTransHeaderIssue extends Component {
         await this.populateReaders();
         await this.populateBooks();
         await this.populateVolumes();
-        this.firstBookTransHeader();
+        await this.firstBookTransHeader();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -74,7 +70,7 @@ class BookTransHeaderIssue extends Component {
         const { name, value } = event.target;
         console.log("Target name", name);
         console.log("Target value", value);
-        const bookTransHeader = { ...this.state.bookTransHeader };
+        const { bookTransHeader } = this.state;
         bookTransHeader[name] = value;
         this.setState({ bookTransHeader });
         this.enableSaveUndoButton();
@@ -117,11 +113,10 @@ class BookTransHeaderIssue extends Component {
 
     validateForm = () => {
         const { bookTransHeader } = this.state;
-        console.log("transDate", bookTransHeader.transDate);
-        console.log("reader", bookTransHeader.reader);
 
         let validateBookTrans = !(
             bookTransHeader.transDate === undefined || bookTransHeader.transDate === null || bookTransHeader.transDate === '' ||
+            bookTransHeader.transType === undefined || bookTransHeader.transType === null || bookTransHeader.transType === '' ||
             bookTransHeader.reader === undefined || bookTransHeader.reader === null || bookTransHeader.reader === ''
         );
         if (validateBookTrans === true) {
@@ -155,7 +150,7 @@ class BookTransHeaderIssue extends Component {
     } */
 
     addBookTransHeader = () => {
-        const bookTransHeader = {};
+        const bookTransHeader = { transType: 'ISSUE' };
         // bookTransHeader.bookTransLines = [];
         this.setState({ bookTransHeader, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
         // this.disableAddButton(true);
@@ -167,8 +162,7 @@ class BookTransHeaderIssue extends Component {
         //     bookTransLine['bookTransHeader'] = bookTransHeader.headerId;
         // });
         bookTransHeader.bookTransLines = bookTransLines;
-        this.setState({ bookTransHeader }, () => { console.log("bookTransHeader", bookTransHeader) }
-        );
+        this.setState({ bookTransHeader }, () => { console.log("bookTransHeader", bookTransHeader) });
     }
 
     saveBookTransHeader = async () => {
@@ -241,8 +235,9 @@ class BookTransHeaderIssue extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { bookTransHeader, navigationDtl } = res.data;
-                this.setState({ bookTransHeader, navigationDtl })
+                const bookTransHeader = res.data.bookTransHeader.transType !== null ? { ...res.data.bookTransHeader } : { ...this.state.bookTransHeader };
+                const { navigationDtl } = res.data;
+                this.setState({ bookTransHeader, navigationDtl });
                 console.log(this.state.bookTransHeader);
             }
         } catch (error) {
@@ -264,8 +259,8 @@ class BookTransHeaderIssue extends Component {
         }
     }
 
-    firstBookTransHeader = () => {
-        this.saveAndNavigateBookTransHeader('first');
+    firstBookTransHeader = async () => {
+        await this.saveAndNavigateBookTransHeader('first');
     }
 
     previousBookTransHeader = () => {

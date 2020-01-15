@@ -192,7 +192,7 @@ class Volume extends Component {
                     <tbody>
                         {
                             volumes && volumes.map((volume, index) => (
-                                <tr key={"row-" + volume.volumeId}
+                                <tr key={`row-${volume.volumeId}-${volume.volumeName}-${volume.remarks}-${volume.book}-${volume.rack}`}
                                 >
                                     <td>
                                         <FormControl

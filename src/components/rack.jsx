@@ -157,7 +157,7 @@ class Rack extends Component {
                     <tbody>
                         {
                             racks && racks.map((rack, index) => (
-                                <tr key={"row-" + rack.rackId}
+                                <tr key={`row-${rack.rackId}-${rack.rackName}-${rack.remarks}-${rack.shelf}`}
                                 >
                                     <td>
                                         <FormControl

@@ -34,7 +34,7 @@ class Author extends Component {
     }
 
     async componentDidMount() {
-        this.firstAuthor();
+        await this.firstAuthor();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -186,8 +186,8 @@ class Author extends Component {
         }
     }
 
-    firstAuthor = () => {
-        this.saveAndNavigateAuthor('first');
+    firstAuthor = async () => {
+        await this.saveAndNavigateAuthor('first');
     }
 
     previousAuthor = () => {

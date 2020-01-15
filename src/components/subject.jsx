@@ -45,7 +45,7 @@ class Subject extends Component {
 
     async componentDidMount() {
         await this.populateSubjects();
-        this.firstSubject();
+        await this.firstSubject();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -218,8 +218,8 @@ class Subject extends Component {
         }
     }
 
-    firstSubject = () => {
-        this.saveAndNavigateSubject('first');
+    firstSubject = async () => {
+        await this.saveAndNavigateSubject('first');
     }
 
     previousSubject = () => {

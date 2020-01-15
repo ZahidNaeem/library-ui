@@ -34,7 +34,7 @@ class Reader extends Component {
     }
 
     async componentDidMount() {
-        this.firstReader();
+        await this.firstReader();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -186,8 +186,8 @@ class Reader extends Component {
         }
     }
 
-    firstReader = () => {
-        this.saveAndNavigateReader('first');
+    firstReader = async () => {
+        await this.saveAndNavigateReader('first');
     }
 
     previousReader = () => {

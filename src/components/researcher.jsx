@@ -34,7 +34,7 @@ class Researcher extends Component {
     }
 
     async componentDidMount() {
-        this.firstResearcher();
+        await this.firstResearcher();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -187,8 +187,8 @@ class Researcher extends Component {
         }
     }
 
-    firstResearcher = () => {
-        this.saveAndNavigateResearcher('first');
+    firstResearcher = async () => {
+        await this.saveAndNavigateResearcher('first');
     }
 
     previousResearcher = () => {

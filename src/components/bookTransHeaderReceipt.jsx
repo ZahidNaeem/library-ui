@@ -37,7 +37,7 @@ class BookTransHeaderReceipt extends Component {
     }
 
     async componentDidMount() {
-        this.firstBookTransHeader();
+        await this.firstBookTransHeader();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -208,8 +208,8 @@ class BookTransHeaderReceipt extends Component {
         }
     }
 
-    firstBookTransHeader = () => {
-        this.saveAndNavigateBookTransHeader('first');
+    firstBookTransHeader = async () => {
+        await this.saveAndNavigateBookTransHeader('first');
     }
 
     previousBookTransHeader = () => {

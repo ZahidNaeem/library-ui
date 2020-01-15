@@ -54,7 +54,7 @@ class Book extends Component {
         await this.populateSubjects();
         await this.populatePublishers();
         await this.populateResearchers();
-        this.firstBook();
+        await this.firstBook();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
@@ -233,8 +233,8 @@ class Book extends Component {
         }
     }
 
-    firstBook = () => {
-        this.saveAndNavigateBook('first');
+    firstBook = async () => {
+        await this.saveAndNavigateBook('first');
     }
 
     previousBook = () => {
