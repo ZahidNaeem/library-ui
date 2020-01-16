@@ -168,3 +168,7 @@ export function clearLocalStorage() {
         return false;
     }
 };
+
+export function generateUniqueId() {
+    return new Date().valueOf() + Math.floor(Math.random() * 10);
+};

@@ -3,7 +3,7 @@ import { FormControl, Button, ButtonToolbar, Table } from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse } from './util/APIUtils'
+import { request, isSuccessfullResponse, generateUniqueId } from './util/APIUtils'
 import {
     API_VOLUME_URL,
     API_RACK_URL,
@@ -74,7 +74,7 @@ class Volume extends Component {
 
     addVolume = async () => {
         let book = { ...this.state.book };
-        let newVolume = {};
+        let newVolume = {rowKey: generateUniqueId()};
 
         if (book === null) {
             alert("Please add book, then add volume");
@@ -192,7 +192,7 @@ class Volume extends Component {
                     <tbody>
                         {
                             volumes && volumes.map((volume, index) => (
-                                <tr key={`row-${volume.volumeId}-${volume.volumeName}-${volume.remarks}-${volume.book}-${volume.rack}`}
+                                <tr key={volume.rowKey}
                                 >
                                     <td>
                                         <FormControl

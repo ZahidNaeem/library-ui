@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { request, isSuccessfullResponse, getCurrentUser, generateUniqueId } from './util/APIUtils'
 import {
     API_BOOK_TRANS_HEADER_URL,
     API_READER_URL,
@@ -99,7 +99,9 @@ class BookTransHeaderIssue extends Component {
         }
 
         filteredVolumes.forEach(volume => {
+            const randomId = generateUniqueId();
             bookTransHeader.bookTransLines.push({
+                rowKey: randomId,
                 volume: volume.volumeId,
                 bookId: volume.bookId,
                 volumeName: volume.volumeName,

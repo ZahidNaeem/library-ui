@@ -147,7 +147,7 @@ class BookTransLine extends Component {
                     <tbody>
                         {
                             bookTransLines && bookTransLines.map((bookTransLine, index) => (
-                                <tr key={`row-${bookTransLine.lineId}-${bookTransLine.volume}-${bookTransLine.bookTransHeader}`}
+                                <tr key={bookTransLine.rowKey}
                                 >
                                     <td>{bookTransLine.bookName}</td>
                                     <td>{bookTransLine.volumeName}</td>
