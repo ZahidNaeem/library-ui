@@ -45,8 +45,8 @@ class Researcher extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -108,8 +108,8 @@ class Researcher extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { researcher, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { researcher, navigationDtl } = res.data.entity;
                     this.setState({ researcher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
                 }
@@ -140,7 +140,7 @@ class Researcher extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { researcher, navigationDtl } = res.data;
+                    const { researcher, navigationDtl } = res.data.entity;
                     this.setState({ researcher, navigationDtl, saveButtonDisabled: true });
                     this.disableAddButton(false);
                 }
@@ -164,7 +164,7 @@ class Researcher extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { researcher, navigationDtl } = res.data;
+                const { researcher, navigationDtl } = res.data.entity;
                 this.setState({ researcher, navigationDtl })
                 console.log(this.state.researcher);
             }

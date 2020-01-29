@@ -65,8 +65,8 @@ class Book extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -154,8 +154,8 @@ class Book extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { book, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { book, navigationDtl } = res.data.entity;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     // this.disableAddButton(false);
                 }
@@ -186,7 +186,7 @@ class Book extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { book, navigationDtl } = res.data;
+                    const { book, navigationDtl } = res.data.entity;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true });
                     // this.disableAddButton(false);
                 }
@@ -210,7 +210,7 @@ class Book extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { book, navigationDtl } = res.data;
+                const { book, navigationDtl } = res.data.entity;
                 this.setState({ book, navigationDtl })
                 console.log(this.state.book);
             }
@@ -309,7 +309,7 @@ class Book extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate authors");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     authors.push({
                         value: element.authorId,
                         label: element.authorName
@@ -334,7 +334,7 @@ class Book extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate subjects");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     subjects.push({
                         value: element.subjectId,
                         label: element.subjectName
@@ -359,7 +359,7 @@ class Book extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate publishers");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     publishers.push({
                         value: element.publisherId,
                         label: element.publisherName
@@ -384,7 +384,7 @@ class Book extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate researchers");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     researchers.push({
                         value: element.researcherId,
                         label: element.researcherName

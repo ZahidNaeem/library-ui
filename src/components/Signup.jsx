@@ -277,7 +277,7 @@ class Signup extends Component {
             const res = await checkUsernameAvailability(usernameValue);
 
             if (isSuccessfullResponse(res)) {
-                if (res.data === true) {
+                if (res.data.entity === true) {
                     this.setState({
                         username: {
                             value: usernameValue,
@@ -332,7 +332,7 @@ class Signup extends Component {
         try {
             const res = await checkEmailAvailability(emailValue);
             if (isSuccessfullResponse(res)) {
-                if (res.data === true) {
+                if (res.data.entity === true) {
                     this.setState({
                         email: {
                             value: emailValue,

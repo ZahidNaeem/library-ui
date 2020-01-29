@@ -24,7 +24,7 @@ class App extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                storeDataIntoLocalStorage(CURRENT_USER, JSON.stringify(res.data));
+                storeDataIntoLocalStorage(CURRENT_USER, JSON.stringify(res.data.entity));
                 this.setState({
                     isAuthenticated: true,
                     isLoading: false
@@ -43,7 +43,7 @@ class App extends Component {
             try {
                 const res = await login(loginRequest);
                 if (isSuccessfullResponse(res)) {
-                    storeDataIntoLocalStorage(ACCESS_TOKEN, res.data.accessToken);
+                    storeDataIntoLocalStorage(ACCESS_TOKEN, res.data.entity.accessToken);
                     await this.loadCurrentUser();
                     let { pathname } = this.props.location;
                     console.log("Path before change", pathname);

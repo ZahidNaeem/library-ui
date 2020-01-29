@@ -46,8 +46,8 @@ class Shelf extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -126,8 +126,8 @@ class Shelf extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { shelf, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { shelf, navigationDtl } = res.data.entity;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     // this.disableAddButton(false);
                 }
@@ -158,7 +158,7 @@ class Shelf extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { shelf, navigationDtl } = res.data;
+                    const { shelf, navigationDtl } = res.data.entity;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true });
                     // this.disableAddButton(false);
                 }
@@ -182,7 +182,7 @@ class Shelf extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { shelf, navigationDtl } = res.data;
+                const { shelf, navigationDtl } = res.data.entity;
                 this.setState({ shelf, navigationDtl })
                 console.log(this.state.shelf);
             }

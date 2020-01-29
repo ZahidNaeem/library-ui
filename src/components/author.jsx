@@ -45,8 +45,8 @@ class Author extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -95,6 +95,7 @@ class Author extends Component {
     }
 
     saveAuthor = async () => {
+        let saveMessage = '';
         if (this.validateForm() === false) {
             toast.error("Author name is required field");
         } else {
@@ -107,21 +108,24 @@ class Author extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { author, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { author, navigationDtl } = res.data.entity;
                     this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
+                    saveMessage = res.data.message;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveMessage = error.response.data;
             }
         }
+        return saveMessage;
     }
 
-    saveAuthorShowMessage = async (message) => {
+    saveAuthorShowMessage = async () => {
         try {
-            await this.saveAuthor();
-            toast.success(message);
+            const saveMessage = await this.saveAuthor();
+            toast.success(saveMessage);
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -139,7 +143,7 @@ class Author extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { author, navigationDtl } = res.data;
+                    const { author, navigationDtl } = res.data.entity;
                     this.setState({ author, navigationDtl, saveButtonDisabled: true });
                     this.disableAddButton(false);
                 }
@@ -163,7 +167,7 @@ class Author extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { author, navigationDtl } = res.data;
+                const { author, navigationDtl } = res.data.entity;
                 this.setState({ author, navigationDtl })
                 console.log(this.state.author);
             }
@@ -372,7 +376,7 @@ class Author extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveAuthorShowMessage("Author saved successfully.")}
+                            onClick={this.saveAuthorShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

@@ -54,7 +54,7 @@ class SearchBook extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate subjects");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     subjects.push({
                         value: element.subjectId,
                         label: element.subjectName,
@@ -80,7 +80,7 @@ class SearchBook extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate authors");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     authors.push({
                         value: element.authorId,
                         label: element.authorName,
@@ -106,7 +106,7 @@ class SearchBook extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate publishers");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     publishers.push({
                         value: element.publisherId,
                         label: element.publisherName,
@@ -132,7 +132,7 @@ class SearchBook extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate researchers");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     researchers.push({
                         value: element.researcherId,
                         label: element.researcherName,
@@ -158,8 +158,8 @@ class SearchBook extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                console.log("Search Book: Object received: ", res.data);
-                this.setState({ books: res.data });
+                console.log("Search Book: Object received: ", res.data.entity);
+                this.setState({ books: res.data.entity });
                 await this.populateVolumes();
             }
         } catch (error) {
@@ -177,7 +177,7 @@ class SearchBook extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate volumes");
-                const volumes = res.data;
+                const volumes = res.data.entity;
                 console.log("Volumes:", volumes);
                 this.setState({ volumes });
             }

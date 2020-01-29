@@ -58,8 +58,8 @@ class BookTransHeaderIssue extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -181,8 +181,8 @@ class BookTransHeaderIssue extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { bookTransHeader, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { bookTransHeader, navigationDtl } = res.data.entity;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     // this.disableAddButton(false);
                 }
@@ -213,7 +213,7 @@ class BookTransHeaderIssue extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { bookTransHeader, navigationDtl } = res.data;
+                    const { bookTransHeader, navigationDtl } = res.data.entity;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true });
                     // this.disableAddButton(false);
                 }
@@ -237,8 +237,8 @@ class BookTransHeaderIssue extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const bookTransHeader = res.data.bookTransHeader.transType !== null ? { ...res.data.bookTransHeader } : { ...this.state.bookTransHeader };
-                const { navigationDtl } = res.data;
+                const bookTransHeader = res.data.entity.bookTransHeader.transType !== null ? { ...res.data.entity.bookTransHeader } : { ...this.state.bookTransHeader };
+                const { navigationDtl } = res.data.entity;
                 this.setState({ bookTransHeader, navigationDtl });
                 console.log(this.state.bookTransHeader);
             }
@@ -337,7 +337,7 @@ class BookTransHeaderIssue extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate readers");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     readers.push({
                         value: element.readerId,
                         label: element.readerName
@@ -362,7 +362,7 @@ class BookTransHeaderIssue extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate books");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     books.push({
                         value: element.bookId,
                         label: element.bookName
@@ -387,7 +387,7 @@ class BookTransHeaderIssue extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate volumes");
-                // res.data.forEach(element => {
+                // res.data.entity.forEach(element => {
                 //     volumes.push({
                 //         value: element.volumeId,
                 //         label: element.volumeName,
@@ -395,7 +395,7 @@ class BookTransHeaderIssue extends Component {
                 //     });
                 // });
             }
-            volumes = res.data;
+            volumes = res.data.entity;
             console.log("Volumes:", volumes);
         } catch (error) {
             console.log(error);

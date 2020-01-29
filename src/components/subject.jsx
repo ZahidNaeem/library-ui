@@ -60,8 +60,8 @@ class Subject extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -136,8 +136,8 @@ class Subject extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { subject, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { subject, navigationDtl } = res.data.entity;
                     this.setState({ subject, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
                     await this.populateSubjects();
@@ -169,7 +169,7 @@ class Subject extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { subject, navigationDtl } = res.data;
+                    const { subject, navigationDtl } = res.data.entity;
                     this.setState({ subject, navigationDtl, saveButtonDisabled: true });
                     this.disableAddButton(false);
                     await this.populateSubjects();
@@ -194,7 +194,7 @@ class Subject extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { subject, navigationDtl } = res.data;
+                const { subject, navigationDtl } = res.data.entity;
                 // this.populateSubjectName(subject.parentSubjectId);
                 this.setState({ subject, navigationDtl })
                 console.log(this.state.subject);
@@ -293,7 +293,7 @@ class Subject extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate subjects");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     subjects.push({
                         value: element.subjectId,
                         label: element.subjectName,

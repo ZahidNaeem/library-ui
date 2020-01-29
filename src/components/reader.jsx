@@ -45,8 +45,8 @@ class Reader extends Component {
         try {
             const res = await getCurrentUser();
             if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data);
-                return res.data;
+                console.log("Current User: ", res.data.entity);
+                return res.data.entity;
             }
         } catch (error) {
             console.log(error);
@@ -107,8 +107,8 @@ class Reader extends Component {
             try {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data);
-                    const { reader, navigationDtl } = res.data;
+                    console.log("Post: Object received: ", res.data.entity);
+                    const { reader, navigationDtl } = res.data.entity;
                     this.setState({ reader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
                 }
@@ -139,7 +139,7 @@ class Reader extends Component {
                 const res = await request(options);
                 if (isSuccessfullResponse(res)) {
                     console.log("Delete: Response: ", res);
-                    const { reader, navigationDtl } = res.data;
+                    const { reader, navigationDtl } = res.data.entity;
                     this.setState({ reader, navigationDtl, saveButtonDisabled: true });
                     this.disableAddButton(false);
                 }
@@ -163,7 +163,7 @@ class Reader extends Component {
         try {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
-                const { reader, navigationDtl } = res.data;
+                const { reader, navigationDtl } = res.data.entity;
                 this.setState({ reader, navigationDtl })
                 console.log(this.state.reader);
             }

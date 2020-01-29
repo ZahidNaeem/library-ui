@@ -141,7 +141,7 @@ class Volume extends Component {
             const res = await request(options);
             if (isSuccessfullResponse(res)) {
                 console.log("Stop populate racks");
-                res.data.forEach(element => {
+                res.data.entity.forEach(element => {
                     racks.push({
                         value: element.rackId,
                         label: 'Shelf:' + element.shelfName + ' - Rack:' + element.rackName

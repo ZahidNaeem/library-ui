@@ -31,7 +31,7 @@ class ForgotPassword extends Component {
         const res = await sendRecoveryEmail(email);
         if (res.status === HttpStatus.OK) {
           this.setState({
-            message: res.data
+            message: res.data.entity
           });
         }
       } catch (error) {
