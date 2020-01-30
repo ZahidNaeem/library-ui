@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 import MySelect from './common/select'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils'
+import { getCurrentUser, request } from './util/APIUtils'
 import {
     API_SUBJECT_URL,
     INPUT_GROUP_TEXT_STYLE,
@@ -59,10 +59,9 @@ class Subject extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -91,15 +90,15 @@ class Subject extends Component {
         const { subject } = this.state;
         return !(subject.subjectName === undefined || subject.subjectName === null || subject.subjectName === '');
     }
-    
+
     enableSaveUndoButton = () => {
         const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     disableAddButton = (boolean) => {
-    this.setState({ addButtonDisabled: boolean });
-}
+        this.setState({ addButtonDisabled: boolean });
+    }
 
     /*     handleSubjectSelectChange = (selectedSubject, name) => {
             const subject = { ...this.state.subject };
@@ -136,13 +135,12 @@ class Subject extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { subject, navigationDtl } = res.data.entity;
-                    this.setState({ subject, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
+
+                console.log("Post: Object received: ", res.data.entity);
+                const { subject, navigationDtl } = res.data.entity;
+                this.setState({ subject, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
             } catch (error) {
                 // throw error.response.data;
                 saveResponse = error.response.data;
@@ -154,18 +152,18 @@ class Subject extends Component {
     saveSubjectShowMessage = async () => {
         try {
             const saveResponse = await this.saveSubject();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
             }
         } catch (error) {
-            toast.error(JSON.stringify(error));
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
         }
     }
 
     deleteSubject = async () => {
-        const subject = {...this.state.subject};
+        const subject = { ...this.state.subject };
         if (subject.subjectId !== undefined && subject.subjectId !== null) {
             console.log("Delete: Subject ID sent: ", subject.subjectId);
             const options = {
@@ -174,16 +172,16 @@ class Subject extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { subject, navigationDtl } = res.data.entity;
-                    this.setState({ subject, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
-                    await this.populateSubjects();
-                }
+
+                console.log("Delete: Response: ", res);
+                const { subject, navigationDtl } = res.data.entity;
+                this.setState({ subject, navigationDtl, saveButtonDisabled: true });
+                this.disableAddButton(false);
+                await this.populateSubjects();
             } catch (error) {
                 console.log(error);
-
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
             }
         } else {
             this.undoChanges();
@@ -200,12 +198,11 @@ class Subject extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const { subject, navigationDtl } = res.data.entity;
-                // this.populateSubjectName(subject.parentSubjectId);
-                this.setState({ subject, navigationDtl })
-                console.log(this.state.subject);
-            }
+
+            const { subject, navigationDtl } = res.data.entity;
+            // this.populateSubjectName(subject.parentSubjectId);
+            this.setState({ subject, navigationDtl })
+            console.log(this.state.subject);
         } catch (error) {
             console.log(error);
         }
@@ -298,16 +295,15 @@ class Subject extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate subjects");
-                res.data.entity.forEach(element => {
-                    subjects.push({
-                        value: element.subjectId,
-                        label: element.subjectName,
-                        parent: element.parentSubjectId
-                    });
+
+            console.log("Stop populate subjects");
+            res.data.entity.forEach(element => {
+                subjects.push({
+                    value: element.subjectId,
+                    label: element.subjectName,
+                    parent: element.parentSubjectId
                 });
-            }
+            });
             console.log("Subjects:", subjects);
         } catch (error) {
             console.log(error);
@@ -453,7 +449,7 @@ class Subject extends Component {
                             onClick={this.firstSubject}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
-              </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -461,7 +457,7 @@ class Subject extends Component {
                             onClick={this.previousSubject}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
-              </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -469,7 +465,7 @@ class Subject extends Component {
                             onClick={this.nextSubject}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
-              </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -477,7 +473,7 @@ class Subject extends Component {
                             onClick={this.lastSubject}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
-              </Button>
+                        </Button>
 
                     </ButtonToolbar>
 
@@ -488,7 +484,7 @@ class Subject extends Component {
                             onClick={this.addSubject}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
-              </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -496,7 +492,7 @@ class Subject extends Component {
                             onClick={() => this.setState({ subjectAlert: true })}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
-              </Button>
+                        </Button>
 
                         <SweetAlert
                             show={this.state.subjectAlert}
@@ -519,7 +515,7 @@ class Subject extends Component {
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
-              </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -527,7 +523,7 @@ class Subject extends Component {
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
-              </Button>
+                        </Button>
                     </ButtonToolbar>
 
                 </Form>

@@ -4,7 +4,7 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { request, getCurrentUser } from './util/APIUtils'
 import {
     API_AUTHOR_URL,
     INPUT_GROUP_TEXT_STYLE,
@@ -44,10 +44,8 @@ class Author extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -74,8 +72,8 @@ class Author extends Component {
     }
 
     disableAddButton = (boolean) => {
-    this.setState({ addButtonDisabled: boolean });
-}
+        this.setState({ addButtonDisabled: boolean });
+    }
     /* handleComboboxChange = (value, name) => {
         let author = { ...this.state.author };
         author[name] = value.toUpperCase();
@@ -107,15 +105,12 @@ class Author extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { author, navigationDtl } = res.data.entity;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
+                console.log("Post: Object received: ", res.data.entity);
+                const { author, navigationDtl } = res.data.entity;
+                this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
             } catch (error) {
-                // throw error.response.data;
                 saveResponse = error.response.data;
             }
         }
@@ -125,18 +120,19 @@ class Author extends Component {
     saveAuthorShowMessage = async () => {
         try {
             const saveResponse = await this.saveAuthor();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
             }
         } catch (error) {
-            toast.error(JSON.stringify(error));
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
     deleteAuthor = async () => {
-        const author = {...this.state.author};
+        const author = { ...this.state.author };
         if (author.authorId !== undefined && author.authorId !== null) {
             console.log("Delete: Author ID sent: ", author.authorId);
             const options = {
@@ -145,14 +141,14 @@ class Author extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { author, navigationDtl } = res.data.entity;
-                    this.setState({ author, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
-                }
+                console.log("Delete: Response: ", res);
+                const { author, navigationDtl } = res.data.entity;
+                this.setState({ author, navigationDtl, saveButtonDisabled: true });
+                this.disableAddButton(false);
             } catch (error) {
                 console.log(error);
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
 
             }
         } else {
@@ -170,11 +166,9 @@ class Author extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const { author, navigationDtl } = res.data.entity;
-                this.setState({ author, navigationDtl })
-                console.log(this.state.author);
-            }
+            const { author, navigationDtl } = res.data.entity;
+            this.setState({ author, navigationDtl })
+            console.log(this.state.author);
         } catch (error) {
             console.log(error);
         }

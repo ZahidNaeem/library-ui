@@ -4,7 +4,7 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { request, getCurrentUser } from './util/APIUtils'
 import {
     API_READER_URL,
     INPUT_GROUP_TEXT_STYLE,
@@ -44,10 +44,9 @@ class Reader extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -74,8 +73,8 @@ class Reader extends Component {
     }
 
     disableAddButton = (boolean) => {
-    this.setState({ addButtonDisabled: boolean });
-}
+        this.setState({ addButtonDisabled: boolean });
+    }
     /* handleComboboxChange = (value, name) => {
         let reader = { ...this.state.reader };
         reader[name] = value.toUpperCase();
@@ -107,13 +106,12 @@ class Reader extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { reader, navigationDtl } = res.data.entity;
-                    this.setState({ reader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
+
+                console.log("Post: Object received: ", res.data.entity);
+                const { reader, navigationDtl } = res.data.entity;
+                this.setState({ reader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
             } catch (error) {
                 // throw error.response.data;
                 saveResponse = error.response.data;
@@ -125,7 +123,7 @@ class Reader extends Component {
     saveReaderShowMessage = async () => {
         try {
             const saveResponse = await this.saveReader();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
@@ -136,7 +134,7 @@ class Reader extends Component {
     }
 
     deleteReader = async () => {
-        const reader = {...this.state.reader};
+        const reader = { ...this.state.reader };
         if (reader.readerId !== undefined && reader.readerId !== null) {
             console.log("Delete: Reader ID sent: ", reader.readerId);
             const options = {
@@ -145,14 +143,15 @@ class Reader extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { reader, navigationDtl } = res.data.entity;
-                    this.setState({ reader, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
-                }
+
+                console.log("Delete: Response: ", res);
+                const { reader, navigationDtl } = res.data.entity;
+                this.setState({ reader, navigationDtl, saveButtonDisabled: true });
+                this.disableAddButton(false);
             } catch (error) {
                 console.log(error);
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
 
             }
         } else {
@@ -170,13 +169,14 @@ class Reader extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const { reader, navigationDtl } = res.data.entity;
-                this.setState({ reader, navigationDtl })
-                console.log(this.state.reader);
-            }
+
+            const { reader, navigationDtl } = res.data.entity;
+            this.setState({ reader, navigationDtl })
+            console.log(this.state.reader);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 

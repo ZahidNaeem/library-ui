@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
-import { request, isSuccessfullResponse, getCurrentUser, generateUniqueId } from './util/APIUtils'
+import { request, getCurrentUser, generateUniqueId } from './util/APIUtils'
 import {
     API_BOOK_TRANS_HEADER_URL,
     API_READER_URL,
@@ -57,10 +57,9 @@ class BookTransHeaderReceipt extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -180,13 +179,12 @@ class BookTransHeaderReceipt extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { bookTransHeader, navigationDtl } = res.data.entity;
-                    this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
+
+                console.log("Post: Object received: ", res.data.entity);
+                const { bookTransHeader, navigationDtl } = res.data.entity;
+                this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
             } catch (error) {
                 // throw error.response.data;
                 saveResponse = error.response.data;
@@ -198,7 +196,7 @@ class BookTransHeaderReceipt extends Component {
     saveBookTransHeaderShowMessage = async () => {
         try {
             const saveResponse = await this.saveBookTransHeader();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
@@ -218,14 +216,14 @@ class BookTransHeaderReceipt extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { bookTransHeader, navigationDtl } = res.data.entity;
-                    this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true });
-                    // this.disableAddButton(false);
-                }
+
+                console.log("Delete: Response: ", res);
+                const { bookTransHeader, navigationDtl } = res.data.entity;
+                this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true });
             } catch (error) {
                 console.log(error);
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
 
             }
         } else {
@@ -243,14 +241,15 @@ class BookTransHeaderReceipt extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const bookTransHeader = res.data.entity.bookTransHeader.transType !== null ? { ...res.data.entity.bookTransHeader } : { ...this.state.bookTransHeader };
-                const { navigationDtl } = res.data.entity;
-                this.setState({ bookTransHeader, navigationDtl });
-                console.log(this.state.bookTransHeader);
-            }
+
+            const bookTransHeader = res.data.entity.bookTransHeader.transType !== null ? { ...res.data.entity.bookTransHeader } : { ...this.state.bookTransHeader };
+            const { navigationDtl } = res.data.entity;
+            this.setState({ bookTransHeader, navigationDtl });
+            console.log(this.state.bookTransHeader);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
@@ -342,18 +341,19 @@ class BookTransHeaderReceipt extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate readers");
-                res.data.entity.forEach(element => {
-                    readers.push({
-                        value: element.readerId,
-                        label: element.readerName
-                    });
+
+            console.log("Stop populate readers");
+            res.data.entity.forEach(element => {
+                readers.push({
+                    value: element.readerId,
+                    label: element.readerName
                 });
-            }
+            });
             console.log("Readers:", readers);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
         this.setState({ readers });
     }
@@ -367,18 +367,19 @@ class BookTransHeaderReceipt extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate books");
-                res.data.entity.forEach(element => {
-                    books.push({
-                        value: element.bookId,
-                        label: element.bookName
-                    });
+
+            console.log("Stop populate books");
+            res.data.entity.forEach(element => {
+                books.push({
+                    value: element.bookId,
+                    label: element.bookName
                 });
-            }
+            });
             console.log("Books:", books);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
         this.setState({ books });
     }
@@ -392,20 +393,14 @@ class BookTransHeaderReceipt extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate volumes");
-                // res.data.entity.forEach(element => {
-                //     volumes.push({
-                //         value: element.volumeId,
-                //         label: element.volumeName,
-                //         bookId: element.bookId
-                //     });
-                // });
-            }
+
+            console.log("Stop populate volumes");
             volumes = res.data.entity;
             console.log("Volumes:", volumes);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
         this.setState({ volumes });
     }

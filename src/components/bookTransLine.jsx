@@ -3,7 +3,7 @@ import { FormControl, Button, ButtonToolbar, Table } from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse } from './util/APIUtils'
+import { request } from './util/APIUtils'
 import {
     API_BOOK_TRANS_LINE_URL,
     STRETCH_STYLE,
@@ -95,9 +95,8 @@ class BookTransLine extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                }
+
+                console.log("Delete: Response: ", res);
             } catch (error) {
                 console.log(error);
             }

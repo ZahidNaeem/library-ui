@@ -78,12 +78,7 @@ class Login extends Component {
 
     handleLogin = async (e) => {
         e.preventDefault();
-        const loginResponse = await this.props.handleLogin(this.state.loginRequest);
-        if (loginResponse.success === true) {
-            toast.success(loginResponse.message);
-        } else {
-            toast.error(loginResponse.message);
-        }
+        await this.props.handleLogin(this.state.loginRequest);
         this.toggleRememberMe();
     }
 

@@ -4,7 +4,7 @@ import { Route, withRouter, Switch } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Main from './components/main';
 import Login from './components/login';
-import { login, changePassword, getCurrentUser, isSuccessfullResponse, storeDataIntoLocalStorage, removeDataFromLocalStorage, retrieveDataFromLocalStorage } from './components/util/APIUtils';
+import { login, changePassword, getCurrentUser, storeDataIntoLocalStorage, removeDataFromLocalStorage, retrieveDataFromLocalStorage } from './components/util/APIUtils';
 import { ACCESS_TOKEN, CURRENT_USER } from './components/constant';
 import NotFound from './components/common/NotFound'
 import ForgotPassword from './components/forgotPassword';
@@ -23,13 +23,11 @@ class App extends Component {
         });
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                storeDataIntoLocalStorage(CURRENT_USER, JSON.stringify(res.data.entity));
-                this.setState({
-                    isAuthenticated: true,
-                    isLoading: false
-                });
-            }
+            storeDataIntoLocalStorage(CURRENT_USER, JSON.stringify(res.data.entity));
+            this.setState({
+                isAuthenticated: true,
+                isLoading: false
+            });
         } catch (error) {
             this.setState({
                 isLoading: false
@@ -42,23 +40,21 @@ class App extends Component {
         if (usernameOrEmail.length > 0 && password.length > 0) {
             try {
                 const res = await login(loginRequest);
-                if (isSuccessfullResponse(res)) {
-                    storeDataIntoLocalStorage(ACCESS_TOKEN, res.data.entity.accessToken);
-                    await this.loadCurrentUser();
-                    let { pathname } = this.props.location;
-                    console.log("Path before change", pathname);
+                storeDataIntoLocalStorage(ACCESS_TOKEN, res.data.entity.accessToken);
+                await this.loadCurrentUser();
+                let { pathname } = this.props.location;
+                console.log("Path before change", pathname);
 
-                    if (pathname === '/login') {
-                        pathname = '/';
-                    }
-                    console.log("Path after change", pathname);
-                    this.props.history.push(pathname);
-                    // this.context.router.push('/item');
+                if (pathname === '/login') {
+                    pathname = '/';
                 }
-                return res.data;
+                console.log("Path after change", pathname);
+                this.props.history.push(pathname);
+                toast.success(res.data.message);
             } catch (error) {
                 console.log(error);
-                return error.response.data;
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
             }
         }
     }
@@ -77,11 +73,7 @@ class App extends Component {
     handleChangePassword = async (changePasswordRequest) => {
         try {
             const res = await changePassword(changePasswordRequest);
-            if (isSuccessfullResponse(res)) {
-                toast.success(res.data.message);
-            } else {
-                toast.error(res.data.message);
-            }
+            toast.success(res.data.message);
         } catch (error) {
             console.log(error.response.data);
             toast.error(error.response.data.message);

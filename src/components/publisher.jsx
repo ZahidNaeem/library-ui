@@ -4,7 +4,7 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { request, getCurrentUser } from './util/APIUtils'
 import {
     API_PUBLISHER_URL,
     INPUT_GROUP_TEXT_STYLE,
@@ -44,10 +44,9 @@ class Publisher extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -67,15 +66,15 @@ class Publisher extends Component {
         const { publisher } = this.state;
         return !(publisher.publisherName === undefined || publisher.publisherName === null || publisher.publisherName === '');
     }
-    
+
     enableSaveUndoButton = () => {
         const saveButtonDisabled = !this.validateForm();
         this.setState({ saveButtonDisabled, undoButtonDisabled: false });
     }
 
     disableAddButton = (boolean) => {
-    this.setState({ addButtonDisabled: boolean });
-}
+        this.setState({ addButtonDisabled: boolean });
+    }
 
     /* handleComboboxChange = (value, name) => {
         let publisher = { ...this.state.publisher };
@@ -108,13 +107,12 @@ class Publisher extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { publisher, navigationDtl } = res.data.entity;
-                    this.setState({ publisher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
+
+                console.log("Post: Object received: ", res.data.entity);
+                const { publisher, navigationDtl } = res.data.entity;
+                this.setState({ publisher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
             } catch (error) {
                 // throw error.response.data;
                 saveResponse = error.response.data;
@@ -126,7 +124,7 @@ class Publisher extends Component {
     savePublisherShowMessage = async () => {
         try {
             const saveResponse = await this.savePublisher();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
@@ -137,7 +135,7 @@ class Publisher extends Component {
     }
 
     deletePublisher = async () => {
-        const publisher = {...this.state.publisher};
+        const publisher = { ...this.state.publisher };
         if (publisher.publisherId !== undefined && publisher.publisherId !== null) {
             console.log("Delete: Publisher ID sent: ", publisher.publisherId);
             const options = {
@@ -146,14 +144,15 @@ class Publisher extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { publisher, navigationDtl } = res.data.entity;
-                    this.setState({ publisher, navigationDtl, saveButtonDisabled: true });
-                    this.disableAddButton(false);
-                }
+
+                console.log("Delete: Response: ", res);
+                const { publisher, navigationDtl } = res.data.entity;
+                this.setState({ publisher, navigationDtl, saveButtonDisabled: true });
+                this.disableAddButton(false);
             } catch (error) {
                 console.log(error);
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
 
             }
         } else {
@@ -171,13 +170,14 @@ class Publisher extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const { publisher, navigationDtl } = res.data.entity;
-                this.setState({ publisher, navigationDtl })
-                console.log(this.state.publisher);
-            }
+
+            const { publisher, navigationDtl } = res.data.entity;
+            this.setState({ publisher, navigationDtl })
+            console.log(this.state.publisher);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
@@ -319,7 +319,7 @@ class Publisher extends Component {
                             onClick={this.firstPublisher}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_FIRST}
-                            </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -327,7 +327,7 @@ class Publisher extends Component {
                             onClick={this.previousPublisher}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_PREVIOUS}
-                            </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -335,7 +335,7 @@ class Publisher extends Component {
                             onClick={this.nextPublisher}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_NEXT}
-                            </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -343,7 +343,7 @@ class Publisher extends Component {
                             onClick={this.lastPublisher}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_LAST}
-                            </Button>
+                        </Button>
 
                     </ButtonToolbar>
 
@@ -354,7 +354,7 @@ class Publisher extends Component {
                             onClick={this.addPublisher}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_ADD}
-                            </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -362,7 +362,7 @@ class Publisher extends Component {
                             onClick={() => this.setState({ publisherAlert: true })}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
-                            </Button>
+                        </Button>
 
                         <SweetAlert
                             show={this.state.publisherAlert}
@@ -385,7 +385,7 @@ class Publisher extends Component {
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}
-                            </Button>
+                        </Button>
 
                         <Button
                             variant="primary"
@@ -393,7 +393,7 @@ class Publisher extends Component {
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
-                            </Button>
+                        </Button>
                     </ButtonToolbar>
 
                 </Form>

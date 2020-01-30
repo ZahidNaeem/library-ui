@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
 import ToggleGroup from './common/toggleGroup'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { request, getCurrentUser } from './util/APIUtils'
 import {
     API_BOOK_URL,
     API_AUTHOR_URL,
@@ -64,10 +64,8 @@ class Book extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -154,15 +152,14 @@ class Book extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { book, navigationDtl } = res.data.entity;
-                    this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
-            } catch (error) {
-                // throw error.response.data;
+
+                console.log("Post: Object received: ", res.data.entity);
+                const { book, navigationDtl } = res.data.entity;
+                this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
+            }
+            catch (error) {
                 saveResponse = error.response.data;
             }
         }
@@ -172,13 +169,14 @@ class Book extends Component {
     saveBookShowMessage = async () => {
         try {
             const saveResponse = await this.saveBook();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
             }
         } catch (error) {
-            toast.error(JSON.stringify(error));
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
@@ -192,15 +190,14 @@ class Book extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { book, navigationDtl } = res.data.entity;
-                    this.setState({ book, navigationDtl, saveButtonDisabled: true });
-                    // this.disableAddButton(false);
-                }
+
+                console.log("Delete: Response: ", res);
+                const { book, navigationDtl } = res.data.entity;
+                this.setState({ book, navigationDtl, saveButtonDisabled: true });
             } catch (error) {
                 console.log(error);
-
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
             }
         } else {
             this.undoChanges();
@@ -217,11 +214,10 @@ class Book extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const { book, navigationDtl } = res.data.entity;
-                this.setState({ book, navigationDtl })
-                console.log(this.state.book);
-            }
+
+            const { book, navigationDtl } = res.data.entity;
+            this.setState({ book, navigationDtl })
+            console.log(this.state.book);
         } catch (error) {
             console.log(error);
         }
@@ -315,15 +311,14 @@ class Book extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate authors");
-                res.data.entity.forEach(element => {
-                    authors.push({
-                        value: element.authorId,
-                        label: element.authorName
-                    });
+
+            console.log("Stop populate authors");
+            res.data.entity.forEach(element => {
+                authors.push({
+                    value: element.authorId,
+                    label: element.authorName
                 });
-            }
+            });
             console.log("Authors:", authors);
         } catch (error) {
             console.log(error);
@@ -340,15 +335,14 @@ class Book extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate subjects");
-                res.data.entity.forEach(element => {
-                    subjects.push({
-                        value: element.subjectId,
-                        label: element.subjectName
-                    });
+
+            console.log("Stop populate subjects");
+            res.data.entity.forEach(element => {
+                subjects.push({
+                    value: element.subjectId,
+                    label: element.subjectName
                 });
-            }
+            });
             console.log("Subjects:", subjects);
         } catch (error) {
             console.log(error);
@@ -365,15 +359,14 @@ class Book extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate publishers");
-                res.data.entity.forEach(element => {
-                    publishers.push({
-                        value: element.publisherId,
-                        label: element.publisherName
-                    });
+
+            console.log("Stop populate publishers");
+            res.data.entity.forEach(element => {
+                publishers.push({
+                    value: element.publisherId,
+                    label: element.publisherName
                 });
-            }
+            });
             console.log("Publishers:", publishers);
         } catch (error) {
             console.log(error);
@@ -390,15 +383,14 @@ class Book extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate researchers");
-                res.data.entity.forEach(element => {
-                    researchers.push({
-                        value: element.researcherId,
-                        label: element.researcherName
-                    });
+
+            console.log("Stop populate researchers");
+            res.data.entity.forEach(element => {
+                researchers.push({
+                    value: element.researcherId,
+                    label: element.researcherName
                 });
-            }
+            });
             console.log("Researchers:", researchers);
         } catch (error) {
             console.log(error);

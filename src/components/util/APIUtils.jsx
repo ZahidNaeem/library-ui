@@ -18,15 +18,12 @@ export async function request(options) {
 
     try {
         const res = await axios(options);
+        callerFunction(res);
         return res;
     } catch (error) {
         console.log(error);
+        callerFunction(error.response);
         return Promise.reject(error);
-        // return error.response;
-        // if (error.response.status === HttpStatus.UNAUTHORIZED) {
-        //     toast.error("You are not authorized to see data or your session is expired.");
-        // }
-
     }
 };
 
@@ -98,7 +95,7 @@ export function changePassword(changePasswordRequest) {
     return request(options);
 }
 
-export function isSuccessfullResponse(res) {
+export function callerFunction(res) {
     var callerName;
     let re = /([^(]+)@|at ([^(]+) \(/g;
     let aRegexResult = re.exec(new Error().stack);
@@ -107,20 +104,6 @@ export function isSuccessfullResponse(res) {
 
     callerName = arr[arr.length - 1];
     console.log("Function:", callerName, "Response status:", res.status);
-    if (res.status === HttpStatus.OK || res.status === HttpStatus.CREATED) {
-        return true;
-    } else {
-        return false;
-    }
-    /* try {
-        throw new Error();
-    } catch (e) {
-        // console.log("Log1", e.stack.split('at ')[3].split(' ')[0]);
-        // console.log("Log2", e.stack.split('at ')[3]);
-        console.log("Log3", );
-        return true;
-    } */
-    // }
 }
 
 export function storeDataIntoLocalStorage(key, value) {
@@ -141,7 +124,7 @@ export function retrieveDataFromLocalStorage(key) {
             return value;
         }
     } catch (error) {
-        console.log("Error retrieving data from AsyncStorage", error);
+        console.log("Error retrieving data from localStorage", error);
         return null;
     }
 }

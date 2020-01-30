@@ -3,7 +3,7 @@ import { FormControl, Button, ButtonToolbar, Table } from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, generateUniqueId } from './util/APIUtils'
+import { request, generateUniqueId } from './util/APIUtils'
 import {
     API_VOLUME_URL,
     API_RACK_URL,
@@ -28,7 +28,7 @@ class Volume extends Component {
         if (props.book !== this.state.book) {
             const { book } = props;
             this.setState({ book });
-        }        
+        }
     }
 
     async componentDidMount() {
@@ -74,7 +74,7 @@ class Volume extends Component {
 
     addVolume = async () => {
         let book = { ...this.state.book };
-        let newVolume = {rowKey: generateUniqueId()};
+        let newVolume = { rowKey: generateUniqueId() };
 
         if (book === null) {
             alert("Please add book, then add volume");
@@ -92,7 +92,7 @@ class Volume extends Component {
             this.props.enableSaveUndoButton();
         } catch (error) {
             console.log(error);
-        }
+}
     }
 
     /*     saveVolume = () => {
@@ -113,12 +113,11 @@ class Volume extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                }
+
+                console.log("Delete: Response: ", res);
             } catch (error) {
                 console.log(error);
-            }
+ }
         }
         volumes.splice(index, 1);
         book.volumes = volumes;
@@ -127,7 +126,7 @@ class Volume extends Component {
             this.setState({ book, volumeAlert: false });
         } catch (error) {
             console.log(error);
-        }
+}
     }
 
     async populateRacks() {
@@ -139,19 +138,18 @@ class Volume extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                console.log("Stop populate racks");
-                res.data.entity.forEach(element => {
-                    racks.push({
-                        value: element.rackId,
-                        label: 'Shelf:' + element.shelfName + ' - Rack:' + element.rackName
-                    });
+
+            console.log("Stop populate racks");
+            res.data.entity.forEach(element => {
+                racks.push({
+                    value: element.rackId,
+                    label: 'Shelf:' + element.shelfName + ' - Rack:' + element.rackName
                 });
-            }
+            });
             console.log("Racks:", racks);
         } catch (error) {
             console.log(error);
-        }
+}
         this.setState({ racks });
     }
 

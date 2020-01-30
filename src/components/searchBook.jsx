@@ -12,7 +12,7 @@ import {
     API_BOOK_URL,
     API_VOLUME_URL
 } from './constant';
-import { getCurrentUser, isSuccessfullResponse, request } from './util/APIUtils';
+import { getCurrentUser, request } from './util/APIUtils';
 
 let expanded = null;
 let isExpanded = false;
@@ -52,7 +52,7 @@ class SearchBook extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
+            
                 console.log("Stop populate subjects");
                 res.data.entity.forEach(element => {
                     subjects.push({
@@ -61,11 +61,10 @@ class SearchBook extends Component {
                         parent: element.parentSubjectId
                     });
                 });
-            }
             console.log("Subjects:", subjects);
         } catch (error) {
             console.log(error);
-        }
+}
         this.setState({ subjects });
     }
 
@@ -78,7 +77,7 @@ class SearchBook extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
+            
                 console.log("Stop populate authors");
                 res.data.entity.forEach(element => {
                     authors.push({
@@ -87,11 +86,10 @@ class SearchBook extends Component {
                         parent: element.parentAuthorId
                     });
                 });
-            }
             console.log("Authors:", authors);
         } catch (error) {
             console.log(error);
-        }
+}
         this.setState({ authors });
     }
 
@@ -104,7 +102,7 @@ class SearchBook extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
+            
                 console.log("Stop populate publishers");
                 res.data.entity.forEach(element => {
                     publishers.push({
@@ -113,11 +111,10 @@ class SearchBook extends Component {
                         parent: element.parentPublisherId
                     });
                 });
-            }
             console.log("Publishers:", publishers);
         } catch (error) {
             console.log(error);
-        }
+}
         this.setState({ publishers });
     }
 
@@ -130,7 +127,7 @@ class SearchBook extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
+            
                 console.log("Stop populate researchers");
                 res.data.entity.forEach(element => {
                     researchers.push({
@@ -139,11 +136,10 @@ class SearchBook extends Component {
                         parent: element.parentResearcherId
                     });
                 });
-            }
             console.log("Researchers:", researchers);
         } catch (error) {
             console.log(error);
-        }
+}
         this.setState({ researchers });
     }
 
@@ -157,11 +153,10 @@ class SearchBook extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
+            
                 console.log("Search Book: Object received: ", res.data.entity);
                 this.setState({ books: res.data.entity });
                 await this.populateVolumes();
-            }
         } catch (error) {
             throw error.response.data;
         }
@@ -175,15 +170,14 @@ class SearchBook extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
+            
                 console.log("Stop populate volumes");
                 const volumes = res.data.entity;
                 console.log("Volumes:", volumes);
                 this.setState({ volumes });
-            }
         } catch (error) {
             console.log(error);
-        }
+}
     }
 
     searchBook = async () => {

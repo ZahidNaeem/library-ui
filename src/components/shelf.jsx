@@ -4,7 +4,7 @@ import SweetAlert from 'react-bootstrap-sweetalert'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, getCurrentUser } from './util/APIUtils'
+import { request, getCurrentUser } from './util/APIUtils'
 import {
     API_SHELF_URL,
     INPUT_GROUP_TEXT_STYLE,
@@ -45,10 +45,9 @@ class Shelf extends Component {
     getCurrentUser = async () => {
         try {
             const res = await getCurrentUser();
-            if (isSuccessfullResponse(res)) {
-                console.log("Current User: ", res.data.entity);
-                return res.data.entity;
-            }
+
+            console.log("Current User: ", res.data.entity);
+            return res.data.entity;
         } catch (error) {
             console.log(error);
         }
@@ -126,13 +125,12 @@ class Shelf extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Post: Object received: ", res.data.entity);
-                    const { shelf, navigationDtl } = res.data.entity;
-                    this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    this.disableAddButton(false);
-                    saveResponse = res.data;
-                }
+
+                console.log("Post: Object received: ", res.data.entity);
+                const { shelf, navigationDtl } = res.data.entity;
+                this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                this.disableAddButton(false);
+                saveResponse = res.data;
             } catch (error) {
                 // throw error.response.data;
                 saveResponse = error.response.data;
@@ -144,13 +142,13 @@ class Shelf extends Component {
     saveShelfShowMessage = async () => {
         try {
             const saveResponse = await this.saveShelf();
-            if(saveResponse.success === undefined || saveResponse.success === null){
+            if (saveResponse.success === undefined || saveResponse.success === null) {
                 toast.error(saveResponse);
             } else {
                 toast.success(saveResponse.message);
             }
         } catch (error) {
-            toast.error(JSON.stringify(error));
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
         }
     }
 
@@ -164,15 +162,15 @@ class Shelf extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                    const { shelf, navigationDtl } = res.data.entity;
-                    this.setState({ shelf, navigationDtl, saveButtonDisabled: true });
-                    // this.disableAddButton(false);
-                }
+
+                console.log("Delete: Response: ", res);
+                const { shelf, navigationDtl } = res.data.entity;
+                this.setState({ shelf, navigationDtl, saveButtonDisabled: true });
             } catch (error) {
                 console.log(error);
-
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+                return;
+                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
             }
         } else {
             this.undoChanges();
@@ -189,13 +187,14 @@ class Shelf extends Component {
         };
         try {
             const res = await request(options);
-            if (isSuccessfullResponse(res)) {
-                const { shelf, navigationDtl } = res.data.entity;
-                this.setState({ shelf, navigationDtl })
-                console.log(this.state.shelf);
-            }
+
+            const { shelf, navigationDtl } = res.data.entity;
+            this.setState({ shelf, navigationDtl })
+            console.log(this.state.shelf);
         } catch (error) {
             console.log(error);
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 

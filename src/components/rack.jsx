@@ -3,7 +3,7 @@ import { FormControl, Button, ButtonToolbar, Table } from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
-import { request, isSuccessfullResponse, generateUniqueId } from './util/APIUtils'
+import { request, generateUniqueId } from './util/APIUtils'
 import {
     API_RACK_URL,
     STRETCH_STYLE,
@@ -67,7 +67,7 @@ class Rack extends Component {
     addRack = async () => {
         let shelf = { ...this.state.shelf };
 
-        let newRack = {rowKey: generateUniqueId()};
+        let newRack = { rowKey: generateUniqueId() };
 
         if (shelf === null) {
             alert("Please add shelf, then add rack");
@@ -105,9 +105,8 @@ class Rack extends Component {
             };
             try {
                 const res = await request(options);
-                if (isSuccessfullResponse(res)) {
-                    console.log("Delete: Response: ", res);
-                }
+
+                console.log("Delete: Response: ", res);
             } catch (error) {
                 console.log(error);
             }
