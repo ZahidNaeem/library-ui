@@ -154,8 +154,6 @@ class Researcher extends Component {
                 console.log(error);
                 toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
                 return;
-                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-                return;
             }
         } else {
             this.undoChanges();
@@ -178,10 +176,6 @@ class Researcher extends Component {
             console.log(this.state.researcher);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
     }
 

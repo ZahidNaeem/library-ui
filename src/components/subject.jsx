@@ -159,6 +159,7 @@ class Subject extends Component {
             }
         } catch (error) {
             toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 

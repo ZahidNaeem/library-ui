@@ -149,6 +149,7 @@ class Shelf extends Component {
             }
         } catch (error) {
             toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
@@ -170,7 +171,6 @@ class Shelf extends Component {
                 console.log(error);
                 toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
                 return;
-                toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
             }
         } else {
             this.undoChanges();
@@ -193,8 +193,6 @@ class Shelf extends Component {
             console.log(this.state.shelf);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
     }
 

@@ -202,7 +202,8 @@ class BookTransHeaderReceipt extends Component {
                 toast.success(saveResponse.message);
             }
         } catch (error) {
-            toast.error(JSON.stringify(error));
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
@@ -248,8 +249,6 @@ class BookTransHeaderReceipt extends Component {
             console.log(this.state.bookTransHeader);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
     }
 
@@ -352,8 +351,6 @@ class BookTransHeaderReceipt extends Component {
             console.log("Readers:", readers);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
         this.setState({ readers });
     }
@@ -378,8 +375,6 @@ class BookTransHeaderReceipt extends Component {
             console.log("Books:", books);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
         this.setState({ books });
     }
@@ -399,8 +394,6 @@ class BookTransHeaderReceipt extends Component {
             console.log("Volumes:", volumes);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
         this.setState({ volumes });
     }

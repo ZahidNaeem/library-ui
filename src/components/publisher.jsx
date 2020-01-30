@@ -130,7 +130,8 @@ class Publisher extends Component {
                 toast.success(saveResponse.message);
             }
         } catch (error) {
-            toast.error(JSON.stringify(error));
+            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
+            return;
         }
     }
 
@@ -176,8 +177,6 @@ class Publisher extends Component {
             console.log(this.state.publisher);
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-            return;
         }
     }
 
