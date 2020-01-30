@@ -43,7 +43,6 @@ class App extends Component {
             try {
                 const res = await login(loginRequest);
                 if (isSuccessfullResponse(res)) {
-                    
                     storeDataIntoLocalStorage(ACCESS_TOKEN, res.data.entity.accessToken);
                     await this.loadCurrentUser();
                     let { pathname } = this.props.location;
@@ -59,7 +58,7 @@ class App extends Component {
                 return res.data;
             } catch (error) {
                 console.log(error);
-                return error;
+                return error.response.data;
                 // return {
                 //     success: false,
                 //     message: error
