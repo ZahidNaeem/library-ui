@@ -59,10 +59,6 @@ class App extends Component {
             } catch (error) {
                 console.log(error);
                 return error.response.data;
-                // return {
-                //     success: false,
-                //     message: error
-                // }
             }
         }
     }
