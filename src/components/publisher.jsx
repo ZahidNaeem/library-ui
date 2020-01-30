@@ -96,6 +96,7 @@ class Publisher extends Component {
     }
 
     savePublisher = async () => {
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Publisher name is required field");
         } else {
@@ -112,17 +113,24 @@ class Publisher extends Component {
                     const { publisher, navigationDtl } = res.data.entity;
                     this.setState({ publisher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    savePublisherShowMessage = async (message) => {
+    savePublisherShowMessage = async () => {
         try {
-            await this.savePublisher();
-            toast.success(message);
+            const saveResponse = await this.savePublisher();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -373,7 +381,7 @@ class Publisher extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.savePublisherShowMessage("Publisher saved successfully.")}
+                            onClick={this.savePublisherShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

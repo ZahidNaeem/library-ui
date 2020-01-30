@@ -124,6 +124,7 @@ class Subject extends Component {
     }
 
     saveSubject = async () => {
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Subject name is required field");
         } else {
@@ -140,18 +141,24 @@ class Subject extends Component {
                     const { subject, navigationDtl } = res.data.entity;
                     this.setState({ subject, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
-                    await this.populateSubjects();
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    saveSubjectShowMessage = async (message) => {
+    saveSubjectShowMessage = async () => {
         try {
-            await this.saveSubject();
-            toast.success(message);
+            const saveResponse = await this.saveSubject();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -508,8 +515,7 @@ class Subject extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveSubjectShowMessage(
-                                "Subject saved successfully.")}
+                            onClick={this.saveSubjectShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

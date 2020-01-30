@@ -168,9 +168,9 @@ class BookTransHeaderReceipt extends Component {
     }
 
     saveBookTransHeader = async () => {
-
+        let saveResponse = {};
         if (this.validateForm() === false) {
-            toast.error("Issuance date and reader are required fields");
+            toast.error("BookTransHeader name is required field");
         } else {
             console.log("Post: Object sent: ", this.state.bookTransHeader);
             const options = {
@@ -184,18 +184,25 @@ class BookTransHeaderReceipt extends Component {
                     console.log("Post: Object received: ", res.data.entity);
                     const { bookTransHeader, navigationDtl } = res.data.entity;
                     this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    // this.disableAddButton(false);
+                    this.disableAddButton(false);
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    saveBookTransHeaderShowMessage = async (message) => {
+    saveBookTransHeaderShowMessage = async () => {
         try {
-            await this.saveBookTransHeader();
-            toast.success(message);
+            const saveResponse = await this.saveBookTransHeader();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -567,7 +574,7 @@ class BookTransHeaderReceipt extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveBookTransHeaderShowMessage("BookTransHeader saved successfully.")}
+                            onClick={this.saveBookTransHeaderShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

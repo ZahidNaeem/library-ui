@@ -95,7 +95,7 @@ class Author extends Component {
     }
 
     saveAuthor = async () => {
-        let saveMessage = '';
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Author name is required field");
         } else {
@@ -112,20 +112,24 @@ class Author extends Component {
                     const { author, navigationDtl } = res.data.entity;
                     this.setState({ author, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
-                    saveMessage = res.data.message;
+                    saveResponse = res.data;
                 }
             } catch (error) {
                 // throw error.response.data;
-                saveMessage = error.response.data;
+                saveResponse = error.response.data;
             }
         }
-        return saveMessage;
+        return saveResponse;
     }
 
     saveAuthorShowMessage = async () => {
         try {
-            const saveMessage = await this.saveAuthor();
-            toast.success(saveMessage);
+            const saveResponse = await this.saveAuthor();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }

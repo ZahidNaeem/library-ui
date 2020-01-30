@@ -43,6 +43,7 @@ class App extends Component {
             try {
                 const res = await login(loginRequest);
                 if (isSuccessfullResponse(res)) {
+                    
                     storeDataIntoLocalStorage(ACCESS_TOKEN, res.data.entity.accessToken);
                     await this.loadCurrentUser();
                     let { pathname } = this.props.location;
@@ -55,8 +56,14 @@ class App extends Component {
                     this.props.history.push(pathname);
                     // this.context.router.push('/item');
                 }
+                return res.data;
             } catch (error) {
                 console.log(error);
+                return error;
+                // return {
+                //     success: false,
+                //     message: error
+                // }
             }
         }
     }
@@ -76,11 +83,9 @@ class App extends Component {
         try {
             const res = await changePassword(changePasswordRequest);
             if (isSuccessfullResponse(res)) {
-                if (res) {
-                    toast.success("Password changed successfully.");
-                }
+                toast.success(res.data.message);
             } else {
-                console.log("Save item response code", res.status);
+                toast.error(res.data.message);
             }
         } catch (error) {
             console.log(error.response.data);

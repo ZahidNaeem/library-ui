@@ -142,6 +142,7 @@ class Book extends Component {
     }
 
     saveBook = async () => {
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Book name is required field");
         } else {
@@ -157,18 +158,25 @@ class Book extends Component {
                     console.log("Post: Object received: ", res.data.entity);
                     const { book, navigationDtl } = res.data.entity;
                     this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    // this.disableAddButton(false);
+                    this.disableAddButton(false);
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    saveBookShowMessage = async (message) => {
+    saveBookShowMessage = async () => {
         try {
-            await this.saveBook();
-            toast.success(message);
+            const saveResponse = await this.saveBook();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -635,7 +643,7 @@ class Book extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveBookShowMessage("Book saved successfully.")}
+                            onClick={this.saveBookShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

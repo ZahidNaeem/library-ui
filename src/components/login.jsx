@@ -6,6 +6,7 @@ import FormItem from 'antd/lib/form/FormItem';
 import Popup from './common/popup';
 import Modal from './popup/model';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 class Login extends Component {
     constructor(props) {
@@ -77,7 +78,13 @@ class Login extends Component {
 
     handleLogin = async (e) => {
         e.preventDefault();
-        await this.props.handleLogin(this.state.loginRequest);
+        const loginResponse = await this.props.handleLogin(this.state.loginRequest);
+        console.log("loginResponse", loginResponse);
+        if (loginResponse.success === true) {
+            toast.success(loginResponse.message);
+        } else {
+            toast.error(loginResponse.message);
+        }
         this.toggleRememberMe();
     }
 
@@ -179,8 +186,8 @@ class Login extends Component {
                                                         Not a member?&nbsp;
                                                         <Link
                                                             to="/signup"
-                                                            // onClick={showRegisterPopup}
-                                                            >
+                                                        // onClick={showRegisterPopup}
+                                                        >
                                                             Register
                                                             </Link>
                                                         {registerPopup}

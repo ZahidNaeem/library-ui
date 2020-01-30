@@ -95,6 +95,7 @@ class Reader extends Component {
     }
 
     saveReader = async () => {
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Reader name is required field");
         } else {
@@ -111,17 +112,24 @@ class Reader extends Component {
                     const { reader, navigationDtl } = res.data.entity;
                     this.setState({ reader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    saveReaderShowMessage = async (message) => {
+    saveReaderShowMessage = async () => {
         try {
-            await this.saveReader();
-            toast.success(message);
+            const saveResponse = await this.saveReader();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -372,7 +380,7 @@ class Reader extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveReaderShowMessage("Reader saved successfully.")}
+                            onClick={this.saveReaderShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

@@ -96,6 +96,7 @@ class Researcher extends Component {
     }
 
     saveResearcher = async () => {
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Researcher name is required field");
         } else {
@@ -112,17 +113,24 @@ class Researcher extends Component {
                     const { researcher, navigationDtl } = res.data.entity;
                     this.setState({ researcher, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
                     this.disableAddButton(false);
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    saveResearcherShowMessage = async (message) => {
+    saveResearcherShowMessage = async () => {
         try {
-            await this.saveResearcher();
-            toast.success(message);
+            const saveResponse = await this.saveResearcher();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -373,7 +381,7 @@ class Researcher extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveResearcherShowMessage("Researcher saved successfully.")}
+                            onClick={this.saveResearcherShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

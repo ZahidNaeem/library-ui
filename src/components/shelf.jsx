@@ -114,6 +114,7 @@ class Shelf extends Component {
     }
 
     saveShelf = async () => {
+        let saveResponse = {};
         if (this.validateForm() === false) {
             toast.error("Shelf name is required field");
         } else {
@@ -129,18 +130,25 @@ class Shelf extends Component {
                     console.log("Post: Object received: ", res.data.entity);
                     const { shelf, navigationDtl } = res.data.entity;
                     this.setState({ shelf, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
-                    // this.disableAddButton(false);
+                    this.disableAddButton(false);
+                    saveResponse = res.data;
                 }
             } catch (error) {
-                throw error.response.data;
+                // throw error.response.data;
+                saveResponse = error.response.data;
             }
         }
+        return saveResponse;
     }
 
-    saveShelfShowMessage = async (message) => {
+    saveShelfShowMessage = async () => {
         try {
-            await this.saveShelf();
-            toast.success(message);
+            const saveResponse = await this.saveShelf();
+            if(saveResponse.success === undefined || saveResponse.success === null){
+                toast.error(saveResponse);
+            } else {
+                toast.success(saveResponse.message);
+            }
         } catch (error) {
             toast.error(JSON.stringify(error));
         }
@@ -391,7 +399,7 @@ class Shelf extends Component {
 
                         <Button
                             variant="primary"
-                            onClick={() => this.saveShelfShowMessage("Shelf saved successfully.")}
+                            onClick={this.saveShelfShowMessage}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={saveButtonDisabled}
                             active>{BUTTON_SAVE}

@@ -75,8 +75,10 @@ class Signup extends Component {
             console.log("Response:", res);
 
             if (isSuccessfullResponse(res)) {
-                toast.success("Thank you! You're successfully registered. Please Login to continue!");
+                toast.success(res.data.message);
                 this.props.history.push("/login");
+            } else {
+                toast.error(res.data.message);
             }
         } catch (error) {
             toast.error(error.message || 'Sorry! Something went wrong. Please try again!');
