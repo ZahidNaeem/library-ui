@@ -13,7 +13,7 @@ class UserInformation extends Component {
         <img className="img-profile rounded-circle" src="https://via.placeholder.com/150/0000FF/808080 ?Text=" alt="profile pic" />
       </Link>
       <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-        <Link className="dropdown-item" to="#">
+        {/* <Link className="dropdown-item" to="#">
           <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
           Profile
         </Link>
@@ -25,7 +25,7 @@ class UserInformation extends Component {
           <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
           Activity Log
         </Link>
-        <div className="dropdown-divider"></div>
+        <div className="dropdown-divider"></div> */}
         <Link className="dropdown-item" to="#" data-toggle="modal" data-target="#changePasswordModal">
           <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
           Change Password

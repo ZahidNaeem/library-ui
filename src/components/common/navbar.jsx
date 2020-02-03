@@ -42,8 +42,8 @@ class Navbar extends Component {
                         </form>
                     </div>
                 </li>
-                <Notification />
-                <Message />
+                {/* <Notification />
+                <Message /> */}
                 <div className="topbar-divider d-none d-sm-block"></div>
                 <UserInformation {...this.props} />
             </ul>
