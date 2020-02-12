@@ -17,7 +17,9 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
 
 class Publisher extends Component {
@@ -30,7 +32,8 @@ class Publisher extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -194,6 +197,29 @@ class Publisher extends Component {
         }
     }
 
+    searchPublisher = async () => {
+        let isSearching = this.state.isSearching;
+        if (isSearching === false) {
+            this.setState({ publisher: {} });
+        } else {
+            const options = {
+                url: API_PUBLISHER_URL + 'search',
+                method: 'POST',
+                data: this.state.publisher
+            };
+            try {
+                const res = await request(options);
+                debugger;
+                await this.navigatePublisher('first');
+                console.log("Publisher Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
+        this.setState({ isSearching });
+    }
+
     firstPublisher = async () => {
         await this.saveAndNavigatePublisher('first');
     }
@@ -261,7 +287,15 @@ class Publisher extends Component {
 
 
     render() {
-        const { publisher, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const { publisher,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
 
         return (
             <>
@@ -395,6 +429,15 @@ class Publisher extends Component {
                         </Button>
                     </ButtonToolbar>
 
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchPublisher}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
+                        </Button>
+                    </ButtonToolbar>
                 </Form>
             </>
         );

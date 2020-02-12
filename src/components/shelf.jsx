@@ -17,7 +17,9 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
 import Rack from './rack';
 
@@ -31,7 +33,8 @@ class Shelf extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -210,6 +213,29 @@ class Shelf extends Component {
         }
     }
 
+    searchShelf = async () => {
+        let isSearching = this.state.isSearching;
+        if (isSearching === false) {
+            this.setState({ shelf: {} });
+        } else {
+            const options = {
+                url: API_SHELF_URL + 'search',
+                method: 'POST',
+                data: this.state.shelf
+            };
+            try {
+                const res = await request(options);
+                debugger;
+                await this.navigateShelf('first');
+                console.log("Shelf Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
+        this.setState({ isSearching });
+    }
+
     firstShelf = async () => {
         await this.saveAndNavigateShelf('first');
     }
@@ -277,7 +303,15 @@ class Shelf extends Component {
 
 
     render() {
-        const { shelf, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const { shelf,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
 
         return (
             <>
@@ -408,6 +442,15 @@ class Shelf extends Component {
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
+                        </Button>
+                    </ButtonToolbar>
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchShelf}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
                         </Button>
                     </ButtonToolbar>
                     <Rack

@@ -17,7 +17,9 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
 
 class Reader extends Component {
@@ -30,7 +32,8 @@ class Reader extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -130,7 +133,7 @@ class Reader extends Component {
             }
         } catch (error) {
             toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
-                return;
+            return;
         }
     }
 
@@ -191,6 +194,29 @@ class Reader extends Component {
         } else {
             this.navigateReader(operation);
         }
+    }
+
+    searchReader = async () => {
+        let isSearching = this.state.isSearching;
+        if (isSearching === false) {
+            this.setState({ reader: {} });
+        } else {
+            const options = {
+                url: API_READER_URL + 'search',
+                method: 'POST',
+                data: this.state.reader
+            };
+            try {
+                const res = await request(options);
+                debugger;
+                await this.navigateReader('first');
+                console.log("Reader Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
+        this.setState({ isSearching });
     }
 
     firstReader = async () => {
@@ -260,7 +286,15 @@ class Reader extends Component {
 
 
     render() {
-        const { reader, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const { reader,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
 
         return (
             <>
@@ -394,6 +428,15 @@ class Reader extends Component {
                         </Button>
                     </ButtonToolbar>
 
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchReader}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
+                        </Button>
+                    </ButtonToolbar>
                 </Form>
             </>
         );

@@ -17,7 +17,9 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
 
 class Researcher extends Component {
@@ -30,7 +32,8 @@ class Researcher extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -193,6 +196,29 @@ class Researcher extends Component {
         }
     }
 
+    searchResearcher = async () => {
+        let isSearching = this.state.isSearching;
+        if (isSearching === false) {
+            this.setState({ researcher: {} });
+        } else {
+            const options = {
+                url: API_RESEARCHER_URL + 'search',
+                method: 'POST',
+                data: this.state.researcher
+            };
+            try {
+                const res = await request(options);
+                debugger;
+                await this.navigateResearcher('first');
+                console.log("Researcher Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
+        this.setState({ isSearching });
+    }
+
     firstResearcher = async () => {
         await this.saveAndNavigateResearcher('first');
     }
@@ -260,7 +286,15 @@ class Researcher extends Component {
 
 
     render() {
-        const { researcher, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const { researcher,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
 
         return (
             <>
@@ -394,6 +428,15 @@ class Researcher extends Component {
                         </Button>
                     </ButtonToolbar>
 
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchResearcher}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
+                        </Button>
+                    </ButtonToolbar>
                 </Form>
             </>
         );

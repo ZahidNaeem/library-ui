@@ -24,7 +24,9 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
 
 let toBeExcluded = [];
@@ -40,7 +42,8 @@ class Subject extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -223,6 +226,29 @@ class Subject extends Component {
         }
     }
 
+    searchSubject = async () => {
+        let isSearching = this.state.isSearching;
+        if (isSearching === false) {
+            this.setState({ subject: {} });
+        } else {
+            const options = {
+                url: API_SUBJECT_URL + 'search',
+                method: 'POST',
+                data: this.state.subject
+            };
+            try {
+                const res = await request(options);
+                debugger;
+                await this.navigateSubject('first');
+                console.log("Subject Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
+        this.setState({ isSearching });
+    }
+
     firstSubject = async () => {
         await this.saveAndNavigateSubject('first');
     }
@@ -359,7 +385,15 @@ class Subject extends Component {
     }
 
     render() {
-        const { subject, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const { subject,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
 
         return (
             <>
@@ -527,6 +561,15 @@ class Subject extends Component {
                         </Button>
                     </ButtonToolbar>
 
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchSubject}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
+                        </Button>
+                    </ButtonToolbar>
                 </Form>
             </>
         );

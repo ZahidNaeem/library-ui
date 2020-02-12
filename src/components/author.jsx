@@ -191,8 +191,26 @@ class Author extends Component {
         }
     }
 
-    searchAuthor = () => {
-        const isSearching = !this.state.isSearching;
+    searchAuthor = async () => {
+        let isSearching = this.state.isSearching;
+        if(isSearching === false){
+            this.setState({author: {}});
+        } else {
+            const options = {
+                url: API_AUTHOR_URL + 'search',
+                method: 'POST',
+                data: this.state.author
+            };
+            try {
+                const res = await request(options);
+                debugger;
+                await this.navigateAuthor('first');
+                console.log("Author Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
         this.setState({ isSearching });
     }
 
