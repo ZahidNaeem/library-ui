@@ -197,16 +197,16 @@ class Reader extends Component {
         await this.saveAndNavigateReader('first');
     }
 
-    previousReader = () => {
-        this.saveAndNavigateReader('previous');
+    previousReader = async () => {
+        await this.saveAndNavigateReader('previous');
     }
 
-    nextReader = () => {
-        this.saveAndNavigateReader('next');
+    nextReader = async () => {
+        await this.saveAndNavigateReader('next');
     }
 
-    lastReader = () => {
-        this.saveAndNavigateReader('last');
+    lastReader = async () => {
+        await this.saveAndNavigateReader('last');
     }
 
     undoChanges = () => {

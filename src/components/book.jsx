@@ -241,16 +241,16 @@ class Book extends Component {
         await this.saveAndNavigateBook('first');
     }
 
-    previousBook = () => {
-        this.saveAndNavigateBook('previous');
+    previousBook = async () => {
+        await this.saveAndNavigateBook('previous');
     }
 
-    nextBook = () => {
-        this.saveAndNavigateBook('next');
+    nextBook = async () => {
+        await this.saveAndNavigateBook('next');
     }
 
-    lastBook = () => {
-        this.saveAndNavigateBook('last');
+    lastBook = async () => {
+        await this.saveAndNavigateBook('last');
     }
 
     undoChanges = () => {

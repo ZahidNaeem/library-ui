@@ -21,6 +21,9 @@ export const BUTTON_DELETE = 'حذف';
 export const BUTTON_SAVE = 'حفظ';
 export const BUTTON_UNDO = 'إلغاء';
 
+export const BUTTON_SEARCH = 'Search';
+export const BUTTON_EXECUTE = 'Execute';
+
 export const ACCESS_TOKEN = 'accessToken';
 export const LOGIN_REQUEST = 'loginRequest';
 export const CURRENT_USER = 'currentUser';

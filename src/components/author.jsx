@@ -17,7 +17,9 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
 
 class Author extends Component {
@@ -30,7 +32,8 @@ class Author extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -188,20 +191,25 @@ class Author extends Component {
         }
     }
 
+    searchAuthor = () => {
+        const isSearching = !this.state.isSearching;
+        this.setState({ isSearching });
+    }
+
     firstAuthor = async () => {
         await this.saveAndNavigateAuthor('first');
     }
 
-    previousAuthor = () => {
-        this.saveAndNavigateAuthor('previous');
+    previousAuthor = async () => {
+        await this.saveAndNavigateAuthor('previous');
     }
 
-    nextAuthor = () => {
-        this.saveAndNavigateAuthor('next');
+    nextAuthor = async () => {
+        await this.saveAndNavigateAuthor('next');
     }
 
-    lastAuthor = () => {
-        this.saveAndNavigateAuthor('last');
+    lastAuthor = async () => {
+        await this.saveAndNavigateAuthor('last');
     }
 
     undoChanges = () => {
@@ -255,7 +263,16 @@ class Author extends Component {
 
 
     render() {
-        const { author, navigationDtl, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const {
+            author,
+            navigationDtl,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
 
         return (
             <>
@@ -388,7 +405,15 @@ class Author extends Component {
                             active>{BUTTON_UNDO}
                         </Button>
                     </ButtonToolbar>
-
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchAuthor}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
+                        </Button>
+                    </ButtonToolbar>
                 </Form>
             </>
         );

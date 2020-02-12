@@ -270,16 +270,16 @@ class BookTransHeaderReceipt extends Component {
         await this.saveAndNavigateBookTransHeader('first');
     }
 
-    previousBookTransHeader = () => {
-        this.saveAndNavigateBookTransHeader('previous');
+    previousBookTransHeader = async () => {
+        await this.saveAndNavigateBookTransHeader('previous');
     }
 
-    nextBookTransHeader = () => {
-        this.saveAndNavigateBookTransHeader('next');
+    nextBookTransHeader = async () => {
+        await this.saveAndNavigateBookTransHeader('next');
     }
 
-    lastBookTransHeader = () => {
-        this.saveAndNavigateBookTransHeader('last');
+    lastBookTransHeader = async () => {
+        await this.saveAndNavigateBookTransHeader('last');
     }
 
     undoChanges = () => {

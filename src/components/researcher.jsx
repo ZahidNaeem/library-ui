@@ -197,16 +197,16 @@ class Researcher extends Component {
         await this.saveAndNavigateResearcher('first');
     }
 
-    previousResearcher = () => {
-        this.saveAndNavigateResearcher('previous');
+    previousResearcher = async () => {
+        await this.saveAndNavigateResearcher('previous');
     }
 
-    nextResearcher = () => {
-        this.saveAndNavigateResearcher('next');
+    nextResearcher = async () => {
+        await this.saveAndNavigateResearcher('next');
     }
 
-    lastResearcher = () => {
-        this.saveAndNavigateResearcher('last');
+    lastResearcher = async () => {
+        await this.saveAndNavigateResearcher('last');
     }
 
     undoChanges = () => {

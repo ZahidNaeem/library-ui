@@ -214,16 +214,16 @@ class Shelf extends Component {
         await this.saveAndNavigateShelf('first');
     }
 
-    previousShelf = () => {
-        this.saveAndNavigateShelf('previous');
+    previousShelf = async () => {
+        await this.saveAndNavigateShelf('previous');
     }
 
-    nextShelf = () => {
-        this.saveAndNavigateShelf('next');
+    nextShelf = async () => {
+        await this.saveAndNavigateShelf('next');
     }
 
-    lastShelf = () => {
-        this.saveAndNavigateShelf('last');
+    lastShelf = async () => {
+        await this.saveAndNavigateShelf('last');
     }
 
     undoChanges = () => {

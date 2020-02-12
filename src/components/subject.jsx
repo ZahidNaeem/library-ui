@@ -227,16 +227,16 @@ class Subject extends Component {
         await this.saveAndNavigateSubject('first');
     }
 
-    previousSubject = () => {
-        this.saveAndNavigateSubject('previous');
+    previousSubject = async () => {
+        await this.saveAndNavigateSubject('previous');
     }
 
-    nextSubject = () => {
-        this.saveAndNavigateSubject('next');
+    nextSubject = async () => {
+        await this.saveAndNavigateSubject('next');
     }
 
-    lastSubject = () => {
-        this.saveAndNavigateSubject('last');
+    lastSubject = async () => {
+        await this.saveAndNavigateSubject('last');
     }
 
     undoChanges = () => {

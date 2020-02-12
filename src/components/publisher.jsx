@@ -198,16 +198,16 @@ class Publisher extends Component {
         await this.saveAndNavigatePublisher('first');
     }
 
-    previousPublisher = () => {
-        this.saveAndNavigatePublisher('previous');
+    previousPublisher = async () => {
+        await this.saveAndNavigatePublisher('previous');
     }
 
-    nextPublisher = () => {
-        this.saveAndNavigatePublisher('next');
+    nextPublisher = async () => {
+        await this.saveAndNavigatePublisher('next');
     }
 
-    lastPublisher = () => {
-        this.saveAndNavigatePublisher('last');
+    lastPublisher = async () => {
+        await this.saveAndNavigatePublisher('last');
     }
 
     undoChanges = () => {
