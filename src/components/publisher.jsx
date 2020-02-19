@@ -287,7 +287,8 @@ class Publisher extends Component {
 
 
     render() {
-        const { publisher,
+        const {
+            publisher,
             navigationDtl,
             fieldsDisabled,
             addButtonDisabled,

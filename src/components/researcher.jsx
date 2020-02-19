@@ -286,7 +286,8 @@ class Researcher extends Component {
 
 
     render() {
-        const { researcher,
+        const {
+            researcher,
             navigationDtl,
             fieldsDisabled,
             addButtonDisabled,

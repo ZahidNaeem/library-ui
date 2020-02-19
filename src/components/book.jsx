@@ -1,12 +1,15 @@
-import React, { Component } from 'react';
-import { InputGroup, FormControl, Button, ButtonToolbar, Form } from 'react-bootstrap'
+import React, {Component} from 'react';
+import {InputGroup, FormControl, Button, ButtonToolbar, Form} from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
-import { toast } from 'react-toastify'
+import {toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
 import ToggleGroup from './common/toggleGroup'
-import { request, getCurrentUser } from './util/APIUtils'
+import {request, getCurrentUser} from './util/APIUtils'
+import Volume from './volume'
+import {ExportCSV} from './common/ExportCSV'
+import {CSVLink, CSVDownload} from "react-csv"
 import {
     API_BOOK_URL,
     API_AUTHOR_URL,
@@ -23,13 +26,14 @@ import {
     BUTTON_ADD,
     BUTTON_DELETE,
     BUTTON_SAVE,
-    BUTTON_UNDO
+    BUTTON_UNDO,
+    BUTTON_SEARCH,
+    BUTTON_EXECUTE
 } from './constant'
-import Volume from './volume';
 
 const bookConditions = [
-    { value: 'New', label: 'New' },
-    { value: 'Old', label: 'Old' }
+    {value: 'New', label: 'New'},
+    {value: 'Old', label: 'Old'}
 ]
 
 class Book extends Component {
@@ -46,7 +50,8 @@ class Book extends Component {
         addButtonDisabled: true,
         deleteButtonDisabled: true,
         saveButtonDisabled: true,
-        undoButtonDisabled: true
+        undoButtonDisabled: true,
+        isSearching: false
     }
 
     async componentDidMount() {
@@ -58,7 +63,7 @@ class Book extends Component {
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
-        this.setState({ addButtonDisabled: !canAdd, fieldsDisabled: !canEdit, deleteButtonDisabled: !canDelete });
+        this.setState({addButtonDisabled: !canAdd, fieldsDisabled: !canEdit, deleteButtonDisabled: !canDelete});
     }
 
     getCurrentUser = async () => {
@@ -71,27 +76,42 @@ class Book extends Component {
         }
     }
 
+    findAll = async () => {
+        const options = {
+            url: API_BOOK_URL,
+            method: 'GET'
+        };
+        try {
+            const res = await request(options);
+            console.log("Type:", Object.prototype.toString.call(res.data.entity));
+            const books = [...res.data.entity];
+            return books;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     handleBookChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         console.log("Target name", name);
         console.log("Target value", value);
-        const book = { ...this.state.book };
+        const book = {...this.state.book};
         book[name] = name === 'bookName' ? value.toUpperCase() : name === 'purchased' ? parseInt(value) : value;
-        this.setState({ book });
+        this.setState({book});
         this.enableSaveUndoButton();
     }
 
     handleSelectChange = (name, value) => {
         console.log("handleSelectChange name", name);
         console.log("handleSelectChange value", value);
-        const { book } = this.state;
+        const {book} = this.state;
         book[name] = value;
-        this.setState({ book });
+        this.setState({book});
         this.enableSaveUndoButton();
     }
 
     validateForm = () => {
-        const { book } = this.state;
+        const {book} = this.state;
         let validateBook = !(book.bookName === undefined || book.bookName === null || book.bookName === '');
         if (validateBook === true) {
             if (book.volumes !== undefined && book.volumes !== null) {
@@ -104,12 +124,12 @@ class Book extends Component {
 
     enableSaveUndoButton = () => {
         const saveButtonDisabled = !this.validateForm();
-        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({saveButtonDisabled, undoButtonDisabled: false});
     }
 
-    // disableAddButton = (boolean) => {
-    //     this.setState({ addButtonDisabled: boolean });
-    // }
+    disableAddButton = (boolean) => {
+        this.setState({addButtonDisabled: boolean});
+    }
 
     /* handleComboboxChange = (value, name) => {
         let book = { ...this.state.book };
@@ -126,17 +146,17 @@ class Book extends Component {
     addBook = () => {
         const book = {};
         // book.volumes = [];
-        this.setState({ book, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
+        this.setState({book, navigationDtl: {first: true, last: true}, undoButtonDisabled: false});
         // this.disableAddButton(true);
     }
 
     addVolumeIntoBook = (volumes) => {
-        let book = { ...this.state.book };
+        let book = {...this.state.book};
         // volumes.map(volume => {
         //     volume['book'] = book.bookId;
         // });
         book.volumes = volumes;
-        this.setState({ book });
+        this.setState({book});
     }
 
     saveBook = async () => {
@@ -154,12 +174,11 @@ class Book extends Component {
                 const res = await request(options);
 
                 console.log("Post: Object received: ", res.data.entity);
-                const { book, navigationDtl } = res.data.entity;
-                this.setState({ book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                const {book, navigationDtl} = res.data.entity;
+                this.setState({book, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true});
                 this.disableAddButton(false);
                 saveResponse = res.data;
-            }
-            catch (error) {
+            } catch (error) {
                 saveResponse = error.response.data;
             }
         }
@@ -181,7 +200,7 @@ class Book extends Component {
     }
 
     deleteBook = async () => {
-        const book = { ...this.state.book };
+        const book = {...this.state.book};
         if (book.bookId !== undefined && book.bookId !== null) {
             console.log("Delete: Book ID sent: ", book.bookId);
             const options = {
@@ -192,8 +211,8 @@ class Book extends Component {
                 const res = await request(options);
 
                 console.log("Delete: Response: ", res);
-                const { book, navigationDtl } = res.data.entity;
-                this.setState({ book, navigationDtl, saveButtonDisabled: true });
+                const {book, navigationDtl} = res.data.entity;
+                this.setState({book, navigationDtl, saveButtonDisabled: true});
             } catch (error) {
                 console.log(error);
                 toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
@@ -215,8 +234,8 @@ class Book extends Component {
         try {
             const res = await request(options);
 
-            const { book, navigationDtl } = res.data.entity;
-            this.setState({ book, navigationDtl })
+            const {book, navigationDtl} = res.data.entity;
+            this.setState({book, navigationDtl})
             console.log(this.state.book);
         } catch (error) {
             console.log(error);
@@ -224,7 +243,7 @@ class Book extends Component {
     }
 
     saveAndNavigateBook = async (operation) => {
-        const { saveButtonDisabled } = this.state;
+        const {saveButtonDisabled} = this.state;
         if (!saveButtonDisabled) {
             try {
                 await this.saveBook();
@@ -235,6 +254,28 @@ class Book extends Component {
         } else {
             this.navigateBook(operation);
         }
+    }
+
+    searchBook = async () => {
+        let isSearching = this.state.isSearching;
+        if (isSearching === false) {
+            this.setState({book: {}});
+        } else {
+            const options = {
+                url: API_BOOK_URL + 'search',
+                method: 'POST',
+                data: this.state.book
+            };
+            try {
+                const res = await request(options);
+                await this.navigateBook('first');
+                console.log("Book Search Result", res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        isSearching = !this.state.isSearching;
+        this.setState({isSearching});
     }
 
     firstBook = async () => {
@@ -254,17 +295,17 @@ class Book extends Component {
     }
 
     undoChanges = () => {
-        const book = { ...this.state.book };
+        const book = {...this.state.book};
         console.log("Book ID: ", book.bookId);
-        this.setState({ saveButtonDisabled: true });
+        this.setState({saveButtonDisabled: true});
         if (book.bookId != null) {
             const operation = book.bookId;
             this.navigateBook(operation);
         } else {
             this.firstBook();
         }
-        this.setState({ undoButtonDisabled: true });
-        // this.disableAddButton(false);
+        this.setState({undoButtonDisabled: true});
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -323,7 +364,7 @@ class Book extends Component {
         } catch (error) {
             console.log(error);
         }
-        this.setState({ authors });
+        this.setState({authors});
     }
 
     async populateSubjects() {
@@ -347,7 +388,7 @@ class Book extends Component {
         } catch (error) {
             console.log(error);
         }
-        this.setState({ subjects });
+        this.setState({subjects});
     }
 
     async populatePublishers() {
@@ -371,7 +412,7 @@ class Book extends Component {
         } catch (error) {
             console.log(error);
         }
-        this.setState({ publishers });
+        this.setState({publishers});
     }
 
     async populateResearchers() {
@@ -395,16 +436,50 @@ class Book extends Component {
         } catch (error) {
             console.log(error);
         }
-        this.setState({ researchers });
+        this.setState({researchers});
+    }
+
+    exportToExcel = async () => {
+        const rows = await this.findAll();
+        console.log("Rows", rows)
+        let csvContent = "data:text/csv;charset=utf-8,"
+            + Object.keys(rows).map((key, index) => rows[key]).join(',');
+        // + rows.map(e => e.join(",")).join("\n");
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link); // Required for FF
+        link.click();
     }
 
     render() {
-        const { book, navigationDtl, authors, subjects, publishers, researchers, fieldsDisabled, addButtonDisabled, deleteButtonDisabled, saveButtonDisabled, undoButtonDisabled } = this.state;
+        const {
+            book,
+            navigationDtl,
+            authors,
+            subjects,
+            publishers,
+            researchers,
+            fieldsDisabled,
+            addButtonDisabled,
+            deleteButtonDisabled,
+            saveButtonDisabled,
+            undoButtonDisabled,
+            isSearching
+        } = this.state;
+
+        const data = this.findAll();
+        // [
+        //     { firstname: "Ahmed", lastname: "Tomi", email: "ah@smthing.co.com" },
+        //     { firstname: "Raed", lastname: "Labes", email: "rl@smthing.co.com" },
+        //     { firstname: "Yezzi", lastname: "Min l3b", email: "ymin@cocococo.com" }
+        // ];
 
         const items = [
-            { value: parseInt("1"), label: "Purchased", disabled: fieldsDisabled },
-            { value: parseInt("0"), label: "Gifted", disabled: fieldsDisabled },
-            { value: parseInt("2"), label: "Other", disabled: fieldsDisabled }
+            {value: parseInt("1"), label: "Purchased", disabled: fieldsDisabled},
+            {value: parseInt("0"), label: "Gifted", disabled: fieldsDisabled},
+            {value: parseInt("2"), label: "Other", disabled: fieldsDisabled}
         ]
 
         return (
@@ -613,7 +688,7 @@ class Book extends Component {
                         <Button
                             variant="primary"
                             disabled={deleteButtonDisabled}
-                            onClick={() => this.setState({ bookAlert: true })}
+                            onClick={() => this.setState({bookAlert: true})}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                         </Button>
@@ -628,10 +703,10 @@ class Book extends Component {
                             title="Delete Confirmation"
                             Text="Are you sure you want to delete this book?"
                             onConfirm={() => this.deleteBook()}
-                            onCancel={() => this.setState({ bookAlert: false })}
+                            onCancel={() => this.setState({bookAlert: false})}
                         >
                             Delete Book
-                                </SweetAlert>
+                        </SweetAlert>
 
                         <Button
                             variant="primary"
@@ -648,6 +723,25 @@ class Book extends Component {
                             disabled={undoButtonDisabled}
                             active>{BUTTON_UNDO}
                         </Button>
+                    </ButtonToolbar>
+                    <ButtonToolbar className="mb-2">
+                        <Button
+                            variant="primary"
+                            // disabled={addButtonDisabled}
+                            onClick={this.searchBook}
+                            className="ml-1" style={SMALL_BUTTON_STYLE}
+                            active>{isSearching === false ? BUTTON_SEARCH : BUTTON_EXECUTE}
+                        </Button>
+                        <Button
+                            onClick={this.exportToExcel}
+                            active>
+                            Download
+                        </Button>
+                        {/*<div className="col-md-4 center">*/}
+                        {/*    <CSVLink data={data}>*/}
+                        {/*        Download me*/}
+                        {/*    </CSVLink>*/}
+                        {/*</div>*/}
                     </ButtonToolbar>
                     <Volume
                         book={book}

@@ -6,7 +6,6 @@ import FormItem from 'antd/lib/form/FormItem';
 import Popup from './common/popup';
 import Modal from './popup/model';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 class Login extends Component {
     constructor(props) {
@@ -109,7 +108,7 @@ class Login extends Component {
             closeButtonTitle="Close Button"
         />) : null;
 
-        const showRegisterPopup = () => this.showRegisterPopup(true);
+        // const showRegisterPopup = () => this.showRegisterPopup(true);
 
         return (<>
             <div className="bg-gradient-primary"

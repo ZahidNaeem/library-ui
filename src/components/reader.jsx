@@ -286,7 +286,8 @@ class Reader extends Component {
 
 
     render() {
-        const { reader,
+        const {
+            reader,
             navigationDtl,
             fieldsDisabled,
             addButtonDisabled,

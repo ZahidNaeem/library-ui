@@ -303,7 +303,8 @@ class Shelf extends Component {
 
 
     render() {
-        const { shelf,
+        const {
+            shelf,
             navigationDtl,
             fieldsDisabled,
             addButtonDisabled,

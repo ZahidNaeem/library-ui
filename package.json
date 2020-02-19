@@ -7,6 +7,7 @@
     "antd": "^3.26.7",
     "axios": "^0.19.1",
     "bootstrap": "^4.4.1",
+    "file-saver": "^2.0.2",
     "http-status-codes": "^1.4.0",
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
@@ -19,7 +20,8 @@
     "react-select": "^3.0.8",
     "react-table": "^7.0.0-rc.15",
     "react-toastify": "^5.5.0",
-    "react-widgets": "^4.4.11"
+    "react-widgets": "^4.4.11",
+    "xlsx": "^0.15.5"
   },
   "scripts": {
     "start": "react-scripts start",

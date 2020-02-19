@@ -385,7 +385,8 @@ class Subject extends Component {
     }
 
     render() {
-        const { subject,
+        const {
+            subject,
             navigationDtl,
             fieldsDisabled,
             addButtonDisabled,
