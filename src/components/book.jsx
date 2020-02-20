@@ -8,8 +8,8 @@ import MySelect from './common/select'
 import ToggleGroup from './common/toggleGroup'
 import {request, getCurrentUser} from './util/APIUtils'
 import Volume from './volume'
-import {ExportCSV} from './common/ExportCSV'
-import {CSVLink, CSVDownload} from "react-csv"
+// import {ExportCSV} from './common/ExportCSV'
+// import {CSVLink, CSVDownload} from "react-csv"
 import {
     API_BOOK_URL,
     API_AUTHOR_URL,
@@ -78,12 +78,11 @@ class Book extends Component {
 
     findAll = async () => {
         const options = {
-            url: API_BOOK_URL,
+            url: API_BOOK_URL + "excel/data",
             method: 'GET'
         };
         try {
             const res = await request(options);
-            console.log("Type:", Object.prototype.toString.call(res.data.entity));
             const books = [...res.data.entity];
             return books;
         } catch (error) {
@@ -439,18 +438,48 @@ class Book extends Component {
         this.setState({researchers});
     }
 
+    // exportToExcel = async () => {
+    //     const rows = await this.findAll();
+    //     console.log("Rows", rows);
+    //     let csvContent = "data:text/csv;charset=utf-8,"
+    //         + Object.keys(rows).map((key, index) => Object.values(rows[key]).map(value => value).join(',')).join('\n');
+    //     // + rows.map(e => e.join(",")).join("\n");
+    //     var encodedUri = encodeURI(csvContent);
+    //     var link = document.createElement("a");
+    //     link.setAttribute("href", encodedUri);
+    //     link.setAttribute("download", "my_data.csv");
+    //     document.body.appendChild(link); // Required for FF
+    //     link.click();
+    // }
+
     exportToExcel = async () => {
-        const rows = await this.findAll();
-        console.log("Rows", rows)
-        let csvContent = "data:text/csv;charset=utf-8,"
-            + Object.keys(rows).map((key, index) => rows[key]).join(',');
-        // + rows.map(e => e.join(",")).join("\n");
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "my_data.csv");
-        document.body.appendChild(link); // Required for FF
-        link.click();
+        const data = await this.findAll();
+        console.log("Rows", data);
+        {
+            var table = "<head><meta charset='UTF-8'></head><table><thead><tr><td>";
+            var head = Object.keys(data[0]);
+            for(var i=0;i<head.length;i++){
+                table += head[i]+"</td><td>";
+            }
+            table += "</td></tr></thead><tbody>";
+            for(var i=0;i<data.length;i++){
+                table += "<tr>";
+                for(var j=0;j<head.length;j++){
+                    table += "<td>"+data[i][head[j]]+"</td>";
+                }
+                table += "</tr>";
+            }
+            table += "</tbody></table>";
+            var uri = 'data:application/vnd.ms-excel;charset=utf-8,'+ table;
+
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = "data.xlsx";
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
     }
 
     render() {
@@ -468,8 +497,6 @@ class Book extends Component {
             undoButtonDisabled,
             isSearching
         } = this.state;
-
-        const data = this.findAll();
         // [
         //     { firstname: "Ahmed", lastname: "Tomi", email: "ah@smthing.co.com" },
         //     { firstname: "Raed", lastname: "Labes", email: "rl@smthing.co.com" },
