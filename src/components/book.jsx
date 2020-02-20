@@ -6,8 +6,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
 import ToggleGroup from './common/toggleGroup'
-import {request, getCurrentUser} from './util/APIUtils'
+import {request, getCurrentUser, exportToCSV} from './util/APIUtils'
 import Volume from './volume'
+import * as XLSX from "xlsx";
+import * as FileSaver from "file-saver";
 // import {ExportCSV} from './common/ExportCSV'
 // import {CSVLink, CSVDownload} from "react-csv"
 import {
@@ -452,34 +454,50 @@ class Book extends Component {
     //     link.click();
     // }
 
+    // exportToExcel = async () => {
+    //     const data = await this.findAll();
+    //     console.log("Rows", data);
+    //     {
+    //         var table = "<head><meta charset='UTF-8'></head><table><thead><tr><td>";
+    //         var head = Object.keys(data[0]);
+    //         for(var i=0;i<head.length;i++){
+    //             table += head[i]+"</td><td>";
+    //         }
+    //         table += "</td></tr></thead><tbody>";
+    //         for(var i=0;i<data.length;i++){
+    //             table += "<tr>";
+    //             for(var j=0;j<head.length;j++){
+    //                 table += "<td>"+data[i][head[j]]+"</td>";
+    //             }
+    //             table += "</tr>";
+    //         }
+    //         table += "</tbody></table>";
+    //         var uri = 'data:application/vnd.ms-excel;charset=utf-8,'+ table;
+    //
+    //         var downloadLink = document.createElement("a");
+    //         downloadLink.href = uri;
+    //         downloadLink.download = "data.xls";
+    //
+    //         document.body.appendChild(downloadLink);
+    //         downloadLink.click();
+    //         document.body.removeChild(downloadLink);
+    //     }
+    // }
+
+    // exportToCSV = (csvData, fileName, sheetName) => {
+    //     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    //     const fileExtension = '.xlsx';
+    //     const ws = XLSX.utils.json_to_sheet(csvData);
+    //     const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    //     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    //     const data = new Blob([excelBuffer], {type: fileType});
+    //     FileSaver.saveAs(data, fileName + fileExtension);
+    // }
+
     exportToExcel = async () => {
-        const data = await this.findAll();
-        console.log("Rows", data);
-        {
-            var table = "<head><meta charset='UTF-8'></head><table><thead><tr><td>";
-            var head = Object.keys(data[0]);
-            for(var i=0;i<head.length;i++){
-                table += head[i]+"</td><td>";
-            }
-            table += "</td></tr></thead><tbody>";
-            for(var i=0;i<data.length;i++){
-                table += "<tr>";
-                for(var j=0;j<head.length;j++){
-                    table += "<td>"+data[i][head[j]]+"</td>";
-                }
-                table += "</tr>";
-            }
-            table += "</tbody></table>";
-            var uri = 'data:application/vnd.ms-excel;charset=utf-8,'+ table;
-
-            var downloadLink = document.createElement("a");
-            downloadLink.href = uri;
-            downloadLink.download = "data.xlsx";
-
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }
+        const csvData = await this.findAll();
+        console.log("Rows", csvData);
+        exportToCSV(csvData, "Book");
     }
 
     render() {
@@ -762,7 +780,7 @@ class Book extends Component {
                         <Button
                             onClick={this.exportToExcel}
                             active>
-                            Download
+                            Excel
                         </Button>
                         {/*<div className="col-md-4 center">*/}
                         {/*    <CSVLink data={data}>*/}

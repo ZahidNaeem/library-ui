@@ -1,9 +1,12 @@
-import { API_BASE_URL, ACCESS_TOKEN } from '../constant';
+import {API_BASE_URL, ACCESS_TOKEN} from '../constant';
 import axios from 'axios';
-import HttpStatus from 'http-status-codes';
+import * as XLSX from "xlsx";
+import * as FileSaver from "file-saver";
+
+// import HttpStatus from 'http-status-codes';
 
 export async function request(options) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = {'Content-Type': 'application/json'};
 
     const accessToken = retrieveDataFromLocalStorage(ACCESS_TOKEN);
     if (accessToken) {
@@ -12,7 +15,7 @@ export async function request(options) {
 
     }
 
-    const defaults = { headers };
+    const defaults = {headers};
     options = Object.assign({}, defaults, options);
     console.log("Options:", options);
 
@@ -139,7 +142,7 @@ export function removeDataFromLocalStorage(key) {
         console.log("Error removing data from localStorage", error);
         return false;
     }
-};
+}
 
 export function clearLocalStorage() {
     try {
@@ -150,8 +153,18 @@ export function clearLocalStorage() {
         console.log("Error clearing localStorage", error);
         return false;
     }
-};
+}
 
 export function generateUniqueId() {
     return new Date().valueOf() + Math.floor(Math.random() * 10);
-};
+}
+
+export function exportToCSV(csvData, fileName) {
+    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const fileExtension = '.xlsx';
+    const ws = XLSX.utils.json_to_sheet(csvData);
+    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+    const data = new Blob([excelBuffer], {type: fileType});
+    FileSaver.saveAs(data, fileName + fileExtension);
+}
