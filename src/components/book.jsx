@@ -8,10 +8,6 @@ import MySelect from './common/select'
 import ToggleGroup from './common/toggleGroup'
 import {request, getCurrentUser, exportToCSV} from './util/APIUtils'
 import Volume from './volume'
-import * as XLSX from "xlsx";
-import * as FileSaver from "file-saver";
-// import {ExportCSV} from './common/ExportCSV'
-// import {CSVLink, CSVDownload} from "react-csv"
 import {
     API_BOOK_URL,
     API_AUTHOR_URL,
