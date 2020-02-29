@@ -159,11 +159,18 @@ export function generateUniqueId() {
     return new Date().valueOf() + Math.floor(Math.random() * 10);
 }
 
-export function exportToCSV(csvData, fileName) {
+export function exportToExcel(excelData, fileName, title) {
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const fileExtension = '.xlsx';
-    const ws = XLSX.utils.json_to_sheet(csvData);
-    const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    /* To assign a new value, set the `v` key and clobber the old formatted text */
+    for (var i = 0; i < title.length; i++) {
+        const indx = String.fromCharCode(65 + i) + "1";
+        if (ws[indx] !== undefined || ws[indx] !== null) {
+            ws[indx].v = title[i];
+        }
+    }
+    const wb = {Sheets: {'data': ws}, SheetNames: ['data']};
     const excelBuffer = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
     const data = new Blob([excelBuffer], {type: fileType});
     FileSaver.saveAs(data, fileName + fileExtension);

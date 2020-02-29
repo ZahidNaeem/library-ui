@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
 import ToggleGroup from './common/toggleGroup'
-import {request, getCurrentUser, exportToCSV} from './util/APIUtils'
+import {request, getCurrentUser, exportToExcel} from './util/APIUtils'
 import Volume from './volume'
 import {
     API_BOOK_URL,
@@ -491,9 +491,20 @@ class Book extends Component {
     // }
 
     exportToExcel = async () => {
-        const csvData = await this.findAll();
-        console.log("Rows", csvData);
-        exportToCSV(csvData, "Book");
+        const excelData = await this.findAll();
+        const title = [
+            'Book Name',
+            'Publication Date',
+            'Condition',
+            'Status',
+            'Author',
+            'Subject',
+            'Publisher',
+            'Researcher',
+            'Remarks',
+            'Volumes'
+        ];
+        exportToExcel(excelData, "Book", title);
     }
 
     render() {
