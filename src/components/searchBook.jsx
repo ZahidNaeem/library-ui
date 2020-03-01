@@ -82,8 +82,7 @@ class SearchBook extends Component {
                 res.data.entity.forEach(element => {
                     authors.push({
                         value: element.authorId,
-                        label: element.authorName,
-                        parent: element.parentAuthorId
+                        label: element.authorName
                     });
                 });
             console.log("Authors:", authors);
@@ -107,8 +106,7 @@ class SearchBook extends Component {
                 res.data.entity.forEach(element => {
                     publishers.push({
                         value: element.publisherId,
-                        label: element.publisherName,
-                        parent: element.parentPublisherId
+                        label: element.publisherName
                     });
                 });
             console.log("Publishers:", publishers);
@@ -132,8 +130,7 @@ class SearchBook extends Component {
                 res.data.entity.forEach(element => {
                     researchers.push({
                         value: element.researcherId,
-                        label: element.researcherName,
-                        parent: element.parentResearcherId
+                        label: element.researcherName
                     });
                 });
             console.log("Researchers:", researchers);

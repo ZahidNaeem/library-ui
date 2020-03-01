@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import { InputGroup, FormControl, Button, ButtonToolbar, Form } from 'react-bootstrap'
+import React, {Component} from 'react';
+import {InputGroup, FormControl, Button, ButtonToolbar, Form} from 'react-bootstrap'
 import SweetAlert from 'react-bootstrap-sweetalert'
-import { toast } from 'react-toastify'
+import {toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-widgets/dist/css/react-widgets.css'
 import MySelect from './common/select'
-import { request, getCurrentUser, generateUniqueId } from './util/APIUtils'
+import {request, getCurrentUser, generateUniqueId} from './util/APIUtils'
 import {
     API_BOOK_TRANS_HEADER_URL,
     API_READER_URL,
@@ -29,13 +29,12 @@ class BookTransHeaderReceipt extends Component {
 
     state = {
         bookTransHeader: {
-            transType: 'ISSUE'
+            transType: 'RECEIPT'
         },
         navigationDtl: {},
         bookTransHeaderAlert: false,
         readers: [],
         books: [],
-        volumes: [],
         fieldsDisabled: true,
         addButtonDisabled: true,
         deleteButtonDisabled: true,
@@ -46,12 +45,12 @@ class BookTransHeaderReceipt extends Component {
     async componentDidMount() {
         await this.populateReaders();
         await this.populateBooks();
-        await this.populateVolumes();
+        // await this.populateVolumes();
         await this.firstBookTransHeader();
         const canAdd = await this.canAdd();
         const canEdit = await this.canEdit();
         const canDelete = await this.canDelete();
-        this.setState({ addButtonDisabled: !canAdd, fieldsDisabled: !canEdit, deleteButtonDisabled: !canDelete });
+        this.setState({addButtonDisabled: !canAdd, fieldsDisabled: !canEdit, deleteButtonDisabled: !canDelete});
     }
 
     getCurrentUser = async () => {
@@ -66,33 +65,35 @@ class BookTransHeaderReceipt extends Component {
     }
 
     handleBookTransHeaderChange = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         console.log("Target name", name);
         console.log("Target value", value);
-        const { bookTransHeader } = this.state;
+        const {bookTransHeader} = this.state;
         bookTransHeader[name] = value;
-        this.setState({ bookTransHeader });
+        this.setState({bookTransHeader});
         this.enableSaveUndoButton();
     }
 
     handleSelectChange = (name, value) => {
         console.log("handleSelectChange name", name);
         console.log("handleSelectChange value", value);
-        const { bookTransHeader } = this.state;
+        const {bookTransHeader} = this.state;
         bookTransHeader[name] = value;
-        this.setState({ bookTransHeader });
+        this.setState({bookTransHeader});
         this.enableSaveUndoButton();
     }
 
-    handleBookChange = (name, value) => {
-        console.log("handleSelectChange name", name);
-        console.log("handleSelectChange value", value);
-        const volumes = [...this.state.volumes];
+    handleSelectBookChange = (name, value) => {
+        console.log("handleSelectBookChange name", name);
+        console.log("handleSelectBookChange value", value);
+        const books = [...this.state.books];
+        const filteredBook = books.filter(book => book.value === value);
+        console.log("filteredBook", filteredBook);
+        const filteredVolumes = [...filteredBook[0].volumes];
+        // const filteredVolumes = volumes.filter(volume => volume.bookId === value);
+        console.log("Filtered Volumess", filteredVolumes);
 
-        const filteredVolumes = volumes.filter(volume => volume.bookId === value);
-        console.log("Filtered Volumes", filteredVolumes);
-
-        const { bookTransHeader } = this.state;
+        const {bookTransHeader} = this.state;
         if (bookTransHeader.bookTransLines === undefined || bookTransHeader.bookTransLines === null) {
             bookTransHeader.bookTransLines = [];
         }
@@ -101,19 +102,15 @@ class BookTransHeaderReceipt extends Component {
             const randomId = generateUniqueId();
             bookTransHeader.bookTransLines.push({
                 rowKey: randomId,
-                volume: volume.volumeId,
-                bookId: volume.bookId,
-                volumeName: volume.volumeName,
-                bookName: volume.bookName,
-                rackName: volume.rackName,
-                remarks: volume.remarks
+                book: volume.book,
+                volume: volume.volumeId
             });
         });
-        this.setState({ bookTransHeader });
+        this.setState({bookTransHeader});
     }
 
     validateForm = () => {
-        const { bookTransHeader } = this.state;
+        const {bookTransHeader} = this.state;
 
         let validateBookTrans = !(
             bookTransHeader.transDate === undefined || bookTransHeader.transDate === null || bookTransHeader.transDate === '' ||
@@ -131,12 +128,12 @@ class BookTransHeaderReceipt extends Component {
 
     enableSaveUndoButton = () => {
         const saveButtonDisabled = !this.validateForm();
-        this.setState({ saveButtonDisabled, undoButtonDisabled: false });
+        this.setState({saveButtonDisabled, undoButtonDisabled: false});
     }
 
-    // disableAddButton = (boolean) => {
-    //     this.setState({ addButtonDisabled: boolean });
-    // }
+    disableAddButton = (boolean) => {
+        this.setState({ addButtonDisabled: boolean });
+    }
 
     /* handleComboboxChange = (value, name) => {
         let bookTransHeader = { ...this.state.bookTransHeader };
@@ -151,19 +148,21 @@ class BookTransHeaderReceipt extends Component {
     } */
 
     addBookTransHeader = () => {
-        const bookTransHeader = { transType: 'ISSUE' };
+        const bookTransHeader = {transType: 'ISSUE'};
         // bookTransHeader.bookTransLines = [];
-        this.setState({ bookTransHeader, navigationDtl: { first: true, last: true }, undoButtonDisabled: false });
-        // this.disableAddButton(true);
+        this.setState({bookTransHeader, navigationDtl: {first: true, last: true}, undoButtonDisabled: false});
+        this.disableAddButton(true);
     }
 
     addBookTransLineIntoBookTransHeader = (bookTransLines) => {
-        let bookTransHeader = { ...this.state.bookTransHeader };
+        let bookTransHeader = {...this.state.bookTransHeader};
         // bookTransLines.map(bookTransLine => {
         //     bookTransLine['bookTransHeader'] = bookTransHeader.headerId;
         // });
         bookTransHeader.bookTransLines = bookTransLines;
-        this.setState({ bookTransHeader }, () => { console.log("bookTransHeader", bookTransHeader) });
+        this.setState({bookTransHeader}, () => {
+            console.log("bookTransHeader", bookTransHeader)
+        });
     }
 
     saveBookTransHeader = async () => {
@@ -181,8 +180,8 @@ class BookTransHeaderReceipt extends Component {
                 const res = await request(options);
 
                 console.log("Post: Object received: ", res.data.entity);
-                const { bookTransHeader, navigationDtl } = res.data.entity;
-                this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true });
+                const {bookTransHeader, navigationDtl} = res.data.entity;
+                this.setState({bookTransHeader, navigationDtl, saveButtonDisabled: true, undoButtonDisabled: true});
                 this.disableAddButton(false);
                 saveResponse = res.data;
             } catch (error) {
@@ -208,7 +207,7 @@ class BookTransHeaderReceipt extends Component {
     }
 
     deleteBookTransHeader = async () => {
-        const bookTransHeader = { ...this.state.bookTransHeader };
+        const bookTransHeader = {...this.state.bookTransHeader};
         if (bookTransHeader.headerId !== undefined && bookTransHeader.headerId !== null) {
             console.log("Delete: BookTransHeader ID sent: ", bookTransHeader.headerId);
             const options = {
@@ -219,8 +218,8 @@ class BookTransHeaderReceipt extends Component {
                 const res = await request(options);
 
                 console.log("Delete: Response: ", res);
-                const { bookTransHeader, navigationDtl } = res.data.entity;
-                this.setState({ bookTransHeader, navigationDtl, saveButtonDisabled: true });
+                const {bookTransHeader, navigationDtl} = res.data.entity;
+                this.setState({bookTransHeader, navigationDtl, saveButtonDisabled: true});
             } catch (error) {
                 console.log(error);
                 toast.error(error.response.data.message || 'Sorry! Something went wrong. Please try again or contact administrator.');
@@ -243,9 +242,9 @@ class BookTransHeaderReceipt extends Component {
         try {
             const res = await request(options);
 
-            const bookTransHeader = res.data.entity.bookTransHeader.transType !== null ? { ...res.data.entity.bookTransHeader } : { ...this.state.bookTransHeader };
-            const { navigationDtl } = res.data.entity;
-            this.setState({ bookTransHeader, navigationDtl });
+            const bookTransHeader = res.data.entity.bookTransHeader.transType !== null ? {...res.data.entity.bookTransHeader} : {...this.state.bookTransHeader};
+            const {navigationDtl} = res.data.entity;
+            this.setState({bookTransHeader, navigationDtl});
             console.log(this.state.bookTransHeader);
         } catch (error) {
             console.log(error);
@@ -253,7 +252,7 @@ class BookTransHeaderReceipt extends Component {
     }
 
     saveAndNavigateBookTransHeader = async (operation) => {
-        const { saveButtonDisabled } = this.state;
+        const {saveButtonDisabled} = this.state;
         if (!saveButtonDisabled) {
             try {
                 await this.saveBookTransHeader();
@@ -283,17 +282,17 @@ class BookTransHeaderReceipt extends Component {
     }
 
     undoChanges = () => {
-        const bookTransHeader = { ...this.state.bookTransHeader };
+        const bookTransHeader = {...this.state.bookTransHeader};
         console.log("BookTransHeader ID: ", bookTransHeader.headerId);
-        this.setState({ saveButtonDisabled: true });
+        this.setState({saveButtonDisabled: true});
         if (bookTransHeader.headerId != null) {
             const operation = bookTransHeader.headerId;
             this.navigateBookTransHeader(operation);
         } else {
             this.firstBookTransHeader();
         }
-        this.setState({ undoButtonDisabled: true });
-        // this.disableAddButton(false);
+        this.setState({undoButtonDisabled: true});
+        this.disableAddButton(false);
     }
 
     userRoles = async () => {
@@ -352,7 +351,7 @@ class BookTransHeaderReceipt extends Component {
         } catch (error) {
             console.log(error);
         }
-        this.setState({ readers });
+        this.setState({readers});
     }
 
     async populateBooks() {
@@ -369,17 +368,18 @@ class BookTransHeaderReceipt extends Component {
             res.data.entity.forEach(element => {
                 books.push({
                     value: element.bookId,
-                    label: element.bookName
+                    label: element.bookName,
+                    volumes: element.volumes
                 });
             });
             console.log("Books:", books);
         } catch (error) {
             console.log(error);
         }
-        this.setState({ books });
+        this.setState({books});
     }
 
-    async populateVolumes() {
+    /*async populateVolumes() {
         console.log("Start populate volumes");
         let volumes = [];
         const options = {
@@ -395,8 +395,8 @@ class BookTransHeaderReceipt extends Component {
         } catch (error) {
             console.log(error);
         }
-        this.setState({ volumes });
-    }
+        this.setState({volumes});
+    }*/
 
     render() {
         const {
@@ -470,7 +470,7 @@ class BookTransHeaderReceipt extends Component {
                                 name="book"
                                 placeholder="Select Book"
                                 // value={bookTransHeader.reader}
-                                onChange={this.handleBookChange}
+                                onChange={this.handleSelectBookChange}
                                 disabled={fieldsDisabled}
                                 options={books}
                             />
@@ -540,7 +540,7 @@ class BookTransHeaderReceipt extends Component {
                         <Button
                             variant="primary"
                             disabled={deleteButtonDisabled}
-                            onClick={() => this.setState({ bookTransHeaderAlert: true })}
+                            onClick={() => this.setState({bookTransHeaderAlert: true})}
                             className="ml-1" style={SMALL_BUTTON_STYLE}
                             active>{BUTTON_DELETE}
                         </Button>
@@ -555,10 +555,10 @@ class BookTransHeaderReceipt extends Component {
                             title="Delete Confirmation"
                             Text="Are you sure you want to delete this bookTransHeader?"
                             onConfirm={() => this.deleteBookTransHeader()}
-                            onCancel={() => this.setState({ bookTransHeaderAlert: false })}
+                            onCancel={() => this.setState({bookTransHeaderAlert: false})}
                         >
                             Delete BookTransHeader
-                                </SweetAlert>
+                        </SweetAlert>
 
                         <Button
                             variant="primary"
