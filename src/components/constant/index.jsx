@@ -9,6 +9,8 @@ export const API_BOOK_URL = API_BASE_URL + 'books/';
 export const API_VOLUME_URL = API_BASE_URL + 'volumes/';
 export const API_READER_URL = API_BASE_URL + 'readers/';
 export const API_BOOK_TRANS_HEADER_URL = API_BASE_URL + 'bookTransHeaders/';
+export const API_BOOK_TRANS_HEADER_ISSUANCE_URL = API_BASE_URL + 'bookTransHeaders/issuance/';
+export const API_BOOK_TRANS_HEADER_RECEIPT_URL = API_BASE_URL + 'bookTransHeaders/receipt/';
 export const API_BOOK_TRANS_LINE_URL = API_BASE_URL + 'bookTransLines/';
 
 export const BUTTON_FIRST = 'الأول';
