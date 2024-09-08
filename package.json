@@ -3,25 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@trendmicro/react-modal": "^3.1.0",
-    "antd": "^3.26.7",
-    "axios": "^0.19.1",
-    "bootstrap": "^4.4.1",
-    "file-saver": "^2.0.2",
-    "http-status-codes": "^1.4.0",
-    "jquery": "^3.4.1",
-    "moment": "^2.24.0",
-    "react": "^16.12.0",
-    "react-bootstrap": "^1.0.0-beta.16",
-    "react-bootstrap-sweetalert": "^4.4.1",
-    "react-dom": "^16.12.0",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.0.1",
-    "react-select": "^3.0.8",
-    "react-table": "^7.0.0-rc.15",
-    "react-toastify": "^5.5.0",
-    "react-widgets": "^4.4.11",
-    "xlsx": "^0.15.5"
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "axios": "^1.7.4",
+    "bootstrap": "^5.3.3",
+    "lodash": "^4.17.21",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-bootstrap-typeahead": "^6.3.2",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1",
+    "react-scripts": "^5.0.1",
+    "react-toastify": "^10.0.5",
+    "web-vitals": "^4.2.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -30,7 +25,13 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "no-unused-vars": "off"
+    }
   },
   "browserslist": {
     "production": [
@@ -43,5 +44,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7"
   }
 }
