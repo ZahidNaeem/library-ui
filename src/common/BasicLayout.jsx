@@ -1,4 +1,3 @@
-
 import AddEditModal from "./AddEditModal";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
@@ -280,11 +279,11 @@ const BasicLayout = ({
         <div className="awesome-table">
           <table className="table table-stripped table-hover scrollable">
             <thead>
-              <tr key="mainPageTableHeaderRow">
-                <th key="mainPageTableHeader#" scope="col" className="short-column-center">#</th>
+              <tr>
+                <th scope="col" className="short-column-center">#</th>
                 {configurations && configurations.map((obj, index) =>
                   <th key={`${obj.tableKey}-${index}`} scope="col">
-                    <div key="mainTableFilterType" className="d-flex flex-row">
+                    <div className="d-flex flex-row">
                       {obj.filter &&
                         <div>
                           {obj.filterType === 'input' &&
@@ -316,33 +315,30 @@ const BasicLayout = ({
                     <div>{obj.title}</div>
                   </th>
                 )}
-                <th key="mainPageTableHeaderOptions" scope="col" className="short-column-center">Options</th>
+                <th scope="col" className="short-column-center">Options</th>
                 {nestedConfig.length > 0 &&
-                  <th key="mainPageTableHeaderEmpty" scope="col" className="short-column-center" />}
+                  <th scope="col" className="short-column-center" />}
               </tr>
             </thead>
-            <tbody key="mainTableBody">
+            <tbody>
               {tableData && tableData.map((row, index) =>
                 <Fragment key={row.id}>
-                  <tr key={`${row.id}${index}`}>
-                    <td key={`${row.id}${index + 1}`} className="short-column-center">{index + 1}</td>
-                    {configurations.map((obj) =>
-                      <td key={row[obj.tableKey]}>
-                        {obj.tableType === 'text' ?
-                          row[obj.tableKey]
-                          : obj.tableType === 'date' ?
-                            row[obj.tableKey] && new Date(row[obj.tableKey]).toLocaleDateString()
-                            : obj.tableType === 'checkbox' ?
-                              <div>
-                                <div className="form-check">
-                                  <input className="form-check-input" type="checkbox" disabled
-                                    value={row[obj.tableKey]} />
-                                </div>
-                              </div> : null
-                        }
+                  <tr>
+                    <td className="short-column-center">{index + 1}</td>
+                    {configurations && configurations.map((obj, index) =>
+                      <td key={`${index}-${row[obj.tableKey]}`}>
+                        {obj.tableType === 'text' && row[obj.tableKey]}
+                        {obj.tableType === 'date' && row[obj.tableKey] && new Date(row[obj.tableKey]).toLocaleDateString()}
+                        {obj.tableType === 'checkbox' &&
+                          <div>
+                            <div className="form-check">
+                              <input className="form-check-input" type="checkbox" disabled
+                                value={row[obj.tableKey]} />
+                            </div>
+                          </div>}
                       </td>
                     )}
-                    <td key="operation">
+                    <td>
                       <img src={pencilImage} alt="Edit" className="m-3 cursor-pointer"
                         onClick={() => edit(row)} />
                       <img src={trashImage} alt="Delete" className="m-1 cursor-pointer"
@@ -352,32 +348,32 @@ const BasicLayout = ({
                         }} />
                     </td>
                     {nestedConfig && nestedConfig.length > 0 &&
-                      <td key={`nestedTableColumn${row.id}`} className="short-column-center cursor-pointer">
+                      <td className="short-column-center cursor-pointer">
                         <img src={isRowExpanded(row.id) ? doubleArrowDown : doubleArrowRight} alt="details"
                           className="m-3 cursor-pointer"
                           onClick={() => toggleExpandDetails(row.id)} />
                       </td>}
                   </tr>
                   {nestedConfig.length > 0 &&
-                    <tr key={`mainPageTableBodyRowForNestedTable${row.id}`}>
-                      <td key={`nestedTable${row.id}`} colSpan="100">
+                    <tr>
+                      <td colSpan="100">
                         {isRowExpanded(row.id) &&
                           <div className="card card-body">
                             <table className="table table-stripped table-hover">
                               <thead>
-                                <tr key={`mainPageNestedTableHeaderRow${row.id}`}>
-                                  <th key={`mainPageNestedTableBody#${row.id}`} scope="col" className="short-column-center">#</th>
-                                  {nestedConfig.map((nestedObj) =>
-                                    <th key={`${nestedObj.tableKey} ${row.id}`} scope="col">{nestedObj.title}</th>
+                                <tr>
+                                  <th scope="col" className="short-column-center">#</th>
+                                  {nestedConfig && nestedConfig.map((nestedObj) =>
+                                    <th key={`${nestedObj.tableKey}-${row.id}`} scope="col">{nestedObj.title}</th>
                                   )}
                                 </tr>
                               </thead>
                               <tbody>
-                                {row[nestedField].map((nestedRow, nestedIndex) =>
+                                {row[nestedField] && row[nestedField].map((nestedRow, nestedIndex) =>
                                   <tr key={nestedRow.id}>
-                                    <td key={`${nestedIndex + 1}${nestedRow.id}`} className="short-column-center">{nestedIndex + 1}</td>
-                                    {nestedConfig.map((nestedObj) =>
-                                      <td key={`${nestedObj.tableKey}${nestedRow.id}`}>
+                                    <td className="short-column-center">{nestedIndex + 1}</td>
+                                    {nestedConfig && nestedConfig.map((nestedObj) =>
+                                      <td key={`${nestedObj.tableKey}-${nestedRow.id}`}>
                                         {nestedObj.tableType === 'text' ?
                                           nestedRow[nestedObj.tableKey]
                                           : nestedObj.tableType === 'date' ?
