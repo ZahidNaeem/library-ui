@@ -1,5 +1,5 @@
 const HOST = 'localhost';
-const PORT = '8080';
+const PORT = '8081';
 export const BASE_URL = `http://${HOST}:${PORT}/api`;
 
 export const AUTH_URL = 'auth';

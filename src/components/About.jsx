@@ -1,7 +1,8 @@
 const About = ()=> {
   return (
       <div className="container">
-        <h1>Jamia Islamaia Imdadia</h1>
+        <h1>Al-Abtaal</h1>
+        <p>Please call 0314-3582009 for contact or query</p>
       </div>
   );
 }
