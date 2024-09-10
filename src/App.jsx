@@ -3,9 +3,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import {Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import Home from "./components/Home";
 import About from "./components/About";
-import Categories from "./components/Categories";
-import Category from "./components/Category";
-import Session from "./components/Session";
 import Header from "./components/Header";
 import Confirmation from "./components/Confirmation";
 import Subjects from "./components/Subjects";
@@ -35,12 +32,6 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home/>}/>
           <Route path="about" element={<About/>}/>
-          <Route path="categories" element={<Categories/>}>
-            <Route path=":catId" element={<Category/>}>
-              <Route path=":sessionId" element={<Session/>}/>
-            </Route>
-            <Route index element={<p><b>Select a category from above</b></p>}/>
-          </Route>
           <Route path="subjects" element={<Subjects/>}/>
           <Route path="authors" element={<Authors/>}/>
           <Route path="publishers" element={<Publishers/>}/>
