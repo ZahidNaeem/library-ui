@@ -1,6 +1,6 @@
 // ================== variables ==================
 const HOST = 'localhost';
-const PORT = '8081';
+const PORT = '8082';
 export const BASE_URL = `http://${HOST}:${PORT}/api`;
 
 export const AUTH_URL = 'auth';
