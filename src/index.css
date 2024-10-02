@@ -5,6 +5,7 @@
 
 body {
   margin: 0;
+  overflow: auto;
   color: #222;
   font-family: "Inter var", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
