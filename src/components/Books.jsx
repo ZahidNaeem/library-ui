@@ -5,7 +5,7 @@ import {findAllAuthors} from "../api/AuthorService";
 import {findAllSubjects} from "../api/SubjectService";
 import {findAllPublishers} from "../api/PublisherService";
 import {findAllResearchers} from "../api/ResearcherService";
-import {findAllShelves} from "../api/ShelfService";
+import {findAllRacks} from "../api/RackService";
 
 const Books = () => {
 
@@ -13,11 +13,21 @@ const Books = () => {
   const [subjects, setSubjects] = useState([]);
   const [publishers, setPublishers] = useState([]);
   const [researchers, setResearchers] = useState([]);
-  const [shelves, setShelves] = useState([]);
+  const [racks, setRacks] = useState([]);
 
   const getBooks = useCallback(async (data, params) => {
     try {
-      return await findAllPaginatedBooks(data, params);
+      const response = await findAllPaginatedBooks(data, params);
+      response.data.entity.list
+      .forEach(element => {
+        const authorNames = element.authors.map(author => author.name).join(", ");
+        const subjectNames = element.subjects.map(subject => subject.name).join(", ");
+        const researcherNames = element.researchers.map(researcher => researcher.name).join(", ");
+        element["authorNames"] = authorNames;
+        element["subjectNames"] = subjectNames;
+        element["researcherNames"] = researcherNames;
+      });
+      return response;
     } catch (e) {
       console.log(e.response.data);
       return e.response;
@@ -64,10 +74,12 @@ const Books = () => {
     }
   }, []);
 
-  const getShelves = useCallback(async () => {
+  const getRacks = useCallback(async () => {
     try {
-      const response = await findAllShelves();
-      return response.data.entity;
+      const response = await findAllRacks();
+      return response.data.entity && response.data.entity.map(rack => {
+        return {id: rack.id, name: `${rack.shelfName} - ${rack.name}`};
+      });
     } catch (e) {
       console.log(e.response.data);
       return [];
@@ -100,16 +112,22 @@ const Books = () => {
 
   useEffect(() => {
     getAuthors()
-    .then(authors => setAuthors(authors));
+    .then(authors => setAuthors(authors.map(author => {
+      return {id: author.id, name: author.name};
+    })));
     getSubjects()
-    .then(subjects => setSubjects(subjects));
+    .then(subjects => setSubjects(subjects.map(subject => {
+      return {id: subject.id, name: subject.name};
+    })));
     getPublishers()
     .then(publishers => setPublishers(publishers));
     getResearchers()
-    .then(researchers => setResearchers(researchers));
-    getShelves()
-    .then(shelves => setShelves(shelves));
-  }, [getAuthors, getPublishers, getResearchers, getShelves, getSubjects]);
+    .then(researchers => setResearchers(researchers.map(researcher => {
+      return {id: researcher.id, name: researcher.name};
+    })));
+    getRacks()
+    .then(racks => setRacks(racks));
+  }, [getAuthors, getPublishers, getResearchers, getRacks, getSubjects]);
 
   const bookConditionList = [
     {value: 'New'},
@@ -127,6 +145,19 @@ const Books = () => {
       tableKey: "name",
       modalKey: "name",
       title: "Name",
+      tableType: "text",
+      modalType: "input",
+      required: true,
+      sort: true,
+      filter: true,
+      filterModel: "",
+      filterType: "input",
+    },
+
+    {
+      tableKey: "bookNumber",
+      modalKey: "bookNumber",
+      title: "Book Number",
       tableType: "text",
       modalType: "input",
       required: true,
@@ -179,14 +210,15 @@ const Books = () => {
     },
 
     {
-      tableKey: "authorName",
-      modalKey: "author",
+      tableKey: "authorNames",
+      modalKey: "authors",
       title: "Author",
       tableType: "text",
       modalType: "select",
       list: authors,
       listLabelKey: "name",
-      listReturnKey: "id",
+      listReturnKey: null,
+      multiple: true,
       required: true,
       sort: true,
       filter: true,
@@ -195,14 +227,15 @@ const Books = () => {
     },
 
     {
-      tableKey: "subjectName",
-      modalKey: "subject",
+      tableKey: "subjectNames",
+      modalKey: "subjects",
       title: "Subject",
       tableType: "text",
       modalType: "select",
       list: subjects,
       listLabelKey: "name",
-      listReturnKey: "id",
+      listReturnKey: null,
+      multiple: true,
       required: true,
       sort: true,
       filter: true,
@@ -226,29 +259,15 @@ const Books = () => {
     },
 
     {
-      tableKey: "researcherName",
-      modalKey: "researcher",
+      tableKey: "researcherNames",
+      modalKey: "researchers",
       title: "Researcher",
       tableType: "text",
       modalType: "select",
       list: researchers,
       listLabelKey: "name",
-      listReturnKey: "id",
-      sort: true,
-      filter: true,
-      filterModel: "",
-      filterType: "enum",
-    },
-
-    {
-      tableKey: "shelfName",
-      modalKey: "shelf",
-      title: "Shelf",
-      tableType: "text",
-      modalType: "select",
-      list: shelves,
-      listLabelKey: "name",
-      listReturnKey: "id",
+      listReturnKey: null,
+      multiple: true,
       sort: true,
       filter: true,
       filterModel: "",
@@ -278,6 +297,34 @@ const Books = () => {
           tableType: "text",
           modalType: "input",
           required: true,
+          sort: true,
+          filter: true,
+          filterModel: "",
+          filterType: "input",
+        },
+
+        {
+          tableKey: "rackName",
+          modalKey: "rack",
+          title: "Rack",
+          tableType: "text",
+          modalType: "select",
+          list: racks,
+          listLabelKey: "name",
+          listReturnKey: "id",
+          required: true,
+          sort: true,
+          filter: true,
+          filterModel: "",
+          filterType: "enum",
+        },
+
+        {
+          tableKey: "pages",
+          modalKey: "pages",
+          title: "Total Pages",
+          tableType: "text",
+          modalType: "input",
           sort: true,
           filter: true,
           filterModel: "",
