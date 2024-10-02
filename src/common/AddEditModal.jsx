@@ -4,6 +4,7 @@ import {useCallback, useEffect, useState} from "react";
 import _ from "lodash";
 import DropdownWithSearchOption from "./DropdownWithSearchOption";
 import NestedTableComponent from "./NestedTableComponent";
+import {getCustomDropdownValue, getFirstElement} from "./Constants";
 
 const AddEditModal = ({
   title,
@@ -27,15 +28,22 @@ const AddEditModal = ({
     setUpdatedObject(object);
   }
 
-  function onDropdownChange(array, filterKey, column) {
+  function onDropdownChange(array, conf) {
+    const {listReturnKey, modalKey, multiple} = conf;
     const object = {...updatedObject};
-    if (array && array.length > 0) {
-      const firstElementReturnValue = array[0][filterKey];
-      if (firstElementReturnValue) {
-        object[column] = firstElementReturnValue;
+    if (multiple) {
+      if (listReturnKey) {
+        object[modalKey] = array.map(element => element[listReturnKey]);
+      } else {
+        object[modalKey] = array;
       }
     } else {
-      object[column] = null;
+      const firstElement = getFirstElement(array);
+      if (listReturnKey) {
+        object[modalKey] = firstElement[listReturnKey] || null;
+      } else {
+        object[modalKey] = firstElement;
+      }
     }
     setUpdatedObject(object);
   }
@@ -81,7 +89,7 @@ const AddEditModal = ({
             {configurations && configurations.map((conf, index) => (
                 <div key={index}>
                   <Form.Group key={index} style={{display: "flex"}} className="mb-3">
-                    <Form.Label className="label-default-size">{conf.title}</Form.Label>
+                    <Form.Label className="label-default-size" style={{color: conf.required ? 'red' : 'auto'}}>{conf.title}</Form.Label>
                     {conf.modalType === 'input' &&
                         <Form.Control type="input" name={conf.modalKey} value={updatedObject[conf.modalKey] || ''} onChange={onChange}/>}
                     {conf.modalType === 'date' &&
@@ -93,8 +101,8 @@ const AddEditModal = ({
                         <DropdownWithSearchOption
                             options={conf.list}
                             multiple={conf.multiple || false}
-                            onChange={(array) => onDropdownChange(array, conf.listReturnKey, conf.modalKey)}
-                            value={conf.list.filter(element => element[conf.listReturnKey] === updatedObject[conf.modalKey])}
+                            onChange={(array) => onDropdownChange(array, conf)}
+                            value={() => getCustomDropdownValue(conf, updatedObject)}
                             labelKey={conf.listLabelKey}/>
                     }
                     {conf.modalType === 'checkbox' &&

@@ -1,6 +1,6 @@
 import AddEditModal from "./AddEditModal";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import {Fragment, useCallback, useEffect, useMemo, useState} from "react";
+import {toast} from "react-toastify";
 import plusImage from '../images/plus.svg';
 import pencilImage from '../images/pencil.svg';
 import trashImage from '../images/trash.svg';
@@ -41,36 +41,36 @@ const BasicLayout = ({
   const tableData = useMemo(() => {
     return tableDataObject.map(row => {
       configurations
-        .filter((obj) => obj.modalType === "date")
-        .map((obj) => obj.modalKey)
-        .forEach(key => {
-          row[key] = row[key].split("T")[0];
-        });
+      .filter((obj) => obj.modalType === "date")
+      .map((obj) => obj.modalKey)
+      .forEach(key => {
+        row[key] = row[key] && row[key].split("T")[0];
+      });
       return row;
     });
   }, [tableDataObject, configurations]);
 
   const populateTable = useCallback(async () => {
     try {
-      const params = { pageNumber, pageSize, sortBy, sortDirection };
+      const params = {pageNumber, pageSize, sortBy, sortDirection};
 
       const response = await refreshData(filterObject, params);
       setTableDataObject(response.data.entity.list);
       const configWithNestedConfig = configurations.find(
-        (obj) => obj.configType === "nested"
+          (obj) => obj.configType === "nested"
       );
       if (configWithNestedConfig) {
         setNestedConfig(configWithNestedConfig.nestedConfig);
         setNestedField(configWithNestedConfig.nestedKey);
       }
       configurations
-        .filter((obj) => obj.modalType === "date")
-        .map((obj) => obj.modalKey)
-        .forEach((key) => {
-          response.data.entity.list.forEach((row) => {
-            row[key] = row[key].split("T")[0];
-          });
+      .filter((obj) => obj.modalType === "date")
+      .map((obj) => obj.modalKey)
+      .forEach((key) => {
+        response.data.entity.list.forEach((row) => {
+          row[key] = row[key] && row[key].split("T")[0];
         });
+      });
       const pages = response.data.entity.totalPages;
       const currentPage = response.data.entity.pageNumber;
       setPageNumber(Math.min(pages > 0 ? pages - 1 : 0, currentPage > -1 ? currentPage : 0));
@@ -102,7 +102,7 @@ const BasicLayout = ({
     setTableRow({});
     const defaultValues = configurations.filter((conf) => conf.default);
     defaultValues.forEach(
-      (val) => (tableRow[val.modalKey] = val.default)
+        (val) => (tableRow[val.modalKey] = val.default)
     );
     setOperation('Add');
   }
@@ -119,7 +119,7 @@ const BasicLayout = ({
 
   const saveData = async (tableRow) => {
     console.log(
-      `save from BasicLayout component called with operation: ${operation} - data: ${JSON.stringify(tableRow)}`,
+        `save from BasicLayout component called with operation: ${operation} - data: ${JSON.stringify(tableRow)}`,
     );
     try {
       const response = await saveFunction(tableRow, operation);
@@ -177,7 +177,7 @@ const BasicLayout = ({
 
   const getSortObject = (column) => {
     let sortObject = sortContents
-      .find(element => element.column === column);
+    .find(element => element.column === column);
     if (!sortObject) {
       sortObject = {
         column,
@@ -210,15 +210,15 @@ const BasicLayout = ({
     setTableDataObject(sortedTableData);
     const sortArray = [...sortContents];
     sortArray
-      .forEach(element => {
-        if (element.column === column) {
-          element.active = true;
-          element.sortAsc = asc;
-        } else {
-          element.active = false;
-          element.sortAsc = true;
-        }
-      });
+    .forEach(element => {
+      if (element.column === column) {
+        element.active = true;
+        element.sortAsc = asc;
+      } else {
+        element.active = false;
+        element.sortAsc = true;
+      }
+    });
     setSortContents(sortArray);
   }
 
@@ -226,7 +226,7 @@ const BasicLayout = ({
     const element = event.target;
     if (element) {
       const bottomOfWindow =
-        element.offsetHeight + element.scrollTop >= element.scrollHeight;
+          element.offsetHeight + element.scrollTop >= element.scrollHeight;
       if (element.scrollTop === 0) {
         const scroll = await dropDownConfig.paginationFunction(-1);
         if (scroll) {
@@ -245,178 +245,201 @@ const BasicLayout = ({
   }, [filterObject, populateTable]);
 
   const onFilterChange = (name, value) => {
-    setFilterObject({ ...filterObject, [name]: value });
+    const object = {...filterObject};
+    if (value) {
+      object[name] = value;
+    } else {
+      Reflect.deleteProperty(object, name);
+    }
+    setFilterObject(object);
+  }
+
+  const onDropdownFilterChange = (array, conf) => {
+    const {listReturnKey, modalKey} = conf;
+    const object = {...filterObject};
+    let value;
+    if (listReturnKey) {
+      value = array.map(element => element[listReturnKey]);
+    } else {
+      value = array;
+    }
+    if (value && value.length > 0) {
+      object[modalKey] = value;
+    } else {
+      Reflect.deleteProperty(object, modalKey);
+    }
+    setFilterObject(object);
   }
 
   return (
-    <div>
-      <h1 className="form-title">{formTitle} Form</h1>
-      <section>
-        {tableData &&
-          <div className="pagination-container">
-            <img className="custom-img" src={first} alt="first" onClick={firstPage} />
-            <img className="custom-img" src={previous} alt="previous" onClick={previousPage} />
-            <span className="inner-pagination-content m-3">Page {pageNumber + 1} of {totalPages}</span>
-            <img className="custom-img" src={next} alt="next" onClick={nextPage} />
-            <img className="custom-img" src={last} alt="last" onClick={lastPage} />
+      <div>
+        <h1 className="form-title">{formTitle} Form</h1>
+        <section>
+          {tableData &&
+              <div className="pagination-container">
+                <img className="custom-img" src={first} alt="first" onClick={firstPage}/>
+                <img className="custom-img" src={previous} alt="previous" onClick={previousPage}/>
+                <span className="inner-pagination-content m-3">Page {pageNumber + 1} of {totalPages}</span>
+                <img className="custom-img" src={next} alt="next" onClick={nextPage}/>
+                <img className="custom-img" src={last} alt="last" onClick={lastPage}/>
+              </div>
+          }
+          <div className="page-size">
+            <label htmlFor="pageSize" className="col-form-label">Records Per Page</label>
+            <select className="form-select" aria-label="Select an option" id="pageSize"
+                    onChange={(e) => setPageSize(e.target.value)}
+                    value={pageSize}>
+              <option key="5" value="5">5</option>
+              <option key="10" value="10">10</option>
+              <option key="25" value="25">25</option>
+              <option key="50" value="50">50</option>
+              <option key="100" value="100">100</option>
+            </select>
           </div>
-        }
-        <div className="page-size">
-          <label htmlFor="pageSize" className="col-form-label">Records Per Page</label>
-          <select className="form-select" aria-label="Select an option" id="pageSize"
-            onChange={(e) => setPageSize(e.target.value)}
-            value={pageSize}>
-            <option key="5" value="5">5</option>
-            <option key="10" value="10">10</option>
-            <option key="25" value="25">25</option>
-            <option key="50" value="50">50</option>
-            <option key="100" value="100">100</option>
-          </select>
-        </div>
-      </section>
-      <div className="main-page">
-        <img className="custom-img" src={plusImage} alt="Add Row" onClick={() => add()} />
-        <div className="awesome-table">
-          <table className="table table-stripped table-hover scrollable">
-            <thead>
+        </section>
+        <div className="main-page">
+          <img className="custom-img" src={plusImage} alt="Add Row" onClick={() => add()}/>
+          <div className="awesome-table">
+            <table className="table table-stripped table-hover scrollable">
+              <thead>
               <tr>
                 <th scope="col" className="short-column-center">#</th>
                 {configurations && configurations.map((obj, index) =>
-                  <th key={`${obj.tableKey}-${index}`} scope="col">
-                    <div className="d-flex flex-row">
-                      {obj.filter &&
-                        <div>
-                          {obj.filterType === 'input' &&
-                            <input className="form-control" type="text" name={obj.modalKey}
-                              value={filterObject[obj.tableKey] || ''} onChange={(e) => onFilterChange(e.target.name, e.target.value)} />}
-                          {obj.filterType === 'date' &&
-                            <input className="form-control" type="date" name={obj.modalKey}
-                              value={filterObject[obj.tableKey] || ''} onChange={(e) => onFilterChange(e.target.name, e.target.value)} />}
-                          {obj.filterType === 'checkbox' &&
-                            <input className="form-control" type="checkbox" name={obj.modalKey}
-                              value={filterObject[obj.tableKey] || ''} onChange={(e) => onFilterChange(e.target.name, e.target.value)} />}
-                          {obj.filterType === 'enum' &&
-                            <div className="typeahead-container">
-                              <DropdownWithSearchOption
-                                options={obj.list}
-                                multiple={true}
-                                labelKey={obj.listLabelKey}
-                                onChange={(array) => onFilterChange(obj.listReturnKey, array.map(elem => elem[obj.listReturnKey]))} />
+                    <th key={`${obj.tableKey}-${index}`} scope="col">
+                      <div className="d-flex flex-row">
+                        {obj.filter &&
+                            <div>
+                              {obj.filterType === 'input' &&
+                                  <input className="form-control" type="text" name={obj.modalKey}
+                                         value={filterObject[obj.tableKey] || ''} onChange={(e) => onFilterChange(e.target.name, e.target.value)}/>}
+                              {obj.filterType === 'date' &&
+                                  <input className="form-control" type="date" name={obj.modalKey}
+                                         value={filterObject[obj.tableKey] || ''} onChange={(e) => onFilterChange(e.target.name, e.target.value)}/>}
+                              {obj.filterType === 'checkbox' &&
+                                  <input className="form-control" type="checkbox" name={obj.modalKey}
+                                         value={filterObject[obj.tableKey] || ''} onChange={(e) => onFilterChange(e.target.name, e.target.value)}/>}
+                              {obj.filterType === 'enum' &&
+                                  <div className="typeahead-container">
+                                    <DropdownWithSearchOption
+                                        options={obj.list}
+                                        multiple={true}
+                                        labelKey={obj.listLabelKey}
+                                        onChange={(array) => onDropdownFilterChange(array, obj)}/>
+                                  </div>
+                              }
                             </div>
-                          }
-                        </div>
-                      }
-                      {obj.sort &&
-                        <div className="d-flex flex-row" style={{ marginLeft: '10px' }}>
-                          <img className="custom-img-shrink" src={getSortImage(obj.tableKey)} alt="Sort"
-                            onClick={() => applySort(obj.tableKey)} />
-                        </div>}
-                    </div>
-                    <div>{obj.title}</div>
-                  </th>
+                        }
+                        {obj.sort &&
+                            <div className="d-flex flex-row" style={{marginLeft: '10px'}}>
+                              <img className="custom-img-shrink" src={getSortImage(obj.tableKey)} alt="Sort"
+                                   onClick={() => applySort(obj.tableKey)}/>
+                            </div>}
+                      </div>
+                      <div>{obj.title}</div>
+                    </th>
                 )}
                 <th scope="col" className="short-column-center">Options</th>
                 {nestedConfig.length > 0 &&
-                  <th scope="col" className="short-column-center" />}
+                    <th scope="col" className="short-column-center"/>}
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {tableData && tableData.map((row, index) =>
-                <Fragment key={row.id}>
-                  <tr>
-                    <td className="short-column-center">{index + 1}</td>
-                    {configurations && configurations.map((obj, index) =>
-                      <td key={`${index}-${row[obj.tableKey]}`}>
-                        {obj.tableType === 'text' && row[obj.tableKey]}
-                        {obj.tableType === 'date' && row[obj.tableKey] && new Date(row[obj.tableKey]).toLocaleDateString()}
-                        {obj.tableType === 'checkbox' &&
-                          <div>
-                            <div className="form-check">
-                              <input className="form-check-input" type="checkbox" disabled
-                                value={row[obj.tableKey]} />
-                            </div>
-                          </div>}
-                      </td>
-                    )}
-                    <td>
-                      <img src={pencilImage} alt="Edit" className="m-3 cursor-pointer"
-                        onClick={() => edit(row)} />
-                      <img src={trashImage} alt="Delete" className="m-1 cursor-pointer"
-                        onClick={() => {
-                          setTableRow(row);
-                          setOperation('Delete');
-                        }} />
-                    </td>
-                    {nestedConfig && nestedConfig.length > 0 &&
-                      <td className="short-column-center cursor-pointer">
-                        <img src={isRowExpanded(row.id) ? doubleArrowDown : doubleArrowRight} alt="details"
-                          className="m-3 cursor-pointer"
-                          onClick={() => toggleExpandDetails(row.id)} />
-                      </td>}
-                  </tr>
-                  {nestedConfig.length > 0 &&
+                  <Fragment key={row.id}>
                     <tr>
-                      <td colSpan="100">
-                        {isRowExpanded(row.id) &&
-                          <div className="card card-body">
-                            <table className="table table-stripped table-hover">
-                              <thead>
-                                <tr>
-                                  <th scope="col" className="short-column-center">#</th>
-                                  {nestedConfig && nestedConfig.map((nestedObj) =>
-                                    <th key={`${nestedObj.tableKey}-${row.id}`} scope="col">{nestedObj.title}</th>
-                                  )}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {row[nestedField] && row[nestedField].map((nestedRow, nestedIndex) =>
-                                  <tr key={nestedRow.id}>
-                                    <td className="short-column-center">{nestedIndex + 1}</td>
-                                    {nestedConfig && nestedConfig.map((nestedObj) =>
-                                      <td key={`${nestedObj.tableKey}-${nestedRow.id}`}>
-                                        {nestedObj.tableType === 'text' ?
-                                          nestedRow[nestedObj.tableKey]
-                                          : nestedObj.tableType === 'date' ?
-                                            nestedRow[nestedObj.tableKey] && new Date(nestedRow[nestedObj.tableKey]).toLocaleDateString()
-                                            : nestedObj.tableType === 'checkbox' ?
-                                              <div>
-                                                <div className="form-check">
-                                                  <input className="form-check-input" type="checkbox" disabled
-                                                    value={nestedRow[nestedObj.tableKey]} />
-                                                </div>
-                                              </div> : null
-                                        }
-                                      </td>
-                                    )}
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        }
+                      <td className="short-column-center">{index + 1}</td>
+                      {configurations && configurations.map((obj, index) =>
+                          <td key={`${index}-${row[obj.tableKey]}`}>
+                            {obj.tableType === 'text' && row[obj.tableKey]}
+                            {obj.tableType === 'date' && row[obj.tableKey] && new Date(row[obj.tableKey]).toLocaleDateString()}
+                            {obj.tableType === 'checkbox' &&
+                                <div>
+                                  <div className="form-check">
+                                    <input className="form-check-input" type="checkbox" disabled
+                                           value={row[obj.tableKey]}/>
+                                  </div>
+                                </div>}
+                          </td>
+                      )}
+                      <td>
+                        <img src={pencilImage} alt="Edit" className="m-3 cursor-pointer"
+                             onClick={() => edit(row)}/>
+                        <img src={trashImage} alt="Delete" className="m-1 cursor-pointer"
+                             onClick={() => {
+                               setTableRow(row);
+                               setOperation('Delete');
+                             }}/>
                       </td>
+                      {nestedConfig && nestedConfig.length > 0 &&
+                          <td className="short-column-center cursor-pointer">
+                            <img src={isRowExpanded(row.id) ? doubleArrowDown : doubleArrowRight} alt="details"
+                                 className="m-3 cursor-pointer"
+                                 onClick={() => toggleExpandDetails(row.id)}/>
+                          </td>}
                     </tr>
-                  }
-                </Fragment>
+                    {nestedConfig.length > 0 &&
+                        <tr>
+                          <td colSpan="100">
+                            {isRowExpanded(row.id) &&
+                                <div className="card card-body">
+                                  <table className="table table-stripped table-hover">
+                                    <thead>
+                                    <tr>
+                                      <th scope="col" className="short-column-center">#</th>
+                                      {nestedConfig && nestedConfig.map((nestedObj) =>
+                                          <th key={`${nestedObj.tableKey}-${row.id}`} scope="col">{nestedObj.title}</th>
+                                      )}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {row[nestedField] && row[nestedField].map((nestedRow, nestedIndex) =>
+                                        <tr key={nestedRow.id}>
+                                          <td className="short-column-center">{nestedIndex + 1}</td>
+                                          {nestedConfig && nestedConfig.map((nestedObj) =>
+                                              <td key={`${nestedObj.tableKey}-${nestedRow.id}`}>
+                                                {nestedObj.tableType === 'text' ?
+                                                    nestedRow[nestedObj.tableKey]
+                                                    : nestedObj.tableType === 'date' ?
+                                                        nestedRow[nestedObj.tableKey] && new Date(nestedRow[nestedObj.tableKey]).toLocaleDateString()
+                                                        : nestedObj.tableType === 'checkbox' ?
+                                                            <div>
+                                                              <div className="form-check">
+                                                                <input className="form-check-input" type="checkbox" disabled
+                                                                       value={nestedRow[nestedObj.tableKey]}/>
+                                                              </div>
+                                                            </div> : null
+                                                }
+                                              </td>
+                                          )}
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                  </table>
+                                </div>
+                            }
+                          </td>
+                        </tr>
+                    }
+                  </Fragment>
               )}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
+        {tableRow && operation && operation.toLowerCase() !== 'delete' &&
+            <AddEditModal
+                configurations={configurations}
+                title={`${operation} ${formTitle}`}
+                currentObject={tableRow}
+                handelSave={async (updatedObject) => saveData(updatedObject)}
+                handleClose={() => handleModalClose()}/>
+        }
+        {tableRow && operation.toLowerCase() === 'delete' &&
+            <DeleteModal
+                handelDelete={() => deleteRow(tableRow.id)}
+                handleClose={() => handleModalClose()}/>
+        }
       </div>
-      {tableRow && operation && operation.toLowerCase() !== 'delete' &&
-        <AddEditModal
-          configurations={configurations}
-          title={`${operation} ${formTitle}`}
-          currentObject={tableRow}
-          handelSave={async (updatedObject) => saveData(updatedObject)}
-          handleClose={() => handleModalClose()} />
-      }
-      {tableRow && operation.toLowerCase() === 'delete' &&
-        <DeleteModal
-          handelDelete={() => deleteRow(tableRow.id)}
-          handleClose={() => handleModalClose()} />
-      }
-    </div>
   );
 }
 export default BasicLayout;

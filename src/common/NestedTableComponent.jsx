@@ -2,6 +2,7 @@ import DropdownWithSearchOption from "./DropdownWithSearchOption";
 import plusImage from "../images/plus.svg";
 import trashImage from '../images/trash.svg';
 import {useState} from "react";
+import {getCustomDropdownValue, getFirstElement} from "./Constants";
 
 const NestedTableComponent = ({configurations, nestedTableData, onNestedTableChange}) => {
 
@@ -29,6 +30,27 @@ const NestedTableComponent = ({configurations, nestedTableData, onNestedTableCha
     onNestedTableChange(data);
   }
 
+  function onDropdownChange(array, conf, index) {
+    const {listReturnKey, modalKey, multiple} = conf;
+    const data = [...tableData];
+    if (multiple) {
+      if (listReturnKey) {
+        data[index][modalKey] = array.map(element => element[listReturnKey]);
+      } else {
+        data[index][modalKey] = array;
+      }
+    } else {
+      const firstElement = getFirstElement(array);
+      if (listReturnKey) {
+        data[index][modalKey] = firstElement[listReturnKey] || null;
+      } else {
+        data[index][modalKey] = firstElement;
+      }
+    }
+    setTableData(data);
+    onNestedTableChange(data);
+  }
+
   return (
       <div>
         <img className="custom-img" src={plusImage} alt="Add Row" onClick={() => addRow()}/>
@@ -39,7 +61,7 @@ const NestedTableComponent = ({configurations, nestedTableData, onNestedTableCha
               <th key="modalNestedTableHeaderRowNumber" scope="col" className="short-column-center">#</th>
               {configurations && configurations.map(obj =>
                   <th key={`modalNestedTableHeader${obj.modalKey}`} scope="col">
-                    <div>{obj.title}</div>
+                    <div key={obj.title} style={{color: obj.required ? 'red' : 'auto'}}>{obj.title}</div>
                   </th>
               )}
               <th key="modalNestedTableOptionsHeader" scope="col" className="short-column-center"></th>
@@ -68,9 +90,9 @@ const NestedTableComponent = ({configurations, nestedTableData, onNestedTableCha
                               <DropdownWithSearchOption
                                   options={obj.list}
                                   multiple={obj.multiple || false}
-                                  value={obj.list.filter(element => element[obj.listReturnKey] === row[obj.modalKey]) || []}
+                                  value={()=> getCustomDropdownValue(obj, row)}
                                   labelKey={obj.listLabelKey}
-                                  onChange={(array) => onChange(index, obj.modalKey, array.map(elem => elem[obj.listReturnKey]).join(","))}/>
+                                  onChange={(array) => onDropdownChange(array, obj, index)}/>
                             </div>
                         }
                       </td>

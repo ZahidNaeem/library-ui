@@ -1,3 +1,4 @@
+// ================== variables ==================
 const HOST = 'localhost';
 const PORT = '8081';
 export const BASE_URL = `http://${HOST}:${PORT}/api`;
@@ -28,3 +29,17 @@ export const READERS_URL = "readers";
 export const READERS_SEARCH_URL = READERS_URL + "/search";
 export const BOOK_TRANS_HEADERS_URL = "bookTransHeaders";
 export const BOOK_TRANS_HEADERS_SEARCH_URL = BOOK_TRANS_HEADERS_URL + "/search";
+// ================== functions ==================
+
+export const getCustomDropdownValue = (conf, object) => {
+  console.log(conf, object);
+  let value;
+  if (conf.listReturnKey) {
+    value = conf.list.filter(element => element[conf.listReturnKey] === object[conf.modalKey]) || [];
+  } else {
+    value = conf.list.filter(element => object[conf.modalKey] && object[conf.modalKey].some(obj => obj.id === element.id)) || [];
+  }
+  return value;
+}
+
+export const getFirstElement = (arr) => arr?.[0] ?? null;
