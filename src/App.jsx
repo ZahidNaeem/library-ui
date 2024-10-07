@@ -10,7 +10,7 @@ import Authors from "./components/Authors";
 import Shelves from "./components/Shelves";
 import Login from "./components/Login";
 import {toast, ToastContainer} from "react-toastify";
-import {isTokenValid, login} from "./api/AuthService";
+import {isTokenValid, login, logout} from "./api/AuthService";
 import CreateUser from "./components/CreateUser";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import Books from "./components/Books";
@@ -22,9 +22,24 @@ import BookTrans from "./components/BookTrans";
 const App = () => {
 
   const [routes, setRoutes] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const logoutRequest = useCallback(() => {
+    logout()
+    .then((response) => {
+      console.log("Response", response);
+      setIsLoggedIn(false);
+      navigate("login");
+    })
+    .catch(e => {
+      console.log(e);
+      toast.error(e.response.data.message);
+      setIsLoggedIn(true);
+    });
+  }, [navigate]);
 
   const secureRoutes = useMemo(() => (
       <>
@@ -43,19 +58,20 @@ const App = () => {
           <Route path="*" element={<h1 className="not-found">Page Not Found</h1>}/>
         </Routes>
       </>
-  ), []);
+  ), [logoutRequest]);
 
   const loginRequest = useCallback((loginData) => {
-    localStorage.removeItem('authorization');
+    setIsLoggedIn(false);
     login(loginData)
     .then(response => {
       const data = response.data;
-      localStorage.setItem('authorization', JSON.stringify(data.entity));
-      setRoutes(secureRoutes);
-      navigate("/");
+      if(data.success) {
+        setIsLoggedIn(true);
+        setRoutes(secureRoutes);
+        navigate("/");
+      }
     })
     .catch(e => {
-      localStorage.removeItem('authorization');
       console.log(e);
       toast.error(e.response.data.message);
     });
@@ -65,6 +81,7 @@ const App = () => {
     {path: "login", element: <Login loginRequest={(loginData) => loginRequest(loginData)}/>},
     {path: "signup", element: <CreateUser/>},
     {path: "confirmed", element: <Confirmation/>},
+    {path: "*", element: <h1 className="not-found">Page Not Found</h1>},
   ], [loginRequest]);
 
   const navigateToLogin = useCallback(() => {
@@ -77,10 +94,6 @@ const App = () => {
     navigate("login");
   }, [insecureRoutesMap, navigate]);
 
-  const logoutRequest = () => {
-    localStorage.removeItem('authorization');
-  }
-
   const updateRoute = useCallback(() => {
     const router = insecureRoutesMap.find(route => "/" + route.path === location.pathname);
     if (router) {
@@ -90,25 +103,13 @@ const App = () => {
           </Routes>
       );
     } else {
-      const authorization = JSON.parse(localStorage.getItem('authorization'));
-      if (authorization) {
-        isTokenValid({jwt: authorization.accessToken})
-        .then(response => {
-          if (response.data.success) {
-            setRoutes(secureRoutes);
-          } else {
-            navigateToLogin();
-          }
-        })
-        .catch(e => {
-          console.log(e);
-          navigateToLogin();
-        });
+      if (isLoggedIn) {
+        setRoutes(secureRoutes);
       } else {
         navigateToLogin();
       }
     }
-  }, [insecureRoutesMap, location, navigateToLogin, secureRoutes]);
+  }, [insecureRoutesMap, isLoggedIn, location.pathname, navigateToLogin, secureRoutes]);
 
   useEffect(() => {
     updateRoute();

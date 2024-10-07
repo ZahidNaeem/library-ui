@@ -5,9 +5,10 @@ export const BASE_URL = `http://${HOST}:${PORT}/api`;
 
 export const AUTH_URL = 'auth';
 export const LOGIN_URL = `${AUTH_URL}/login`;
-export const CURRENT_USER_URL = `${AUTH_URL}/user/me`;
+export const LOGOUT_URL = `${AUTH_URL}/logout`;
 export const VALIDATE_TOKEN_URL = AUTH_URL + '/validate-token';
 export const USERS_URL = 'users';
+export const CURRENT_USER_URL = `${BASE_URL}/user/me`;
 export const SUBJECTS_URL = 'subjects';
 export const SUBJECTS_SEARCH_URL = SUBJECTS_URL + "/search";
 export const AUTHORS_URL = 'authors';

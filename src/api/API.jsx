@@ -3,20 +3,13 @@ import axios from "axios";
 
 const instance = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
 });
 
-instance.interceptors.request.use((config) => {
-  const authorization = JSON.parse(localStorage.getItem('authorization'));
-
-  if (authorization) {
-    config.headers['Authorization'] = `${authorization.tokenType} ${authorization.accessToken}`;
-  }
-  return config;
-});
 instance.interceptors.response.use((response) => {
       return response;
     },
@@ -27,4 +20,5 @@ instance.interceptors.response.use((response) => {
       return Promise.reject(error);
     }
 );
+
 export default instance;
