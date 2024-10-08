@@ -10,7 +10,7 @@ import Authors from "./components/Authors";
 import Shelves from "./components/Shelves";
 import Login from "./components/Login";
 import {toast, ToastContainer} from "react-toastify";
-import {isTokenValid, login, logout} from "./api/AuthService";
+import {login, logout} from "./api/AuthService";
 import CreateUser from "./components/CreateUser";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import Books from "./components/Books";
@@ -22,24 +22,33 @@ import BookTrans from "./components/BookTrans";
 const App = () => {
 
   const [routes, setRoutes] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // Retrieve the state from local storage if it exists
+    const savedState = localStorage.getItem('isLoggedIn');
+    return savedState !== null ? JSON.parse(savedState) : false;
+  });
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const setLoginState = useCallback((value)=> {
+    localStorage.setItem('isLoggedIn', JSON.stringify(value));
+    setIsLoggedIn(value);
+  },[]);
 
   const logoutRequest = useCallback(() => {
     logout()
     .then((response) => {
       console.log("Response", response);
-      setIsLoggedIn(false);
+      setLoginState(false);
       navigate("login");
     })
     .catch(e => {
       console.log(e);
       toast.error(e.response.data.message);
-      setIsLoggedIn(true);
+      setLoginState(true);
     });
-  }, [navigate]);
+  }, [navigate, setLoginState]);
 
   const secureRoutes = useMemo(() => (
       <>
@@ -61,12 +70,12 @@ const App = () => {
   ), [logoutRequest]);
 
   const loginRequest = useCallback((loginData) => {
-    setIsLoggedIn(false);
+    setLoginState(false);
     login(loginData)
     .then(response => {
       const data = response.data;
-      if(data.success) {
-        setIsLoggedIn(true);
+      if (data.success) {
+        setLoginState(true);
         setRoutes(secureRoutes);
         navigate("/");
       }
@@ -75,7 +84,7 @@ const App = () => {
       console.log(e);
       toast.error(e.response.data.message);
     });
-  }, [navigate, secureRoutes]);
+  }, [navigate, secureRoutes, setLoginState]);
 
   const insecureRoutesMap = useMemo(() => [
     {path: "login", element: <Login loginRequest={(loginData) => loginRequest(loginData)}/>},
@@ -112,8 +121,9 @@ const App = () => {
   }, [insecureRoutesMap, isLoggedIn, location.pathname, navigateToLogin, secureRoutes]);
 
   useEffect(() => {
+    localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
     updateRoute();
-  }, [updateRoute]);
+  }, [isLoggedIn, updateRoute]);
 
   return (
       <>

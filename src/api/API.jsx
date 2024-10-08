@@ -15,6 +15,7 @@ instance.interceptors.response.use((response) => {
     },
     (error) => {
       if (error.response && error.response.status === 401) {
+        localStorage.setItem('isLoggedIn', JSON.stringify(false));
         window.location.href = '/login'; // Redirect to login page
       }
       return Promise.reject(error);
