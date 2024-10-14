@@ -221,25 +221,6 @@ const BasicLayout = ({
     });
     setSortContents(sortArray);
   }
-
-  const handleScroll = async (event, dropDownConfig) => {
-    const element = event.target;
-    if (element) {
-      const bottomOfWindow =
-          element.offsetHeight + element.scrollTop >= element.scrollHeight;
-      if (element.scrollTop === 0) {
-        const scroll = await dropDownConfig.paginationFunction(-1);
-        if (scroll) {
-          element.scrollTop = element.scrollHeight - 1000;
-        }
-      } else if (bottomOfWindow) {
-        const scroll = await dropDownConfig.paginationFunction(1);
-        if (scroll) {
-          element.scrollTop = 1000;
-        }
-      }
-    }
-  }
   useEffect(() => {
     populateTable();
   }, [filterObject, populateTable]);
