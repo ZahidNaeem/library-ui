@@ -188,6 +188,7 @@ const Books = () => {
       list: bookConditionList,
       listLabelKey: "value",
       listReturnKey: "value",
+      required: true,
       sort: true,
       filter: true,
       filterModel: "",
